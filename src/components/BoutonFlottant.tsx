@@ -1,20 +1,40 @@
+import Link from 'next/link';
 /**
- * Le bouton d'accès rapide, en bas à droite.
+ * Le bouton flottant d'aide.
  *
- * Sur un catalogue, la question qui revient est toujours la même : « où est le
- * jeu que je cherche ». Ce bouton ramène à la recherche depuis n'importe quelle
- * page, sans remonter en haut — c'est le geste le plus fréquent, autant qu'il
- * soit toujours à portée de pouce.
+ * Sur la maquette c'est un cadre néon biseauté ouvert — les traits ne se
+ * rejoignent pas aux angles. C'est ce qui le distingue d'une pastille ronde
+ * ordinaire, et ce qui le rattache au reste de la charte.
  */
 export function BoutonFlottant() {
   return (
-    <a
-      href="/catalogue"
-      aria-label="Search the catalogue"
-      className="fixed bottom-5 right-5 z-40 grid h-12 w-12 place-items-center rounded-full border-2 border-neon-cyan bg-fond-panneau text-lg text-neon-cyan transition-all hover:bg-neon-cyan/15"
-      style={{ boxShadow: '0 0 6px rgba(34,224,255,0.8), 0 0 18px rgba(34,224,255,0.45)' }}
+    <Link
+      href="/guides"
+      className="group fixed bottom-6 right-6 z-40 hidden h-14 w-14 place-items-center sm:grid"
+      aria-label="Read the guides"
     >
-      ⌕
-    </a>
+      <svg viewBox="0 0 56 56" className="absolute inset-0 h-full w-full" fill="none" aria-hidden>
+        {/* Cadre ouvert : quatre équerres, pas un rectangle. */}
+        <path
+          d="M4 18 V8 L14 8 M42 8 H52 V18 M52 38 V48 H42 M14 48 H4 V38"
+          stroke="#2fd8f5"
+          strokeWidth="2"
+          className="transition-[stroke] group-hover:stroke-[#f13fdc]"
+        />
+      </svg>
+      <svg
+        viewBox="0 0 24 24"
+        className="relative h-6 w-6 text-neon-cyan transition-colors group-hover:text-neon-magenta"
+        fill="none"
+        aria-hidden
+      >
+        <path
+          d="M4 5h16v10H9l-5 4V5Z"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </Link>
   );
 }

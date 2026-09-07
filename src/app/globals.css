@@ -11,23 +11,140 @@
  */
 :root {
   color-scheme: dark;
-  --police-titre: 'Segoe UI', system-ui, sans-serif;
-  --police-corps: system-ui, sans-serif;
+  /* La profondeur de la coupe d'angle. Un seul chiffre commande toute la
+     charte — panneaux, cartes, boutons — et les trois s'accordent parce
+     qu'ils lisent la même variable. */
+  --coupe: 16px;
 }
 
 body {
   @apply bg-fond text-texte font-corps antialiased;
+  /*
+   * La charte pose des halos et des tracés volontairement hors cadre — le
+   * dégradé de l'accroche déborde de 96 px à droite, par construction. Chaque
+   * section qui en porte un est en `overflow-hidden`, mais il suffit d'en
+   * oublier une pour que la page entière se mette à défiler latéralement au
+   * téléphone. Cette ligne est le filet ; elle ne remplace pas le confinement
+   * section par section.
+   */
+  overflow-x: hidden;
 }
 
-/* Le liseré néon des panneaux, factorisé : il revient sur chaque carte. */
 @layer components {
-  .panneau {
-    @apply rounded-xl border border-fond-bordure bg-fond-panneau shadow-carte;
+  /*
+   * ── La découpe ──────────────────────────────────────────────────────────
+   *
+   * Coupe en haut à gauche et en bas à droite. La diagonale reste constante
+   * quelle que soit la taille du bloc : un pourcentage se déformerait sur un
+   * bandeau large, et l'angle ne serait plus à 45°.
+   */
+  .biseau {
+    clip-path: polygon(
+      var(--coupe) 0,
+      100% 0,
+      100% calc(100% - var(--coupe)),
+      calc(100% - var(--coupe)) 100%,
+      0 100%,
+      0 var(--coupe)
+    );
   }
-  .liseré-cyan {
-    @apply border border-neon-cyan/40 shadow-neon-cyan;
+
+  .biseau-petit {
+    --coupe: 9px;
+    clip-path: polygon(
+      var(--coupe) 0,
+      100% 0,
+      100% calc(100% - var(--coupe)),
+      calc(100% - var(--coupe)) 100%,
+      0 100%,
+      0 var(--coupe)
+    );
   }
-  .liseré-magenta {
-    @apply border border-neon-magenta/40 shadow-neon-magenta;
+
+  /* Coupe sur les quatre angles — pour les vignettes et les pastilles. */
+  .biseau-quatre {
+    --coupe: 10px;
+    clip-path: polygon(
+      var(--coupe) 0,
+      calc(100% - var(--coupe)) 0,
+      100% var(--coupe),
+      100% calc(100% - var(--coupe)),
+      calc(100% - var(--coupe)) 100%,
+      var(--coupe) 100%,
+      0 calc(100% - var(--coupe)),
+      0 var(--coupe)
+    );
+  }
+
+  /*
+   * ── Le cadre néon ───────────────────────────────────────────────────────
+   *
+   * Une bordure ordinaire suit le rectangle, pas la découpe : le liseré
+   * disparaît dans les angles coupés, et il ne reste qu'un panneau tronqué
+   * sans contour. La seule façon de faire courir un trait le long de la
+   * diagonale est d'empiler deux formes biseautées — le dégradé dessous,
+   * le fond du panneau dessus, à un pixel près.
+   */
+  .cadre {
+    @apply relative isolate p-px;
+  }
+  .cadre > .cadre-fond {
+    @apply block h-full w-full bg-fond-panneau;
+  }
+
+  /*
+   * ── Les boutons tube ────────────────────────────────────────────────────
+   *
+   * Le halo est porté par `filter`, pas par `box-shadow`, pour la même raison
+   * que les panneaux : une ombre portée ignore la découpe.
+   */
+  .tube {
+    @apply relative inline-flex items-center justify-center px-6 py-2.5 font-ui text-[13px] font-bold uppercase tracking-[0.08em] transition-all;
+    --coupe: 11px;
+    clip-path: polygon(
+      var(--coupe) 0,
+      100% 0,
+      100% calc(100% - var(--coupe)),
+      calc(100% - var(--coupe)) 100%,
+      0 100%,
+      0 var(--coupe)
+    );
+  }
+  .tube-magenta {
+    @apply bg-neon-magenta text-white;
+    filter: drop-shadow(0 0 8px rgba(241, 63, 220, 0.55));
+  }
+  .tube-magenta:hover {
+    filter: drop-shadow(0 0 16px rgba(241, 63, 220, 0.85));
+  }
+  .tube-cyan {
+    @apply bg-fond/70 text-neon-cyan;
+    box-shadow: inset 0 0 0 2px #2fd8f5;
+    filter: drop-shadow(0 0 7px rgba(47, 216, 245, 0.45));
+  }
+  .tube-cyan:hover {
+    @apply bg-neon-cyan/10;
+    filter: drop-shadow(0 0 15px rgba(47, 216, 245, 0.75));
+  }
+
+  /*
+   * ── Le champ de recherche ───────────────────────────────────────────────
+   *
+   * Sur la maquette, sa bordure n'est pas d'une couleur : elle passe du cyan
+   * au magenta le long du tube. C'est le seul élément de la page à porter les
+   * deux néons à la fois, et c'est ce qui en fait le point d'entrée.
+   */
+  .champ-neon {
+    @apply relative rounded-full p-[2.5px];
+    /* La bascule se fait tard : le cyan tient la première moitié, le magenta
+       ne s'impose que sur le dernier tiers. Un dégradé centré donnerait un
+       violet franc au milieu — et deux néons fondus en un troisième, c'est
+       exactement l'effet qu'on ne veut pas. */
+    background: linear-gradient(96deg, #2fd8f5 0%, #35c8f2 32%, #8b5cf6 62%, #f13fdc 92%);
+    filter: drop-shadow(0 0 8px rgba(47, 216, 245, 0.4))
+      drop-shadow(0 0 12px rgba(241, 63, 220, 0.32));
+  }
+  .champ-neon > * {
+    @apply rounded-full bg-[#171d2c];
   }
 }

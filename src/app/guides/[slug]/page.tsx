@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { EnTete } from '@/components/EnTete';
@@ -34,7 +35,7 @@ export default async function Guide({ params }: { params: Promise<{ slug: string
       <EnTete />
       <main className="mx-auto max-w-[760px] px-6 py-8">
         <nav className="mb-5 font-mono text-[11px] text-texte-faible">
-          <a href="/guides" className="hover:text-neon-cyan">Guides</a>
+          <Link href="/guides" className="hover:text-neon-cyan">Guides</Link>
         </nav>
 
         <h1 className="font-titre text-[28px] font-black uppercase leading-[1.05] tracking-tight text-white sm:text-[34px]">

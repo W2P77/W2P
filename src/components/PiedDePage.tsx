@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Liseré } from './DecorNeon';
 
 /**
@@ -29,16 +30,16 @@ export function PiedDePage() {
             <div>
               <p className="mb-2 font-semibold uppercase tracking-wide text-texte-faible">Browse</p>
               <ul className="space-y-1.5">
-                <li><a href="/catalogue" className="text-texte-doux hover:text-neon-cyan">Catalogue</a></li>
-                <li><a href="/demos" className="text-texte-doux hover:text-neon-cyan">Free demos</a></li>
-                <li><a href="/reviews" className="text-texte-doux hover:text-neon-cyan">Verified slots</a></li>
+                <li><Link href="/catalogue" className="text-texte-doux hover:text-neon-cyan">Catalogue</Link></li>
+                <li><Link href="/demos" className="text-texte-doux hover:text-neon-cyan">Free demos</Link></li>
+                <li><Link href="/reviews" className="text-texte-doux hover:text-neon-cyan">Verified slots</Link></li>
               </ul>
             </div>
             <div>
               <p className="mb-2 font-semibold uppercase tracking-wide text-texte-faible">Learn</p>
               <ul className="space-y-1.5">
-                <li><a href="/guides" className="text-texte-doux hover:text-neon-cyan">Guides</a></li>
-                <li><a href="/account" className="text-texte-doux hover:text-neon-cyan">My games</a></li>
+                <li><Link href="/guides" className="text-texte-doux hover:text-neon-cyan">Guides</Link></li>
+                <li><Link href="/account" className="text-texte-doux hover:text-neon-cyan">My games</Link></li>
               </ul>
             </div>
           </nav>

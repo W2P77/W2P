@@ -1,13 +1,173 @@
+import type { ReactNode } from 'react';
+
 /**
- * Les éléments de décor néon : équerres, tirets, encoches.
+ * Les éléments de décor néon.
  *
  * Ils sont regroupés ici plutôt qu'éparpillés dans les pages, parce qu'ils
- * reviennent partout et qu'ils doivent rester cohérents. Tous sont
- * `aria-hidden` : ce sont des ornements, ils n'ont rien à annoncer à un
- * lecteur d'écran.
+ * reviennent partout et qu'ils doivent rester cohérents. Tous les ornements
+ * sont `aria-hidden` : ils n'ont rien à annoncer à un lecteur d'écran.
  */
 
-/** Équerre d'angle, comme celles qui encadrent le visuel de l'accroche. */
+type Teinte = 'cyan' | 'magenta' | 'mixte';
+
+const DEGRADES: Record<Teinte, string> = {
+  cyan: 'linear-gradient(135deg,#2fd8f5 0%,rgba(47,216,245,0.35) 45%,rgba(47,216,245,0.15) 100%)',
+  magenta: 'linear-gradient(135deg,#f13fdc 0%,rgba(241,63,220,0.35) 45%,rgba(241,63,220,0.15) 100%)',
+  mixte: 'linear-gradient(135deg,#2fd8f5 0%,#8b5cf6 50%,#f13fdc 100%)',
+};
+
+const LUEURS: Record<Teinte, string> = {
+  cyan: 'drop-shadow(0 0 4px rgba(47,216,245,0.4))',
+  magenta: 'drop-shadow(0 0 4px rgba(241,63,220,0.4))',
+  mixte: 'drop-shadow(0 0 4px rgba(139,92,246,0.4))',
+};
+
+/**
+ * Un panneau biseauté, liseré compris.
+ *
+ * ── Pourquoi deux éléments imbriqués ──────────────────────────────────────
+ *
+ * Parce qu'une `border` suit le rectangle et pas la découpe : dans les angles
+ * coupés, le trait s'interrompt et le panneau se retrouve sans contour là où
+ * il est le plus visible. On empile donc le dégradé dessous et le fond du
+ * panneau dessus, décalé d'un pixel — le pixel qui dépasse **est** le liseré,
+ * et il suit la diagonale parce qu'il porte la même découpe.
+ *
+ * Le halo passe par `filter`, jamais par `box-shadow` : une ombre portée
+ * ignore le `clip-path` et redessine un rectangle autour du panneau.
+ */
+export function Panneau({
+  children,
+  teinte = 'mixte',
+  className = '',
+  epaisseur = 1,
+}: {
+  children: ReactNode;
+  teinte?: Teinte;
+  className?: string;
+  epaisseur?: 1 | 2;
+}) {
+  return (
+    <div
+      className="biseau relative"
+      style={{ background: DEGRADES[teinte], padding: epaisseur, filter: LUEURS[teinte] }}
+    >
+      <div className={`biseau h-full w-full bg-fond-panneau ${className}`}>{children}</div>
+    </div>
+  );
+}
+
+/**
+ * Le motif de chevrons qui suit un titre de section.
+ *
+ * Sur la maquette, il n'est pas symétrique : deux barres pleines, puis une
+ * traîne de barres de plus en plus fines. C'est ce dégradé de densité qui
+ * donne la direction — un peigne régulier ferait tapisserie.
+ */
+export function Chevrons({ inverse = false }: { inverse?: boolean }) {
+  const barres = [
+    { h: 22, l: 5, c: '#f13fdc' },
+    { h: 20, l: 5, c: '#f13fdc' },
+    { h: 17, l: 3, c: '#a855f7' },
+    { h: 15, l: 3, c: '#8b5cf6' },
+    { h: 13, l: 2, c: '#7c6cf0' },
+    { h: 11, l: 2, c: '#5f8ef2' },
+    { h: 9, l: 2, c: '#42b3f4' },
+    { h: 7, l: 2, c: '#2fd8f5' },
+  ];
+  return (
+    <span
+      className="flex shrink-0 items-center gap-[3px]"
+      style={{ transform: inverse ? 'scaleX(-1)' : undefined }}
+      aria-hidden
+    >
+      {barres.map((b, i) => (
+        <span
+          key={i}
+          style={{
+            height: b.h,
+            width: b.l,
+            background: b.c,
+            transform: 'skewX(-20deg)',
+            opacity: 1 - i * 0.07,
+          }}
+        />
+      ))}
+    </span>
+  );
+}
+
+/**
+ * Un tracé de circuit imprimé.
+ *
+ * ── Pourquoi il est dessiné et non répété ─────────────────────────────────
+ *
+ * Un motif qui se répète se lit comme une texture ; un circuit se lit parce
+ * qu'il va quelque part. Les coudes sont donc à 45°, comme la découpe des
+ * panneaux, et chaque ligne se termine sur un nœud — sans terminaison, un
+ * trait qui s'arrête au milieu du vide a l'air d'un bug d'affichage.
+ */
+export function TraceCircuit({
+  cote = 'gauche',
+  className = '',
+}: {
+  cote?: 'gauche' | 'droite';
+  className?: string;
+}) {
+  const traits = [
+    { d: 'M0 8 H46 L58 20 H150', c: '#2fd8f5', o: 0.85 },
+    { d: 'M0 20 H30 L40 30 H92', c: '#f13fdc', o: 0.6 },
+    { d: 'M0 32 H18 L28 42 H70 L78 34 H132', c: '#ff9d4d', o: 0.55 },
+    { d: 'M0 44 H58', c: '#8b5cf6', o: 0.45 },
+  ];
+  const noeuds = [
+    { x: 150, y: 8, c: '#2fd8f5' },
+    { x: 92, y: 30, c: '#f13fdc' },
+    { x: 132, y: 34, c: '#ff9d4d' },
+  ];
+  return (
+    <svg
+      viewBox="0 0 160 52"
+      className={className}
+      fill="none"
+      aria-hidden
+      style={{ transform: cote === 'droite' ? 'scaleX(-1)' : undefined }}
+    >
+      {traits.map((t, i) => (
+        <path key={i} d={t.d} stroke={t.c} strokeOpacity={t.o} strokeWidth="1.4" />
+      ))}
+      {noeuds.map((n, i) => (
+        <rect key={i} x={n.x - 2} y={n.y - 2} width="4" height="4" fill={n.c} />
+      ))}
+    </svg>
+  );
+}
+
+/**
+ * La conduite néon qui longe un bord et se coude en biseau.
+ *
+ * C'est l'élément que la maquette répète le plus : un double trait cyan et
+ * orange qui court sous l'en-tête, se casse à 45°, et repart. Il ne sépare
+ * rien — il relie, et c'est ce qui fait tenir la page comme un seul appareil
+ * plutôt que comme une pile de blocs.
+ */
+export function Conduite({ className = '' }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 1200 26"
+      preserveAspectRatio="none"
+      className={className}
+      fill="none"
+      aria-hidden
+    >
+      <path d="M0 5 H820 L840 25 H1200" stroke="#f13fdc" strokeWidth="2" strokeOpacity="0.9" />
+      <path d="M0 11 H806 L826 31 H1200" stroke="#2fd8f5" strokeWidth="1.6" strokeOpacity="0.55" />
+      <path d="M120 19 H780 L800 39 H1200" stroke="#ff9d4d" strokeWidth="1.4" strokeOpacity="0.5" />
+    </svg>
+  );
+}
+
+/** Équerre d'angle, pour souligner un coin sans enfermer le bloc. */
 export function Equerre({
   position,
   couleur = 'cyan',
@@ -25,13 +185,13 @@ export function Equerre({
   return <span className={`pointer-events-none absolute h-7 w-7 ${bord} ${teinte}`} aria-hidden />;
 }
 
-/** La paire de tirets qui ponctue les titres de section. */
+/** La paire de tirets qui ponctue un titre secondaire. */
 export function Tirets() {
   return (
     <span className="flex shrink-0 items-center gap-1.5" aria-hidden>
-      <span className="h-[3px] w-7 rounded-full bg-neon-magenta shadow-neon-magenta" />
-      <span className="h-[3px] w-3.5 rounded-full bg-neon-violet" />
-      <span className="h-[3px] w-1.5 rounded-full bg-neon-cyan" />
+      <span className="h-[3px] w-7 bg-neon-magenta shadow-neon-magenta" />
+      <span className="h-[3px] w-3.5 bg-neon-violet" />
+      <span className="h-[3px] w-1.5 bg-neon-cyan" />
     </span>
   );
 }
@@ -45,7 +205,9 @@ export function Liseré({ inverse = false }: { inverse?: boolean }) {
           ? 'bg-gradient-to-l from-neon-magenta via-neon-violet to-neon-cyan'
           : 'bg-gradient-to-r from-neon-magenta via-neon-violet to-neon-cyan'
       }`}
-      style={{ clipPath: inverse ? 'polygon(4% 0, 100% 0, 100% 100%, 0 100%)' : 'polygon(0 0, 96% 0, 100% 100%, 0 100%)' }}
+      style={{
+        clipPath: inverse ? 'polygon(4% 0, 100% 0, 100% 100%, 0 100%)' : 'polygon(0 0, 96% 0, 100% 100%, 0 100%)',
+      }}
       aria-hidden
     />
   );
@@ -56,40 +218,21 @@ export function Chapeau({ texte }: { texte: string }) {
   return (
     <span className="mb-3 flex items-center gap-2">
       <span className="h-[3px] w-8 bg-neon-cyan shadow-neon-cyan" aria-hidden />
-      <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-neon-cyan">
+      <span className="font-ui text-[10px] font-semibold uppercase tracking-[0.3em] text-neon-cyan">
         {texte}
       </span>
     </span>
   );
 }
 
-/**
- * Le cadre anguleux qui encercle un bloc.
- *
- * Sur la maquette, l'accroche est tenue par deux traits néon qui courent en
- * haut et sur les côtés, coupés en biseau aux angles. Ce n'est pas une bordure
- * : c'est ce qui donne au bloc son air de panneau de contrôle. Une simple
- * `border` produit un rectangle, pas une découpe.
- */
-export function CadreAnguleux() {
+/** Un titre de section, avec sa ponctuation de chevrons. */
+export function TitreSection({ children }: { children: ReactNode }) {
   return (
-    <div className="pointer-events-none absolute inset-0 z-10" aria-hidden>
-      {/* Trait supérieur, biseauté à droite */}
-      <span
-        className="absolute left-0 top-0 h-[2px] w-full bg-gradient-to-r from-neon-magenta via-neon-violet to-transparent"
-        style={{ clipPath: 'polygon(0 0, 92% 0, 96% 100%, 0 100%)' }}
-      />
-      {/* Trait inférieur, biseauté à gauche */}
-      <span
-        className="absolute bottom-0 left-0 h-[2px] w-full bg-gradient-to-r from-transparent via-neon-violet to-neon-cyan"
-        style={{ clipPath: 'polygon(6% 0, 100% 0, 100% 100%, 2% 100%)' }}
-      />
-      {/* Montants latéraux, courts : ils suggèrent le cadre sans l'enfermer */}
-      <span className="absolute left-0 top-0 h-16 w-[2px] bg-gradient-to-b from-neon-magenta to-transparent" />
-      <span className="absolute bottom-0 right-0 h-16 w-[2px] bg-gradient-to-t from-neon-cyan to-transparent" />
-      {/* Encoches d'angle */}
-      <span className="absolute left-0 top-0 h-6 w-6 border-l-2 border-t-2 border-neon-magenta" />
-      <span className="absolute bottom-0 right-0 h-6 w-6 border-b-2 border-r-2 border-neon-cyan" />
+    <div className="mb-5 flex items-center gap-4">
+      <h2 className="font-titre text-[22px] font-extrabold uppercase leading-none tracking-[0.01em] text-white sm:text-[26px]">
+        {children}
+      </h2>
+      <Chevrons />
     </div>
   );
 }

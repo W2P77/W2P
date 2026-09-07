@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { Logo } from './Logo';
+import { Conduite, TraceCircuit } from './DecorNeon';
 
 /**
  * L'en-tête, et son menu mobile.
@@ -15,10 +17,10 @@ import { useState } from 'react';
  *
  * ── Les liens décrivent ce qui existe ─────────────────────────────────────
  *
- * `REVIEWS`, `GUIDES` et `ACCOUNT` renvoyaient une 404. Un menu qui promet
- * quatre sections vides abîme plus la confiance qu'un menu de trois entrées
- * qui marchent — surtout sur un site dont l'argument est de ne rien affirmer
- * qu'il ne puisse tenir.
+ * Un menu qui promet des sections vides abîme plus la confiance qu'un menu
+ * court qui marche — surtout sur un site dont l'argument est de ne rien
+ * affirmer qu'il ne puisse tenir. Chaque entrée ci-dessous mène à une page
+ * réelle.
  */
 const LIENS = [
   { label: 'HOME', href: '/' },
@@ -33,37 +35,52 @@ const LIENS = [
 export function EnTete() {
   const chemin = usePathname();
   const [ouvert, setOuvert] = useState(false);
-  const actif = (href: string) =>
-    href === '/' ? chemin === '/' : chemin.startsWith(href);
+  const actif = (href: string) => (href === '/' ? chemin === '/' : chemin.startsWith(href));
 
   return (
-    <header className="relative z-30 border-b border-neon-cyan/20">
-      <div className="mx-auto flex max-w-[1400px] items-center gap-8 px-6 py-3">
-        <Link href="/" className="flex shrink-0 items-center gap-3">
-          <span
-            className="grid h-11 w-11 place-items-center border-2 border-neon-cyan bg-fond-carte text-xl shadow-neon-cyan"
-            style={{ clipPath: 'polygon(20% 0, 100% 0, 100% 80%, 80% 100%, 0 100%, 0 20%)' }}
-            aria-hidden
-          >
-            🎰
-          </span>
-          <span className="font-titre text-[20px] font-bold tracking-tight text-white sm:text-[22px]">
-            where<span className="text-neon-cyan">2</span>play
-            <span className="text-texte-doux">.info</span>
+    <header className="relative z-30 bg-[#080b16]">
+      {/*
+       * Les tracés de circuit occupent leur propre bande, au-dessus de la
+       * barre. Posés en absolu derrière elle, ils passaient sous le dernier
+       * lien de navigation — « ACCOUNT » se lisait sur un enchevêtrement de
+       * traits. Un décor qui abîme la lisibilité d'un lien n'est plus un
+       * décor, et le régler en baissant l'opacité n'aurait fait que le rendre
+       * sale au lieu d'illisible.
+       */}
+      <div className="relative hidden h-[26px] lg:block" aria-hidden>
+        <TraceCircuit className="absolute left-0 top-0 h-[26px] w-[150px] opacity-80" />
+        <TraceCircuit cote="droite" className="absolute right-0 top-0 h-[26px] w-[150px] opacity-80" />
+      </div>
+
+      <div className="mx-auto flex max-w-[1440px] items-center gap-8 px-6 pb-4 pt-1 lg:pt-0">
+        <Link href="/" className="flex shrink-0 items-center gap-2.5">
+          <Logo className="h-9 w-9 shrink-0 drop-shadow-lueur-cyan sm:h-11 sm:w-11" />
+          <span className="font-titre text-[19px] font-extrabold tracking-[0.005em] text-white sm:text-[23px] lg:text-[26px]">
+            where<span className="text-neon-magenta">2</span>play
+            <span className="font-normal text-texte-doux">.info</span>
           </span>
         </Link>
 
-        <nav className="ml-auto hidden items-center gap-7 xl:flex">
+        <nav className="ml-auto hidden items-center gap-6 xl:flex">
           {LIENS.map((l) => (
             <Link
               key={l.href}
               href={l.href}
-              className={`text-[13px] font-semibold tracking-[0.04em] transition-colors ${
-                actif(l.href) ? 'text-neon-magenta' : 'text-texte-doux hover:text-neon-cyan'
+              className={`relative font-ui text-[13px] font-semibold uppercase tracking-[0.06em] transition-colors ${
+                actif(l.href) ? 'text-neon-magenta' : 'text-white/85 hover:text-neon-cyan'
               }`}
             >
               {l.label}
-              {l.chevron && <span className="ml-1.5 text-neon-cyan">›</span>}
+              {l.chevron && <span className="ml-1 text-neon-cyan">›</span>}
+              {/* La barre d'état actif, sous le mot : sur la maquette c'est
+                  elle qui dit où l'on est, pas seulement la couleur — une
+                  différence de teinte seule ne se voit pas en daltonisme. */}
+              {actif(l.href) && (
+                <span
+                  className="absolute -bottom-1.5 left-0 h-[2px] w-full bg-neon-magenta shadow-neon-magenta"
+                  aria-hidden
+                />
+              )}
             </Link>
           ))}
         </nav>
@@ -71,7 +88,7 @@ export function EnTete() {
         <button
           type="button"
           onClick={() => setOuvert((o) => !o)}
-          className="ml-auto grid h-9 w-9 place-items-center rounded border border-neon-cyan/50 text-neon-cyan xl:hidden"
+          className="biseau-petit ml-auto grid h-10 w-10 place-items-center border-2 border-neon-cyan/60 font-ui text-neon-cyan xl:hidden"
           aria-expanded={ouvert}
           aria-label={ouvert ? 'Close menu' : 'Open menu'}
         >
@@ -86,7 +103,7 @@ export function EnTete() {
               key={l.href}
               href={l.href}
               onClick={() => setOuvert(false)}
-              className={`block border-b border-fond-bordure px-6 py-3.5 text-[13px] font-semibold tracking-wide last:border-0 ${
+              className={`block border-b border-fond-bordure px-6 py-3.5 font-ui text-[13px] font-semibold uppercase tracking-wide last:border-0 ${
                 actif(l.href) ? 'text-neon-magenta' : 'text-texte-doux'
               }`}
             >
@@ -96,11 +113,8 @@ export function EnTete() {
         </nav>
       )}
 
-      <div
-        className="h-[3px] bg-gradient-to-r from-neon-magenta via-neon-violet to-neon-cyan"
-        style={{ clipPath: 'polygon(0 0, 96% 0, 100% 100%, 0 100%)' }}
-        aria-hidden
-      />
+      {/* La conduite néon qui court sous la barre et se coude à 45°. */}
+      <Conduite className="h-[26px] w-full" />
     </header>
   );
 }

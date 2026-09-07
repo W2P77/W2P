@@ -3,11 +3,23 @@ import type { Config } from 'tailwindcss';
 /**
  * La charte de where2play, en jetons.
  *
- * Un catalogue est un site qu'on parcourt vite : la lisibilité prime sur
- * l'effet. Le néon sert donc d'accent — bordures, halos, éléments actifs — et
- * jamais de fond de texte. Les valeurs vivent ici et nulle part ailleurs :
- * une couleur écrite en dur dans un composant est une couleur qu'on ne peut
- * plus changer.
+ * ── Ce qui fait l'identité, et qu'on ne peut pas obtenir avec des arrondis ─
+ *
+ * Toute la charte tient sur une découpe : les panneaux sont **biseautés à
+ * 45°** en haut à gauche et en bas à droite, et un liseré néon suit la coupe.
+ * Un `border-radius`, même généreux, donne un site sombre ordinaire ; c'est
+ * l'angle coupé qui donne l'air de panneau de contrôle. La découpe vit donc
+ * dans `globals.css` (`.biseau`), pas ici — Tailwind ne sait pas générer un
+ * `clip-path` paramétré.
+ *
+ * ── L'orange n'est pas décoratif ──────────────────────────────────────────
+ *
+ * Deux néons se lisent comme un dégradé ; trois se lisent comme un circuit.
+ * L'orange ne sert jamais à un état ni à une donnée — uniquement aux tracés —
+ * ce qui le distingue du cyan (action) et du magenta (actif, sélection).
+ *
+ * Les valeurs vivent ici et nulle part ailleurs : une couleur écrite en dur
+ * dans un composant est une couleur qu'on ne peut plus changer.
  */
 const config: Config = {
   content: ['./src/**/*.{ts,tsx}'],
@@ -15,31 +27,40 @@ const config: Config = {
     extend: {
       colors: {
         fond: {
-          DEFAULT: '#07050f',
-          panneau: '#0f0a1d',
-          carte: '#150e26',
-          bordure: '#2a1f46',
+          DEFAULT: '#070a14',
+          panneau: '#0d1121',
+          carte: '#141a2e',
+          bordure: '#212a47',
         },
         neon: {
-          magenta: '#ff2fd0',
-          cyan: '#22e0ff',
+          magenta: '#f13fdc',
+          cyan: '#2fd8f5',
           violet: '#8b5cf6',
+          /* Réservé aux tracés de circuit. Jamais un état, jamais une donnée. */
+          orange: '#ff9d4d',
         },
         texte: {
-          DEFAULT: '#f3eaff',
-          doux: '#a99ec4',
-          faible: '#6f6590',
+          DEFAULT: '#eef2ff',
+          doux: '#9aa5c8',
+          faible: '#65708f',
         },
         note: '#ffc247',
       },
       fontFamily: {
-        titre: ['var(--police-titre)', 'system-ui', 'sans-serif'],
+        titre: ['var(--police-titre)', 'Impact', 'sans-serif'],
+        ui: ['var(--police-ui)', 'system-ui', 'sans-serif'],
         corps: ['var(--police-corps)', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
-        'neon-magenta': '0 0 12px rgba(255,47,208,0.45), 0 0 32px rgba(255,47,208,0.18)',
-        'neon-cyan': '0 0 12px rgba(34,224,255,0.45), 0 0 32px rgba(34,224,255,0.18)',
+        'neon-magenta': '0 0 12px rgba(241,63,220,0.45), 0 0 32px rgba(241,63,220,0.18)',
+        'neon-cyan': '0 0 12px rgba(47,216,245,0.45), 0 0 32px rgba(47,216,245,0.18)',
         carte: '0 8px 28px rgba(0,0,0,0.55)',
+      },
+      dropShadow: {
+        /* `box-shadow` ignore un `clip-path` : le halo d'un panneau biseauté
+           doit passer par un filtre, sinon il déborde en rectangle. */
+        'lueur-cyan': ['0 0 5px rgba(47,216,245,0.55)', '0 0 16px rgba(47,216,245,0.25)'],
+        'lueur-magenta': ['0 0 5px rgba(241,63,220,0.55)', '0 0 16px rgba(241,63,220,0.25)'],
       },
       backgroundImage: {
         'grille-neon':
