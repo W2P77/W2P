@@ -1,4 +1,5 @@
 import { BadgePreuve, type Confiance } from './BadgePreuve';
+import { EtoileEnregistrer } from './EtoileEnregistrer';
 
 /**
  * La vignette d'un jeu.
@@ -32,7 +33,9 @@ export function CarteJeu({ jeu, index = 0 }: { jeu: JeuVignette; index?: number 
   const rtp = jeu.rtpStudio == null ? null : Number(jeu.rtpStudio);
 
   return (
-    <a
+    <div className="relative">
+      <EtoileEnregistrer jeu={jeu} />
+      <a
       href={`/slot/${jeu.studio.slug ?? ''}/${jeu.slug}`}
       className={`group flex flex-col overflow-hidden rounded-lg border-2 bg-fond-carte transition-all ${
         cyan
@@ -72,6 +75,7 @@ export function CarteJeu({ jeu, index = 0 }: { jeu: JeuVignette; index?: number 
           {jeu.volatilite ? VOLATILITE_EN[jeu.volatilite] ?? '' : jeu.studio.nom}
         </span>
       </div>
-    </a>
+      </a>
+    </div>
   );
 }

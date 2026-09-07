@@ -6,12 +6,43 @@ import { BarreFiltres } from '@/components/BarreFiltres';
 import { GrilleStudios } from '@/components/GrilleStudios';
 import { Tirets } from '@/components/DecorNeon';
 import { chercherJeux, studiosDuCatalogue } from '@/lib/donnees/catalogue';
+import { SITE_URL } from '@/lib/site';
 
-export const metadata: Metadata = {
-  title: 'Slot catalogue — RTP, volatility and demos',
-  description:
-    'Every slot with its RTP, volatility and max win — and where each number comes from.',
-};
+/**
+ * Les vues filtrées ne sont pas indexées, et c'est délibéré.
+ *
+ * Cinq filtres combinables sur sept cents jeux produisent des dizaines de
+ * milliers d'adresses, toutes construites à partir du même contenu. Les
+ * laisser indexer noierait les fiches — celles qui portent réellement le
+ * trafic — sous des pages de listes interchangeables.
+ *
+ * La page nue reste indexable : c'est l'entrée du catalogue. Les
+ * combinaisons, elles, existent pour être partagées et parcourues, pas
+ * référencées.
+ */
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>;
+}): Promise<Metadata> {
+  const sp = await searchParams;
+  const filtre = sp.q || sp.studio || sp.volatilite || sp.preuve || sp.rtpMin || sp.page;
+
+  if (filtre) {
+    return {
+      title: sp.q ? `Search: ${sp.q}` : 'Filtered catalogue',
+      robots: { index: false, follow: true },
+      alternates: { canonical: `${SITE_URL}/catalogue` },
+    };
+  }
+
+  return {
+    title: 'Slot catalogue — RTP, volatility and demos',
+    description:
+      'Every slot with its RTP, volatility and max win — and where each number comes from.',
+    alternates: { canonical: `${SITE_URL}/catalogue` },
+  };
+}
 
 export default async function Catalogue({
   searchParams,
@@ -78,9 +109,24 @@ export default async function Catalogue({
             }))}
           />
         ) : resultat.jeux.length === 0 ? (
-          <p className="panneau p-8 text-center text-sm text-texte-doux">
-            No slot matches these filters. Try widening one of them.
-          </p>
+          <div className="panneau p-8 text-center">
+            <p className="text-[15px] text-texte">
+              {sp.q ? (
+                <>No slot matches “{sp.q}”.</>
+              ) : (
+                <>No slot matches these filters.</>
+              )}
+            </p>
+            <p className="mx-auto mt-2 max-w-md text-[13px] text-texte-doux">
+              {sp.q
+                ? 'It may not be in the catalogue yet — we are adding games continuously. Try the provider name, or a shorter part of the title.'
+                : 'Try widening one criterion — the minimum RTP is the one that excludes the most games.'}
+            </p>
+            <div className="mt-5 flex flex-wrap justify-center gap-2.5">
+              <a href="/catalogue" className="tube tube-cyan">Clear all filters</a>
+              <a href="/demos" className="tube tube-magenta">Browse free demos</a>
+            </div>
+          </div>
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
             {resultat.jeux.map((j, i) => (
