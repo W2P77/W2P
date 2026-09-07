@@ -98,17 +98,17 @@ body {
    * Le halo est porté par `filter`, pas par `box-shadow`, pour la même raison
    * que les panneaux : une ombre portée ignore la découpe.
    */
+  /*
+   * Les commandes sont **arrondies**, les panneaux sont **biseautés**.
+   *
+   * Ce n'est pas une incohérence : c'est la règle de la maquette, et elle est
+   * lisible. Ce qui se clique est en pilule — boutons, champ de recherche ;
+   * ce qui contient est coupé à 45° — panneaux, cartes, plateaux. Biseauter
+   * les boutons comme je l'avais fait effaçait cette distinction et rendait
+   * toute la page uniformément anguleuse, donc plus plate.
+   */
   .tube {
-    @apply relative inline-flex items-center justify-center px-6 py-2.5 font-ui text-[13px] font-bold uppercase tracking-[0.08em] transition-all;
-    --coupe: 11px;
-    clip-path: polygon(
-      var(--coupe) 0,
-      100% 0,
-      100% calc(100% - var(--coupe)),
-      calc(100% - var(--coupe)) 100%,
-      0 100%,
-      0 var(--coupe)
-    );
+    @apply relative inline-flex items-center justify-center rounded-full px-8 py-3.5 font-ui text-[14px] font-bold uppercase tracking-[0.08em] transition-all;
   }
   .tube-magenta {
     @apply bg-neon-magenta text-white;

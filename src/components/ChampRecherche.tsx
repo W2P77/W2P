@@ -18,11 +18,20 @@
  */
 export function ChampRecherche({ className = '' }: { className?: string }) {
   return (
-    <div className={`biseau border border-white/[0.14] bg-[#0d1220]/80 px-4 py-4 backdrop-blur-sm sm:px-6 sm:py-6 ${className}`}
-      style={{ ["--coupe" as string]: "22px" }}>
+    /*
+     * Le plateau déborde de sa propre marge vers la gauche (`-ml-4`).
+     *
+     * Sur la maquette, c'est la **pilule** qui s'aligne sur le titre, pas le
+     * plateau : celui-ci la dépasse d'une dizaine de pixels de chaque côté,
+     * comme un support. Aligner le plateau décalait la pilule de 20 px vers la
+     * droite et cassait la colonne de texte — l'œil voit ce décalage même
+     * quand il ne sait pas le nommer.
+     */
+    <div className={`biseau -ml-4 border border-white/[0.14] bg-[#0d1220]/70 px-4 py-3 backdrop-blur-sm ${className}`}
+      style={{ ["--coupe" as string]: "18px" }}>
       <form role="search" action="/catalogue">
         <div className="champ-neon">
-          <div className="flex items-center gap-3 px-5 py-3.5 sm:px-7 sm:py-4">
+          <div className="flex items-center gap-3 px-5 py-2.5 sm:px-6 sm:py-3">
             <input
               type="search"
               name="q"

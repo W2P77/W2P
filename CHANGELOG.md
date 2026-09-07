@@ -2,6 +2,59 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Le rendu rejoint la maquette, point par point
+
+Découpage de la maquette sur une largeur utile de 920 px, ramenée à 1440
+(× 1,565). Sept écarts mesurés, sept corrigés :
+
+- **Le sur-titre « SLOT CATALOGUE » n'existe pas** sur la maquette. Il ajoutait
+  une ligne avant l'argument, au-dessus d'un titre qui dit déjà de quoi il
+  s'agit.
+- **Les commandes sont arrondies, les contenants biseautés.** Ce n'est pas une
+  incohérence, c'est la règle : ce qui se clique est en pilule — boutons, champ
+  de recherche ; ce qui contient est coupé à 45° — panneaux, cartes, plateaux.
+  Les avoir tous biseautés effaçait la distinction et rendait la page
+  uniformément anguleuse, donc plus plate.
+- **Le titre occupait 34 % de la largeur contre 52 %** sur la maquette : 62 px
+  au lieu de 72.
+- **Le sous-titre passait à la ligne**, ce qui poussait les boutons hors du
+  premier écran.
+- **La pilule de recherche s'aligne sur le titre, pas le plateau** : celui-ci
+  la dépasse d'une dizaine de pixels de chaque côté, comme un support.
+  Aligner le plateau décalait la pilule de 20 px — un écart que l'œil voit
+  sans savoir le nommer.
+- **Logo à 70 px** au lieu de 40, plus les quatre points cyan sous le
+  mot-marque.
+- **Rythme vertical compressé** pour que la première rangée de cartes soit
+  visible sans défiler : en-tête de 110 à 85 px, accroche resserrée.
+
+**Le visuel d'accroche.** Il occupe le flanc droit avec une arête diagonale,
+pas le cadre entier. En plein cadre, deux choses cassaient à la fois : le rendu
+est en 16:9 pour un bloc en 3,5:1, donc la borne perdait sa couronne et son
+socle ; et les enseignes du milieu de rue passaient derrière le titre et la
+barre de recherche, où elles n'étaient que du bruit. En panneau (~2:1), le
+recadrage tombe de 49 % à 11 %.
+
+**Pièges payés :**
+
+- **Le cadre biseauté remplissait tout le héros d'un lavis violet.** La
+  technique des deux calques suppose un intérieur **opaque** : le dégradé du
+  dessous n'est visible que sur le pixel qui dépasse. Ici l'intérieur devait
+  rester transparent pour laisser voir le fond — le dégradé couvrait donc tout.
+  Remplacé par six segments tracés : quatre bords droits qui s'arrêtent avant
+  les angles, deux diagonales de 23 px (16 × √2).
+- **Quatre halos à 15-25 % d'opacité se sont additionnés en un aplat magenta**
+  plus lumineux que la borne censée être le sujet. Un néon ne se voit que sur
+  du noir : le fond reste sombre à 90 %, la lumière est ponctuelle, jamais
+  ambiante.
+- **Les fondus de lisibilité sont horizontaux**, donc inopérants sous 1024 px
+  où le texte occupe toute la largeur : le sous-titre passait sur la borne
+  éclairée. Un voile uniforme, réservé au téléphone, rend le contraste.
+
+Cinq extensions sont acceptées pour le fichier d'accroche. N'en accepter
+qu'une aurait produit un fichier déposé au bon endroit, au bon nom, et
+toujours invisible.
+
 ## 2026-09-08 — Le tube néon de la barre de recherche
 
 Le contour paraissait flou et la pilule molle. La cause n'était pas la

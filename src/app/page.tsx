@@ -5,7 +5,7 @@ import { CarteJeu } from '@/components/CarteJeu';
 import { Accroche } from '@/components/Accroche';
 import { ChampRecherche } from '@/components/ChampRecherche';
 import { ListeGuides } from '@/components/ListeGuides';
-import { Panneau, TitreSection, Chapeau } from '@/components/DecorNeon';
+import { Panneau, TitreSection } from '@/components/DecorNeon';
 import { BoutonFlottant } from '@/components/BoutonFlottant';
 import { jeuxEnAvant, compterCatalogue } from '@/lib/donnees/jeux';
 import { studiosDuCatalogue } from '@/lib/donnees/catalogue';
@@ -27,20 +27,24 @@ export default async function Home() {
 
       <Accroche>
         <div className="max-w-2xl">
-          <Chapeau texte="slot catalogue" />
-
-          <h1 className="font-titre text-[34px] font-black uppercase leading-[0.88] tracking-[0.005em] text-white sm:text-[52px] md:text-[64px] lg:text-[74px]">
+          {/*
+           * Pas de sur-titre : la maquette attaque directement au titre. Un
+           * « SLOT CATALOGUE » au-dessus d'un titre qui dit déjà de quoi il
+           * s'agit ne fait qu'ajouter une ligne avant l'argument.
+           */}
+          <h1 className="font-titre text-[34px] font-black uppercase leading-[0.86] tracking-[0.005em] text-white sm:text-[50px] md:text-[60px] lg:text-[72px]">
             Discover your next
             <br />
             reel adventure
           </h1>
 
-          <p className="mt-5 max-w-lg font-corps text-[16px] leading-relaxed text-texte-doux">
-            Thousands of free slots, demos and expert reviews — with every number
-            telling you where it comes from.
+          {/* Une seule ligne : sur deux, le bloc perd sa densité et le bouton
+              descend hors du premier écran. */}
+          <p className="mt-4 max-w-[36rem] font-corps text-[17px] leading-snug text-texte-doux">
+            Thousands of free slots, demos and expert reviews — every number sourced.
           </p>
 
-          <div className="mt-7 flex flex-wrap gap-3">
+          <div className="mt-5 flex flex-wrap gap-3">
             <Link href="/demos" className="tube tube-magenta">
               Play free demos
             </Link>
@@ -50,11 +54,11 @@ export default async function Home() {
           </div>
         </div>
 
-        <ChampRecherche className="mt-8 max-w-[880px] sm:mt-10" />
+        <ChampRecherche className="mt-6 max-w-[646px] sm:mt-7" />
       </Accroche>
 
       {/* ── Les deux panneaux ────────────────────────────────────────────── */}
-      <section className="mx-auto grid max-w-[1440px] gap-6 px-6 py-10 lg:grid-cols-[1.75fr_1fr]">
+      <section className="mx-auto grid max-w-[1440px] gap-6 px-6 py-7 lg:grid-cols-[1.75fr_1fr]">
         <Panneau teinte="mixte" className="p-6">
           <TitreSection>Top rated slots this week</TitreSection>
 

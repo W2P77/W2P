@@ -228,8 +228,8 @@ export function Chapeau({ texte }: { texte: string }) {
 /** Un titre de section, avec sa ponctuation de chevrons. */
 export function TitreSection({ children }: { children: ReactNode }) {
   return (
-    <div className="mb-5 flex items-center gap-4">
-      <h2 className="font-titre text-[22px] font-extrabold uppercase leading-none tracking-[0.01em] text-white sm:text-[26px]">
+    <div className="mb-4 flex items-center gap-4">
+      <h2 className="font-titre text-[20px] font-extrabold uppercase leading-none tracking-[0.01em] text-white sm:text-[23px]">
         {children}
       </h2>
       <Chevrons />
