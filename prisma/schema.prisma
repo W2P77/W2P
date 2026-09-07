@@ -1,0 +1,123 @@
+// where2play — catalogue de machines à sous.
+//
+// ── Ce que ce schéma modélise différemment ────────────────────────────────
+//
+// Un jeu n'a pas « un » RTP, et c'est précisément l'erreur que commettent tous
+// les agrégateurs. Un même titre porte couramment :
+//
+//   · le RTP par défaut du studio ;
+//   · des paliers que l'opérateur configure, toujours plus bas ;
+//   · un RTP différent quand on achète le bonus, souvent plus haut ;
+//   · parfois une répartition jeu de base / tours gratuits.
+//
+// Vérifié le 06/09/2026 sur BetsRank : quatre fiches Red Tiger portaient le
+// palier opérateur au lieu de la valeur studio, et six fiches Nolimit/Hacksaw
+// affichaient un RTP d'achat de bonus présenté comme celui du jeu. Stocker un
+// nombre unique, c'est se condamner à recopier l'erreur du voisin.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Niveau de preuve d'une donnée. Affiché au visiteur : c'est l'argument du site.
+enum Confiance {
+  /// Publié par le studio, source consignée.
+  STUDIO
+  /// Source secondaire sérieuse, recoupée deux fois.
+  RECOUPE
+  /// Une seule source, non recoupée.
+  UNIQUE
+  /// Aucune source fiable à ce jour. Affiché comme tel, jamais deviné.
+  AUCUNE
+}
+
+enum Volatilite {
+  BASSE
+  MOYENNE
+  HAUTE
+  TRES_HAUTE
+}
+
+model Studio {
+  id        String   @id @default(uuid()) @db.Uuid
+  slug      String   @unique
+  nom       String
+  siteUrl   String?
+  /// Où ce studio publie ses chiffres — la méthode diffère d'un éditeur à
+  /// l'autre : bloc « Game Data » chez Hacksaw, fiche PDF chez ELK, communiqué
+  /// chez Pragmatic. Le noter évite de le rechercher à chaque fiche.
+  ouSourcer String?  @map("ou_sourcer")
+  jeux      Jeu[]
+  creeLe    DateTime @default(now()) @map("cree_le")
+  majLe     DateTime @updatedAt @map("maj_le")
+
+  @@map("studios")
+}
+
+model Jeu {
+  id       String @id @default(uuid()) @db.Uuid
+  slug     String @unique
+  nom      String
+  studioId String @map("studio_id") @db.Uuid
+  studio   Studio @relation(fields: [studioId], references: [id])
+
+  // ── Les RTP, au pluriel ────────────────────────────────────────────────
+  /// Le RTP par défaut du studio. C'est celui qu'on affiche en premier.
+  rtpStudio     Decimal?  @map("rtp_studio") @db.Decimal(5, 2)
+  /// Les paliers que l'opérateur peut configurer, du plus haut au plus bas.
+  rtpPaliers    Decimal[] @map("rtp_paliers") @db.Decimal(5, 2)
+  /// Le RTP lorsqu'on achète le bonus, quand le studio le publie.
+  rtpAchatBonus Decimal?  @map("rtp_achat_bonus") @db.Decimal(5, 2)
+  /// L'URL exacte qui atteste `rtpStudio`. Sans elle, la confiance retombe.
+  rtpSource     String?   @map("rtp_source")
+  rtpConfiance  Confiance @default(AUCUNE) @map("rtp_confiance")
+  rtpVerifieLe  DateTime? @map("rtp_verifie_le")
+
+  // ── Le reste de la fiche d'identité ────────────────────────────────────
+  volatilite         Volatilite?
+  /// Multiple de la mise **totale**. Chaque studio publie sur sa propre base :
+  /// per line chez Amusnet, en euros chez Evoplay. Convertir avant d'écrire.
+  gainMaxMultiple    Int?      @map("gain_max_multiple")
+  rouleaux           Int?
+  lignes             Int?
+  mecaniques         String[]  @default([])
+  achatBonus         Boolean?  @map("achat_bonus")
+  sortieLe           DateTime? @map("sortie_le")
+  /// URL de démo. Jamais celle d'un concurrent : une démo pointant ailleurs
+  /// envoie le visiteur chez lui — l'erreur a coûté 590 fiches sur BetsRank.
+  demoUrl            String?   @map("demo_url")
+  visuelUrl          String?   @map("visuel_url")
+
+  confiance Confiance @default(AUCUNE)
+  creeLe    DateTime  @default(now()) @map("cree_le")
+  majLe     DateTime  @updatedAt @map("maj_le")
+
+  traductions Traduction[]
+
+  @@index([studioId])
+  @@index([sortieLe])
+  @@map("jeux")
+}
+
+model Traduction {
+  id     String @id @default(uuid()) @db.Uuid
+  jeuId  String @map("jeu_id") @db.Uuid
+  jeu    Jeu    @relation(fields: [jeuId], references: [id], onDelete: Cascade)
+  langue String @db.VarChar(5)
+
+  titre       String?
+  chapo       String?
+  presentation String?
+  points      String[] @default([])
+
+  creeLe DateTime @default(now()) @map("cree_le")
+  majLe  DateTime @updatedAt @map("maj_le")
+
+  @@unique([jeuId, langue])
+  @@map("traductions")
+}

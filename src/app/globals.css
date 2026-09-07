@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Thème sombre unique et assumé.
+ *
+ * BetsRank force déjà le sombre ; ici c'est un choix de charte, pas un défaut :
+ * un catalogue de machines à sous se lit sur fond noir, et proposer un thème
+ * clair reviendrait à maintenir deux palettes néon dont une inutilisable.
+ */
+:root {
+  color-scheme: dark;
+  --police-titre: 'Segoe UI', system-ui, sans-serif;
+  --police-corps: system-ui, sans-serif;
+}
+
+body {
+  @apply bg-fond text-texte font-corps antialiased;
+}
+
+/* Le liseré néon des panneaux, factorisé : il revient sur chaque carte. */
+@layer components {
+  .panneau {
+    @apply rounded-xl border border-fond-bordure bg-fond-panneau shadow-carte;
+  }
+  .liseré-cyan {
+    @apply border border-neon-cyan/40 shadow-neon-cyan;
+  }
+  .liseré-magenta {
+    @apply border border-neon-magenta/40 shadow-neon-magenta;
+  }
+}
