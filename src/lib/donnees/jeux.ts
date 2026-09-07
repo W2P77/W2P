@@ -12,23 +12,45 @@ const CHAMPS_VIGNETTE = {
 } as const;
 
 /**
- * Les jeux mis en avant sur l'accueil, **un par studio d'abord**.
+ * Les titres que le public cherche par leur nom.
  *
- * Un simple tri alphabétique donnait huit « Big Bass » à la suite : la vitrine
- * donnait l'impression d'un catalogue d'un seul jeu décliné. Prendre un titre
- * par studio avant de compléter montre la couverture réelle, qui est ce qu'on
- * vend.
+ * ── Pourquoi une liste écrite à la main ───────────────────────────────────
+ *
+ * La vitrine était triée par niveau de preuve puis par ordre alphabétique,
+ * avec un jeu par studio pour éviter huit « Big Bass » à la suite. Le résultat
+ * montrait la **couverture** du catalogue — Annihilator, Cygnus 2, Dead
+ * Canary — mais aucun des titres pour lesquels les gens arrivent. Or l'accueil
+ * n'a pas à démontrer l'étendue : il a à faire reconnaître quelque chose en
+ * une seconde.
+ *
+ * Aucun critère en base ne peut produire cette liste. Ni le RTP, ni la date,
+ * ni le nombre de casinos qui le proposent ne disent qu'un jeu est célèbre. Le
+ * volume de recherche est la seule mesure qui le dirait, et il n'est pas dans
+ * nos données. Une liste écrite est donc la solution honnête — à condition
+ * d'être maintenue.
+ *
+ * L'ordre compte : ce sont les quatre premiers qui portent la première rangée.
  */
+const VEDETTES = [
+  'gates-of-olympus',
+  'sweet-bonanza-1000',
+  'sugar-rush',
+  'starlight-princess',
+  'big-bass-bonanza',
+  'gates-of-olympus-1000',
+  'book-of-dead',
+  'wolf-gold',
+  'madame-destiny-megaways',
+];
+
 export async function jeuxEnAvant(limite = 8) {
   /*
    * Seulement les jeux qui ont une jaquette.
    *
    * Deux tiers du catalogue n'en ont pas, et le repli — nom composé sur fond
    * dégradé — est fait pour une grille de recherche, pas pour une vitrine.
-   * Sur l'accueil, une rangée où six cartes sur huit sont des rectangles de
-   * texte donne l'impression d'un catalogue vide, alors qu'il compte 1 951
-   * jeux. Le filtre coûte de la variété de studios ; il gagne la première
-   * impression, qui est ce que la page vend.
+   * Sur l'accueil, six cartes de texte sur huit donnent l'impression d'un
+   * catalogue vide alors qu'il compte 1 951 jeux.
    */
   const tous = await prisma.jeu.findMany({
     where: { visuelUrl: { not: null } },
@@ -36,16 +58,24 @@ export async function jeuxEnAvant(limite = 8) {
     select: CHAMPS_VIGNETTE,
   });
 
-  const vus = new Set<string>();
-  const varies = tous.filter((j) => {
-    if (vus.has(j.studio.nom)) return false;
-    vus.add(j.studio.nom);
+  const parSlug = new Map(tous.map((j) => [j.slug, j]));
+  const vedettes = VEDETTES.map((slug) => parSlug.get(slug)).filter((j) => j != null);
+
+  /*
+   * Le complément garde la règle d'un titre par studio : si la liste écrite
+   * devient trop courte — un jeu retiré, une jaquette perdue — la rangée se
+   * remplit avec de la variété plutôt qu'avec le premier venu par ordre
+   * alphabétique.
+   */
+  const dejaLa = new Set(vedettes.map((j) => j!.slug));
+  const studiosVus = new Set(vedettes.map((j) => j!.studio.nom));
+  const complement = tous.filter((j) => {
+    if (dejaLa.has(j.slug) || studiosVus.has(j.studio.nom)) return false;
+    studiosVus.add(j.studio.nom);
     return true;
   });
 
-  // Si les studios ne suffisent pas à remplir la rangée, on complète.
-  const restants = tous.filter((j) => !varies.includes(j));
-  return [...varies, ...restants].slice(0, limite);
+  return [...vedettes, ...complement].slice(0, limite) as typeof tous;
 }
 
 export async function compterCatalogue() {

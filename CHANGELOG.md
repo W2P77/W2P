@@ -2,6 +2,39 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Logos officiels et vitrine des titres connus
+
+**Dix logos récupérés sur les sites des studios**, ce qui porte la couverture
+de 17 à 24 sur 27. Sept étaient en basse définition réelle (Play'n GO, PG Soft,
+BGaming, Playson, Relax, ELK, InOut) : quatre ont désormais leur fichier
+officiel, en SVG pour la plupart.
+
+Les SVG sont **rasterisés à haute densité, pas redimensionnés** : lu à sa
+densité par défaut, un SVG donne parfois 198×24 px, et l'agrandir ensuite
+produit exactement le flou qu'on voulait éviter. En imposant la densité au
+décodage, le tracé est rendu à la taille finale, donc net par construction.
+
+**Le garde-fou de luminance a servi dès le premier passage.** Un logo sombre
+disparaît sur fond noir sans que rien ne le signale — la case paraît
+simplement vide. Le script mesure la luminance moyenne des pixels opaques et
+refuse d'écrire en dessous de 70. Wazdan publie son logo en `#191919`
+(luminance 25), sa version de pied de page aussi. Le tracé étant monochrome —
+une forme, une couleur — il a été recoloré en blanc, l'usage normal d'une
+marque sur fond sombre. Un logo polychrome serait resté écarté : on ne
+réinvente pas les couleurs d'un partenaire.
+
+**La vitrine montre enfin les titres que le public cherche.** Elle était triée
+par niveau de preuve puis alphabétiquement, un jeu par studio : ça montrait la
+*couverture* du catalogue — Annihilator, Cygnus 2, Dead Canary — et aucun des
+titres pour lesquels les gens arrivent. L'accueil n'a pas à démontrer
+l'étendue, il a à faire reconnaître quelque chose en une seconde.
+
+Aucun critère en base ne peut produire cette liste : ni le RTP, ni la date, ni
+le nombre de casinos ne disent qu'un jeu est célèbre, et le volume de recherche
+n'est pas dans nos données. D'où une liste écrite à la main — la solution
+honnête, à condition d'être maintenue. Le complément garde la règle d'un titre
+par studio, pour que la rangée reste variée si la liste se vide.
+
 ## 2026-09-08 — Logos de studios et vitrine sans trous
 
 **« Browse by provider » affiche les logos.** 17 studios sur 27 en ont un ; les
