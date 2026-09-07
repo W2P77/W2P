@@ -48,6 +48,14 @@ model Studio {
   slug      String   @unique
   nom       String
   siteUrl   String?
+  logoUrl   String?  @map("logo_url")
+  /// La clé sous laquelle les casinos déclarent ce studio.
+  ///
+  /// Elle est **stockée**, pas déduite : dériver « pragmatic » de
+  /// « pragmatic-play » marche jusqu'au studio dont le nom ne suit pas la
+  /// règle, et ce jour-là il disparaît des listes sans un message d'erreur.
+  cleCasino String? @map("cle_casino")
+
   /// Où ce studio publie ses chiffres — la méthode diffère d'un éditeur à
   /// l'autre : bloc « Game Data » chez Hacksaw, fiche PDF chez ELK, communiqué
   /// chez Pragmatic. Le noter évite de le rechercher à chaque fiche.
@@ -83,8 +91,12 @@ model Jeu {
   /// Multiple de la mise **totale**. Chaque studio publie sur sa propre base :
   /// per line chez Amusnet, en euros chez Evoplay. Convertir avant d'écrire.
   gainMaxMultiple    Int?      @map("gain_max_multiple")
-  rouleaux           Int?
-  lignes             Int?
+  /// Texte libre, et c'est volontaire : une grille moderne ne se réduit pas à
+  /// un entier. « 5x3 », mais aussi « 6 rouleaux, 2 à 8 rangées ». Forcer un
+  /// nombre reviendrait à écrire une donnée fausse pour un tiers du catalogue.
+  grille             String?
+  /// Idem : « 20 lignes », « Cluster Pays », « 117 649 façons en jeu de base ».
+  lignesPaiement     String?   @map("lignes_paiement")
   mecaniques         String[]  @default([])
   achatBonus         Boolean?  @map("achat_bonus")
   sortieLe           DateTime? @map("sortie_le")
@@ -102,6 +114,33 @@ model Jeu {
   @@index([studioId])
   @@index([sortieLe])
   @@map("jeux")
+}
+
+/// Un casino partenaire, repris des accords déjà signés.
+///
+/// On n'y garde que ce qui sert le catalogue : de quels studios il propose les
+/// jeux, où il est accessible, et le lien de suivi. Le reste — barème, notes
+/// éditoriales, historique commercial — appartient à BetsRank et n'a rien à
+/// faire ici.
+model Casino {
+  id        Int      @id
+  slug      String   @unique
+  nom       String
+  logo      String?
+  /// Clés de studios, telles que déclarées côté accord.
+  providers String[] @default([])
+  playUrl   String
+  /// Pays où **notre sélection** le propose. Ce champ décrit notre couverture,
+  /// jamais une décision de l'opérateur.
+  pays      String[] @default([])
+  note      Decimal? @db.Decimal(3, 1)
+  bonusTexte String? @map("bonus_texte")
+  actif     Boolean  @default(true)
+
+  creeLe DateTime @default(now()) @map("cree_le")
+  majLe  DateTime @updatedAt @map("maj_le")
+
+  @@map("casinos")
 }
 
 model Traduction {
