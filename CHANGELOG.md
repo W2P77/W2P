@@ -2,6 +2,27 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Le décrochement est une ligne, pas un cadre
+
+Le champ de recherche paraissait posé dans une boîte noire. La cause : mes
+trois traits — haut, droite, bas — **se refermaient en rectangle**. Un
+rectangle autour d'un champ, c'est une bordure de formulaire ; ce n'est pas ce
+que fait la référence.
+
+La ligne doit **passer**, pas entourer : elle monte du bord gauche du cadre par
+une diagonale à 45°, court au-dessus de la pilule, redescend à droite sur
+124 px — le dénivelé exact jusqu'au bord bas — et rejoint la conduite. Rien ne
+referme en bas, rien ne referme à droite. La barre pend sous la ligne.
+
+Deux corrections qui vont avec :
+
+- **La ligne est néon, pas grise.** C'est la même conduite que celles qui
+  courent sous l'en-tête et au bas de l'accroche. Un trait gris en faisait une
+  bordure de champ au lieu d'un détour de la conduite.
+- **La diagonale de descente était trop courte** et s'arrêtait en l'air. Une
+  ligne coupée redonne au décrochement l'air d'un objet posé — c'est
+  exactement ce qu'on cherchait à défaire.
+
 ## 2026-09-08 — L'accroche au pixel
 
 Trois allers-retours sur zooms successifs. Ce qui a changé, et ce que chaque
