@@ -51,14 +51,28 @@ export function CarteJeu({ jeu, index = 0 }: { jeu: JeuVignette; index?: number 
        * titre du jeu, qui est justement ce qui permet de le reconnaître dans
        * une grille. Un léger bord noir vaut mieux qu'un « BASS / NANZA ».
        */}
-      <div className="relative aspect-[16/10] overflow-hidden bg-fond">
+      <div className="relative aspect-[16/10] overflow-hidden border-b border-fond-bordure bg-fond">
         {jeu.visuelUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={jeu.visuelUrl} alt="" className="h-full w-full object-contain" />
         ) : (
-          <div className="grid h-full place-items-center px-3 text-center">
-            <span className="font-titre text-[15px] font-black uppercase leading-[1.05] tracking-tight text-white/90">
-              {jeu.nom}
+          /*
+           * Le repli sans jaquette.
+           *
+           * Il concerne les deux tiers du catalogue : les visuels disponibles
+           * portaient le filigrane d'un concurrent et ont été écartés. Ce
+           * repli doit donc avoir l'air d'un choix, pas d'une image qui n'a
+           * pas chargé — d'où le liseré, le nom composé et la mention du
+           * studio, plutôt qu'un rectangle vide.
+           */
+          <div className="grid h-full place-items-center bg-gradient-to-br from-neon-violet/25 via-fond-carte to-fond px-2.5 text-center">
+            <span>
+              <span className="block font-titre text-[13px] font-black uppercase leading-[1.1] tracking-tight text-white/90">
+                {jeu.nom}
+              </span>
+              <span className="mt-1.5 block font-mono text-[8px] uppercase tracking-[0.2em] text-texte-faible">
+                {jeu.studio.nom}
+              </span>
             </span>
           </div>
         )}

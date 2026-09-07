@@ -91,9 +91,20 @@ async function main() {
   const appliquer = process.argv.includes('--appliquer');
   const tous: SlotSource[] = JSON.parse(readFileSync('/tmp/slots-propres.json', 'utf-8'));
 
-  // Tout ce qui possède un visuel propre. Le filtre par notoriété limitait le
-  // catalogue à 35 titres ; or un catalogue incomplet n'est pas un petit
-  // catalogue, c'est un site qu'on quitte parce qu'on n'y trouve pas son jeu.
+  /*
+   * Tout le catalogue, jaquette ou pas.
+   *
+   * Une première version n'importait que les jeux dotés d'un visuel propre —
+   * les autres portant le filigrane d'un concurrent. Résultat mesuré : sur
+   * vingt-neuf titres majeurs absents du site, vingt l'étaient **uniquement**
+   * pour cette raison. Razor Shark, Fire in the Hole, Legacy of Dead, Le
+   * Bandit : des jeux que les gens cherchent par leur nom.
+   *
+   * Le filtre était juste sur son objet — ne pas afficher la marque d'un
+   * concurrent — et faux dans sa portée. Une fiche sans image vaut infiniment
+   * mieux qu'une fiche absente : l'image est cosmétique, la donnée est le
+   * produit. Les jaquettes filigranées restent exclues, les jeux non.
+   */
   const lot = tous;
   const avecSource = lot.filter((s) => SOURCES[s.slug]).length;
 
