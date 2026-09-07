@@ -2,6 +2,35 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Logos de studios et vitrine sans trous
+
+**« Browse by provider » affiche les logos.** 17 studios sur 27 en ont un ; les
+dix autres gardent leur nom, une pastille vide serait pire qu'un mot lisible.
+Le nombre de jeux reste sous le logo : un logo se reconnaît plus vite qu'un
+mot, mais il ne dit pas combien de titres il y a derrière, et c'est le chiffre
+qui fait cliquer.
+
+**Pourquoi « passer les logos en 4K » aurait été contre-productif.** Les
+sources vont de 240×62 à 1500×846 px pour un affichage à ~110 px. Agrandir une
+source de 240 px vers 4K n'ajoute aucun détail — l'interpolation invente des
+pixels, elle ne retrouve pas ceux qui n'ont jamais été capturés — et multiplie
+le poids par vingt pour un résultat identique, voire plus flou. Ce qui améliore
+réellement la netteté, c'est de servir **trois fois la taille d'affichage** :
+tous sont normalisés sur une toile de 400×160 en `contain`, fond transparent.
+Les grands y sont réduits, donc plus nets ; les petits y sont posés sans
+déformation.
+
+Le script **signale les sept sources plus petites que la toile** (Play'n GO,
+PG Soft, BGaming, Playson, Relax, ELK, InOut) : ce sont les seules réellement
+en basse définition, et les seules à remplacer par un fichier officiel. Les
+traiter en silence reviendrait à croire le problème résolu.
+
+**La vitrine ne montre plus que des jeux avec jaquette.** Deux tiers du
+catalogue n'en ont pas, et le repli — nom composé sur fond dégradé — est fait
+pour une grille de recherche, pas pour une vitrine. Six cartes de texte sur
+huit donnaient l'impression d'un catalogue vide alors qu'il compte 1 951 jeux.
+Le filtre coûte de la variété de studios ; il gagne la première impression.
+
 ## 2026-09-08 — Calage final : barre 10 px plus bas, conduites à 15 px
 
 La barre descend de 10 px et les trois conduites la suivent pour garder une

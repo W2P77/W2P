@@ -131,18 +131,37 @@ export default async function Home() {
             <h3 className="mb-3 font-ui text-[11px] font-bold uppercase tracking-[0.18em] text-texte-faible">
               Browse by provider
             </h3>
-            <ul className="grid grid-cols-2 gap-2">
+            <ul className="grid grid-cols-2 gap-2.5">
               {studios.slice(0, 6).map((s) => (
                 <li key={s.slug}>
                   <Link
                     href={`/slot/${s.slug}`}
-                    className="biseau-petit flex items-center gap-2 border border-fond-bordure bg-fond px-2 py-1.5 transition hover:border-neon-cyan"
+                    className="biseau-petit flex h-[62px] flex-col items-center justify-center gap-1 border border-fond-bordure bg-fond px-2 py-2 transition hover:border-neon-cyan"
                   >
-                    <span className="min-w-0 flex-1 truncate font-corps text-[12px] text-texte">
-                      {s.nom}
-                    </span>
-                    <span className="shrink-0 font-ui text-[11px] tabular-nums text-texte-faible">
-                      {s._count.jeux}
+                    {/*
+                     * Le logo remplace le nom, et le nombre de jeux reste.
+                     *
+                     * Un logo se reconnaît plus vite qu'un mot, mais il ne dit
+                     * pas combien de titres il y a derrière — c'est le chiffre
+                     * qui fait cliquer. Les dix studios sans logo officiel
+                     * gardent leur nom : une pastille vide serait pire qu'un
+                     * mot lisible.
+                     */}
+                    {s.logoUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={s.logoUrl}
+                        alt={s.nom}
+                        className="h-7 w-full object-contain"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <span className="flex h-7 items-center font-ui text-[12px] font-semibold text-texte">
+                        {s.nom}
+                      </span>
+                    )}
+                    <span className="font-ui text-[10px] tabular-nums text-texte-faible">
+                      {s._count.jeux} games
                     </span>
                   </Link>
                 </li>

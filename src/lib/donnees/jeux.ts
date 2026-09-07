@@ -20,7 +20,18 @@ const CHAMPS_VIGNETTE = {
  * vend.
  */
 export async function jeuxEnAvant(limite = 8) {
+  /*
+   * Seulement les jeux qui ont une jaquette.
+   *
+   * Deux tiers du catalogue n'en ont pas, et le repli — nom composé sur fond
+   * dégradé — est fait pour une grille de recherche, pas pour une vitrine.
+   * Sur l'accueil, une rangée où six cartes sur huit sont des rectangles de
+   * texte donne l'impression d'un catalogue vide, alors qu'il compte 1 951
+   * jeux. Le filtre coûte de la variété de studios ; il gagne la première
+   * impression, qui est ce que la page vend.
+   */
   const tous = await prisma.jeu.findMany({
+    where: { visuelUrl: { not: null } },
     orderBy: [{ rtpConfiance: 'asc' }, { nom: 'asc' }],
     select: CHAMPS_VIGNETTE,
   });
