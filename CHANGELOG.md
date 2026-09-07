@@ -5,7 +5,9 @@ Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commi
 ## 2026-09-08 — Calage final : barre 10 px plus bas, conduites à 15 px
 
 La barre descend de 10 px et les trois conduites la suivent pour garder une
-marge de 15 px entre la plus basse et le haut de la pilule.
+marge de 10 px entre la plus basse et le haut de la pilule — à cette distance
+le halo du tube commence à toucher la conduite orange, ce qui les relie au lieu
+de les juxtaposer.
 
 Le réglage passe par **la hauteur du conteneur**, pas par les décalages
 individuels : `ConduiteDecrochee` est ancrée en bas, donc réduire sa hauteur

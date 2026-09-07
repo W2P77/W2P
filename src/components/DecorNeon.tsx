@@ -261,9 +261,9 @@ export function TitreSection({ children }: { children: ReactNode }) {
  * diagonales sont posées à longueur fixe et gardent leur angle.
  */
 const LIGNES = [
-  { haut: 0, palier: 585, chute: 61, couleur: '#f13fdc', opacite: 0.85 },
-  { haut: 7, palier: 570, chute: 57, couleur: '#2fd8f5', opacite: 0.5 },
-  { haut: 14, palier: 555, chute: 53, couleur: '#ff9d4d', opacite: 0.45 },
+  { haut: 0, palier: 585, chute: 56, couleur: '#f13fdc', opacite: 0.85 },
+  { haut: 7, palier: 570, chute: 52, couleur: '#2fd8f5', opacite: 0.5 },
+  { haut: 14, palier: 555, chute: 48, couleur: '#ff9d4d', opacite: 0.45 },
 ];
 
 export function ConduiteDecrochee({ className = '' }: { className?: string }) {

@@ -168,7 +168,7 @@ export function Accroche({ children }: { children: React.ReactNode }) {
        * plus de sens. La conduite droite reprend la main.
        */}
       <Conduite className="absolute bottom-0 left-0 z-10 h-[17px] w-full -scale-x-100 lg:hidden" />
-      <ConduiteDecrochee className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 hidden h-[77px] lg:block" />
+      <ConduiteDecrochee className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 hidden h-[72px] lg:block" />
     </section>
   );
 }
