@@ -7,6 +7,7 @@ import { BadgePreuve, type Confiance } from '@/components/BadgePreuve';
 import { Tirets, Equerre } from '@/components/DecorNeon';
 import { jeuParSlug, memeStudio, casinosPourStudio } from '@/lib/donnees/catalogue';
 import { OuJouer } from '@/components/OuJouer';
+import { BoutonEnregistrer } from '@/components/BoutonEnregistrer';
 import { baliseJeu } from '@/lib/donnees-structurees';
 import { SITE_URL } from '@/lib/site';
 
@@ -128,10 +129,24 @@ export default async function PageJeu({
             <h1 className="font-titre text-[30px] font-black uppercase leading-[0.95] tracking-tight text-white sm:text-[40px]">
               Where to play {jeu.nom}
             </h1>
-            <p className="mt-2 text-[14px] text-texte-doux">
-              {jeu.studio.nom}
-              {jeu.sortieLe ? ` · released ${new Date(jeu.sortieLe).getFullYear()}` : ''}
-            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              <p className="text-[14px] text-texte-doux">
+                {jeu.studio.nom}
+                {jeu.sortieLe ? ` · released ${new Date(jeu.sortieLe).getFullYear()}` : ''}
+              </p>
+              <BoutonEnregistrer
+                jeu={{
+                  slug: jeu.slug,
+                  nom: jeu.nom,
+                  rtpStudio: rtp,
+                  rtpConfiance: jeu.rtpConfiance,
+                  volatilite: jeu.volatilite,
+                  gainMaxMultiple: jeu.gainMaxMultiple,
+                  visuelUrl: jeu.visuelUrl,
+                  studio: { nom: jeu.studio.nom, slug: jeu.studio.slug },
+                }}
+              />
+            </div>
 
             {jeu.visuelUrl && (
               <div className="relative mt-5 overflow-hidden rounded-lg border border-neon-violet/40 bg-fond-carte">

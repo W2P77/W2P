@@ -16,13 +16,16 @@ export const revalidate = 3600;
  * intermédiaire qui renvoie une 404 est une promesse cassée — pour le visiteur
  * qui remonte le fil d'Ariane comme pour le robot qui suit la hiérarchie.
  */
-async function studioParSlug(slug: string) {
+const PAR_PAGE = 36;
+
+async function studioParSlug(slug: string, page: number) {
   return prisma.studio.findUnique({
     where: { slug },
     include: {
       jeux: {
         orderBy: [{ rtpConfiance: 'asc' }, { nom: 'asc' }],
-        take: 60,
+        skip: (page - 1) * PAR_PAGE,
+        take: PAR_PAGE,
         select: {
           slug: true, nom: true, rtpStudio: true, rtpConfiance: true,
           volatilite: true, gainMaxMultiple: true, visuelUrl: true,
@@ -50,12 +53,19 @@ export async function generateMetadata({
 
 export default async function PageStudio({
   params,
+  searchParams,
 }: {
   params: Promise<{ studio: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
-  const { studio } = await params;
-  const s = await studioParSlug(studio);
+  const [{ studio }, { page: pageBrute }] = await Promise.all([params, searchParams]);
+  const page = Math.max(1, Number(pageBrute ?? 1));
+  const s = await studioParSlug(studio, page);
   if (!s) notFound();
+
+  // 624 jeux chez le plus fourni : sans pagination, la page en montrait
+  // soixante et taisait les cinq cent soixante-quatre autres.
+  const pages = Math.max(1, Math.ceil(s._count.jeux / PAR_PAGE));
 
   return (
     <div className="min-h-screen bg-fond">
@@ -82,6 +92,30 @@ export default async function PageStudio({
             <CarteJeu key={j.slug} jeu={j} index={i} />
           ))}
         </div>
+
+        {pages > 1 && (
+          <nav className="mt-8 flex items-center justify-center gap-3" aria-label="Pagination">
+            {page > 1 && (
+              <a
+                href={`/slot/${s.slug}?page=${page - 1}`}
+                className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan"
+              >
+                ← Previous
+              </a>
+            )}
+            <span className="font-mono text-[12px] text-texte-faible">
+              {page} / {pages}
+            </span>
+            {page < pages && (
+              <a
+                href={`/slot/${s.slug}?page=${page + 1}`}
+                className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan"
+              >
+                Next →
+              </a>
+            )}
+          </nav>
+        )}
       </main>
       <PiedDePage />
     </div>

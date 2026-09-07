@@ -35,7 +35,7 @@ const TRIS: Record<string, Prisma.JeuOrderByWithRelationInput[]> = {
   preuve: [{ rtpConfiance: 'asc' }, { nom: 'asc' }],
 };
 
-function construireOu(f: FiltresCatalogue): Prisma.JeuWhereInput {
+export function construireOu(f: FiltresCatalogue): Prisma.JeuWhereInput {
   const et: Prisma.JeuWhereInput[] = [];
 
   if (f.q?.trim()) {
