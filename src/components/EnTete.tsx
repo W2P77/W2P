@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { Logo } from './Logo';
 import { Conduite, TraceCircuit } from './DecorNeon';
 
 /**
@@ -54,7 +53,25 @@ export function EnTete() {
 
       <div className="mx-auto flex max-w-[1440px] items-center gap-8 px-6 pb-2.5 pt-1 lg:pt-0">
         <Link href="/" className="flex shrink-0 items-end gap-2.5">
-          <Logo className="h-10 w-10 shrink-0 drop-shadow-lueur-cyan sm:h-12 sm:w-12" />
+          {/*
+           * L'emblème est découpé du logo complet, pas le logo entier.
+           *
+           * Le fichier livré est un lockup — emblème, mot-marque et baseline
+           * « SLOT REVIEW & GUIDES ». À la hauteur d'un en-tête (50 px), la
+           * baseline serait un pâté de 4 px de haut : illisible, et elle
+           * salirait le bloc au lieu de l'informer. Le mot-marque reste donc
+           * du texte HTML — net à toute taille, sélectionnable, et lu par les
+           * moteurs — et seul l'emblème vient de l'image.
+           *
+           * Le rapport 1,41:1 est celui du découpage : forcer un carré
+           * ajouterait des marges transparentes et rétrécirait le dessin.
+           */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/embleme-w2p.webp"
+            alt=""
+            className="h-11 w-[62px] shrink-0 object-contain sm:h-[52px] sm:w-[73px]"
+          />
           <span className="flex flex-col">
             <span className="font-titre text-[21px] font-extrabold leading-none tracking-[0.005em] text-white sm:text-[26px] lg:text-[30px]">
               where<span className="text-neon-magenta">2</span>play

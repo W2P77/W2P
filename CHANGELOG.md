@@ -2,6 +2,22 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — L'emblème remplace le logo tracé
+
+Le logo livré est un **lockup** : emblème néon, mot-marque et baseline « SLOT
+REVIEW & GUIDES ». Seul l'emblème est découpé et intégré à l'en-tête.
+
+À la hauteur d'un bandeau (50 px), la baseline du lockup ferait 4 px de haut :
+illisible, et elle salirait le bloc au lieu de l'informer. Le mot-marque reste
+donc du **texte HTML** — net à toute taille, sélectionnable, lu par les moteurs
+— et l'image n'apporte que ce qu'un tracé ne sait pas faire.
+
+Le découpage garde son rapport 1,41:1 : forcer un carré aurait ajouté des
+marges transparentes et rétréci le dessin d'autant.
+
+Le tracé SVG fait à la main disparaît. Il tenait la place en attendant, et
+c'était sa seule fonction.
+
 ## 2026-09-08 — Logos officiels et vitrine des titres connus
 
 **Dix logos récupérés sur les sites des studios**, ce qui porte la couverture
