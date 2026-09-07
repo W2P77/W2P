@@ -156,7 +156,7 @@ export function Accroche({ children }: { children: React.ReactNode }) {
         <BorneNeon className="pointer-events-none absolute bottom-0 right-[4%] hidden h-[92%] w-auto opacity-95 lg:block" />
       )}
 
-      <div className="relative z-20 mx-auto max-w-[1440px] px-6 pb-4 pt-9 lg:pb-3 lg:pt-11">
+      <div className="relative z-20 mx-auto max-w-[1440px] px-6 pb-4 pt-9 lg:pb-[2px] lg:pt-11">
         {children}
       </div>
 
@@ -168,7 +168,7 @@ export function Accroche({ children }: { children: React.ReactNode }) {
        * plus de sens. La conduite droite reprend la main.
        */}
       <Conduite className="absolute bottom-0 left-0 z-10 h-[17px] w-full -scale-x-100 lg:hidden" />
-      <ConduiteDecrochee className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 hidden h-[92px] lg:block" />
+      <ConduiteDecrochee className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 hidden h-[77px] lg:block" />
     </section>
   );
 }

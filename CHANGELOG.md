@@ -2,6 +2,18 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Calage final : barre 10 px plus bas, conduites à 15 px
+
+La barre descend de 10 px et les trois conduites la suivent pour garder une
+marge de 15 px entre la plus basse et le haut de la pilule.
+
+Le réglage passe par **la hauteur du conteneur**, pas par les décalages
+individuels : `ConduiteDecrochee` est ancrée en bas, donc réduire sa hauteur
+descend les trois lignes d'un bloc en conservant leur écartement de 7 px. Les
+chutes sont réduites d'autant, faute de quoi les paliers bas sortiraient sous
+le conteneur — qui n'a pas d'`overflow: hidden`, et les laisserait donc
+déborder sur la section suivante sans rien signaler.
+
 ## 2026-09-08 — Position finale de la barre de recherche
 
 La barre descend de 8 px de plus et les conduites gardent leur tracé
