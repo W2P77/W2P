@@ -26,7 +26,13 @@
  */
 export function ChampRecherche({ className = '' }: { className?: string }) {
   return (
-    <div className={`relative -ml-2 pl-5 pr-7 pt-3.5 ${className}`}>
+    /*
+     * Plus de marge négative : elle servait à rejoindre le bord gauche du
+     * cadre de l'accroche, qui n'existe plus. Sans elle, la pilule s'aligne
+     * simplement sur le titre — ce qui était déjà l'intention, obtenue au
+     * détour d'un décalage compensé.
+     */
+    <div className={`relative pt-3.5 ${className}`}>
       {/*
        * Aucun trait n'est dessiné ici, et c'est le point.
        *

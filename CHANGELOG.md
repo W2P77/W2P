@@ -2,6 +2,19 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Le cadre du héros disparaît
+
+Le contour cyan qui encadrait l'accroche est supprimé. Il ajoutait une boîte
+autour d'un bloc que les conduites suffisent à tenir, et il refermait la
+composition là où la référence la laisse ouverte sur l'image.
+
+Effet de bord utile : le champ de recherche portait une marge négative
+(`-ml-2`) dont la seule raison d'être était de **rejoindre le bord gauche de ce
+cadre**. Sans lui, la pilule s'aligne simplement sur le titre — ce qui était
+l'intention depuis le début, obtenue jusque-là au détour d'un décalage
+compensé. La largeur passe de 547 à 499 px, soit la pilule seule, sans la
+gouttière qui servait au cadre.
+
 ## 2026-09-08 — La conduite se décroche, elle n'est pas doublée
 
 Trois versions pour comprendre la même chose. Le champ de recherche ne doit

@@ -156,28 +156,6 @@ export function Accroche({ children }: { children: React.ReactNode }) {
         <BorneNeon className="pointer-events-none absolute bottom-0 right-[4%] hidden h-[92%] w-auto opacity-95 lg:block" />
       )}
 
-      {/*
-       * ── Le cadre biseauté qui tient l'accroche ────────────────────────
-       *
-       * Il est tracé en six segments, et pas avec la technique des deux
-       * calques biseautés utilisée pour les panneaux. Cette technique suppose
-       * un intérieur **opaque** : le dégradé du dessous n'est visible que sur
-       * le pixel qui dépasse. Ici l'intérieur doit rester transparent pour
-       * laisser voir le fond — le dégradé remplissait donc tout le héros
-       * d'un lavis violet, plus lumineux que la borne censée en être le sujet.
-       *
-       * Quatre bords droits, qui s'arrêtent avant les angles coupés, et deux
-       * diagonales de 23 px (16 × √2) pour les fermer.
-       */}
-      <div className="pointer-events-none absolute inset-x-4 inset-y-3 z-10" aria-hidden>
-        <span className="absolute left-4 right-0 top-0 h-px bg-gradient-to-r from-neon-cyan/70 via-neon-violet/35 to-neon-magenta/60" />
-        <span className="absolute bottom-4 right-0 top-0 w-px bg-gradient-to-b from-neon-magenta/60 to-neon-magenta/20" />
-        <span className="absolute bottom-0 left-0 right-4 h-px bg-gradient-to-l from-neon-magenta/55 via-neon-violet/30 to-neon-cyan/50" />
-        <span className="absolute bottom-0 left-0 top-4 w-px bg-gradient-to-t from-neon-cyan/45 to-neon-cyan/70" />
-        <span className="absolute left-0 top-4 h-px w-[23px] origin-left -rotate-45 bg-neon-cyan/70" />
-        <span className="absolute bottom-4 right-0 h-px w-[23px] origin-right rotate-45 bg-neon-magenta/60" />
-      </div>
-
       <div className="relative z-20 mx-auto max-w-[1440px] px-6 pb-6 pt-9 lg:pb-7 lg:pt-11">
         {children}
       </div>
