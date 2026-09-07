@@ -134,17 +134,42 @@ body {
    * au magenta le long du tube. C'est le seul élément de la page à porter les
    * deux néons à la fois, et c'est ce qui en fait le point d'entrée.
    */
+  /*
+   * ── Le tube néon ────────────────────────────────────────────────────────
+   *
+   * Un néon est un **trait lumineux**, pas une zone brillante. La première
+   * version portait deux `drop-shadow` de 8 et 12 px : à cette distance la
+   * lumière cesse de suivre le contour, se mélange en un bloom violet, et
+   * délave le trait qu'elle était censée mettre en valeur. Le contour
+   * paraissait alors flou et la pilule molle.
+   *
+   * Trois halos très courts et très opaques donnent l'inverse : la lumière
+   * reste collée au trait, le trait reste net. Le rayon compte plus que
+   * l'intensité — 2 px à 0,9 éclaire, 12 px à 0,3 salit.
+   */
   .champ-neon {
-    @apply relative rounded-full p-[2.5px];
-    /* La bascule se fait tard : le cyan tient la première moitié, le magenta
-       ne s'impose que sur le dernier tiers. Un dégradé centré donnerait un
-       violet franc au milieu — et deux néons fondus en un troisième, c'est
-       exactement l'effet qu'on ne veut pas. */
-    background: linear-gradient(96deg, #2fd8f5 0%, #35c8f2 32%, #8b5cf6 62%, #f13fdc 92%);
-    filter: drop-shadow(0 0 8px rgba(47, 216, 245, 0.4))
-      drop-shadow(0 0 12px rgba(241, 63, 220, 0.32));
+    @apply relative rounded-full p-[3px];
+    /* Chaque néon tient sa moitié, la bascule est courte et centrée : un
+       dégradé progressif produirait un violet franc au milieu, soit deux
+       néons fondus en un troisième — exactement ce qu'on ne veut pas. */
+    background: linear-gradient(
+      95deg,
+      #22d3f7 0%,
+      #22d3f7 34%,
+      #7b5cf0 52%,
+      #f13fdc 70%,
+      #f13fdc 100%
+    );
+    filter: drop-shadow(0 0 1px rgba(120, 200, 255, 0.95))
+      drop-shadow(0 0 4px rgba(90, 150, 240, 0.55))
+      drop-shadow(0 0 9px rgba(140, 90, 220, 0.28));
   }
   .champ-neon > * {
-    @apply rounded-full bg-[#171d2c];
+    @apply rounded-full;
+    /* Le fond de la pilule est plus clair que celui du plateau : c'est ce
+       contraste qui la fait paraître creusée dedans plutôt que posée dessus. */
+    background: #1b2130;
+    /* Le liseré déborde légèrement vers l'intérieur, comme un vrai tube. */
+    box-shadow: inset 0 0 10px rgba(90, 160, 230, 0.14);
   }
 }

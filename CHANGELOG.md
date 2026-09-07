@@ -2,6 +2,27 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Le tube néon de la barre de recherche
+
+Le contour paraissait flou et la pilule molle. La cause n'était pas la
+couleur : c'étaient les deux `drop-shadow` de 8 et 12 px. **À cette distance
+la lumière cesse de suivre le contour** — elle se mélange en un bloom violet
+et délave le trait qu'elle était censée mettre en valeur.
+
+Trois halos très courts (1, 4, 9 px) et très opaques donnent l'inverse : la
+lumière reste collée au trait, le trait reste net. Le rayon compte plus que
+l'intensité — 2 px à 0,9 éclaire, 12 px à 0,3 salit. C'est vrai de tous les
+néons de la charte, pas seulement de celui-ci.
+
+Deux réglages qui vont avec : le fond de la pilule passe au-dessus de celui du
+plateau (#1b2130 contre #0d1220), ce qui la fait paraître encastrée plutôt que
+posée ; et un `inset` très faible fait déborder le liseré vers l'intérieur,
+comme un vrai tube de verre.
+
+Les proportions, elles, étaient déjà justes — 24 px de marge pour une pilule
+de 61 px, soit exactement le ratio de la maquette. Vérifié avant de toucher à
+quoi que ce soit, ce qui a évité de corriger ce qui n'était pas cassé.
+
 ## 2026-09-08 — Géo, logos, et la langue des faits
 
 **Filtrage par pays.** Les fiches de jeu sont rendues avec `revalidate` : leur
