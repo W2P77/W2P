@@ -2,6 +2,26 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Position finale de la barre de recherche
+
+La barre descend de 8 px de plus et les conduites gardent leur tracé
+d'origine : un palier au-dessus de la barre, à une vingtaine de pixels, puis
+la descente à 45° à sa droite.
+
+Deux pistes explorées et abandonnées en chemin, gardées ici parce qu'elles
+disent ce que la charte n'est pas :
+
+- **Faire passer le palier bas derrière la pilule**, pour que le trait
+  traverse l'élément. L'effet est joli sur le papier ; en place, il fait
+  remonter tout le faisceau au niveau des boutons et la barre se retrouve
+  isolée dans un grand vide.
+- **Réduire la descente pour poser le palier juste au-dessus de la barre.**
+  Le décrochement devient alors si court qu'il ne se lit plus comme un
+  décrochement, seulement comme un décalage.
+
+Le tracé qui fonctionne est le plus simple des trois : le trait longe la barre
+de près, et c'est cette proximité — pas l'entrelacement — qui les relie.
+
 ## 2026-09-08 — Le cadre du héros disparaît
 
 Le contour cyan qui encadrait l'accroche est supprimé. Il ajoutait une boîte

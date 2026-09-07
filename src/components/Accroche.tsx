@@ -156,7 +156,7 @@ export function Accroche({ children }: { children: React.ReactNode }) {
         <BorneNeon className="pointer-events-none absolute bottom-0 right-[4%] hidden h-[92%] w-auto opacity-95 lg:block" />
       )}
 
-      <div className="relative z-20 mx-auto max-w-[1440px] px-6 pb-4 pt-9 lg:pb-5 lg:pt-11">
+      <div className="relative z-20 mx-auto max-w-[1440px] px-6 pb-4 pt-9 lg:pb-3 lg:pt-11">
         {children}
       </div>
 
