@@ -2,6 +2,46 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — L'accroche au pixel
+
+Trois allers-retours sur zooms successifs. Ce qui a changé, et ce que chaque
+erreur a appris :
+
+**Les boutons sont des hexagones**, coupés aux quatre angles — pas des biseaux
+à deux angles (premier essai), pas des pilules (deuxième). À petite échelle un
+hexagone allongé ressemble à une pilule : les deux premières lectures venaient
+de maquettes vues trop petit. La forme compte au-delà du goût — la pilule
+appartient au champ de recherche, seul élément vraiment arrondi de la page, et
+la donner aux boutons effaçait ce qui le distingue.
+
+**Les deux boutons sont en contour**, intérieur presque noir, texte blanc sur
+les deux. Le magenta plein écrasait le bloc et le second bouton n'existait
+plus ; colorer le texte du second le faisait passer pour un lien secondaire.
+
+**Le champ de recherche n'est pas un plateau, c'est un décrochement du cadre.**
+Les traits qui l'entourent sont ceux de l'accroche : ils arrivent par le bord
+gauche, se coudent à 45°, passent au-dessus de la pilule, redescendent à
+droite, et le bas du cadre referme dessous. Un panneau posé ajoute un objet ;
+un décrochement dit que la barre appartient au bloc.
+
+**La méthode qui a débloqué les mesures.** Comparer des largeurs entre deux
+captures d'échelles inconnues ne donne rien — j'ai obtenu 39 px puis 46 px pour
+la même hauteur de pilule selon le zoom utilisé. Mesurer **la même chaîne de
+texte** rendue dans la même police (le placeholder) donne le facteur d'échelle
+exact, et tout le reste s'en déduit. Résultat : pilule à 499 px de large et
+39 px d'intérieur, contre 424 × 46 auparavant.
+
+**Un piège de rendu, pas de style.** Un `input[type=search]` porte une hauteur
+intrinsèque que ni `py` ni `leading-tight` ne réduisent : le réglage annonçait
+40 px, le navigateur en rendait 50, et la pilule se retrouvait **plus haute que
+les boutons** alors qu'elle doit être plus basse. Le rapport correct est 0,87 —
+il faut fixer la hauteur, pas la déduire du padding.
+
+**Le visuel repasse en plein cadre.** Le panneau clippé à 62 % donnait une
+arête franche et une borne à 24 % de la largeur au lieu de 34 ; le même panneau
+avec `scale(1.4)` la sortait du cadre par la droite. En plein cadre,
+`object-cover` la pose d'elle-même à 60→99 %, sans transformation.
+
 ## 2026-09-08 — Le rendu rejoint la maquette, point par point
 
 Découpage de la maquette sur une largeur utile de 920 px, ramenée à 1440

@@ -65,32 +65,50 @@ export function Accroche({ children }: { children: React.ReactNode }) {
              * reste entière, et la moitié gauche redevient du noir franc où
              * le titre se pose sans lutter.
              */}
-            <div
-              className="absolute inset-y-0 right-0 w-full lg:w-[62%]"
-              style={{ clipPath: 'polygon(14% 0, 100% 0, 100% 100%, 0 100%)' }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={VISUEL!}
-                alt=""
-                className="h-full w-full object-cover"
-                style={{ objectPosition: '78% 42%' }}
-              />
-              {/* Le fondu vers la gauche : l'image doit entrer dans la page,
-                  pas y être collée comme une vignette rapportée. */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#070a14] via-[#070a14]/35 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#070a14]/70 via-transparent to-[#070a14]/45" />
-            </div>
+            {/*
+             * ── Plein cadre, sans découpe ─────────────────────────────────
+             *
+             * Trois essais pour arriver ici, et les deux premiers sont
+             * instructifs :
+             *
+             * · **Panneau clippé à 62 %** : arête franche, le héros se lisait
+             *   comme deux blocs collés, et la borne tombait à 24 % de la
+             *   largeur au lieu de 34 %.
+             * · **Panneau + `scale(1.4)`** : la borne retrouvait sa taille
+             *   mais sortait du panneau par la droite — coupée net.
+             *
+             * En plein cadre, `object-cover` cale l'image sur la largeur : la
+             * borne se pose d'elle-même à 60→99 % de la page, très près des
+             * 58→92 % de la référence, sans transformation. Le prix est un
+             * recadrage vertical à 50 % — le rendu est en 16:9 pour un bloc
+             * en 3,5:1, aucun cadrage ne peut éviter ça. On sacrifie le socle
+             * et la couronne, jamais les rouleaux, qui sont le sujet.
+             */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={VISUEL!}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{ objectPosition: '68% 40%' }}
+            />
 
-            {/* L'arête diagonale, soulignée au néon comme sur la maquette. */}
+            {/*
+             * Le fondu vers la gauche, en trois arrêts explicites.
+             *
+             * Un `to-transparent` linéaire éclaircit déjà à 40 % de la
+             * largeur, là où court le titre. Les arrêts calés à 0 / 46 / 78 %
+             * gardent le noir franc sur toute la colonne de texte, puis
+             * lâchent d'un coup — c'est ce qui donne l'impression d'une seule
+             * image plutôt que d'un dégradé posé dessus.
+             */}
             <div
-              className="absolute inset-y-0 right-0 hidden w-[62%] lg:block"
+              className="absolute inset-0"
               style={{
-                clipPath: 'polygon(14% 0, 14.35% 0, 0.35% 100%, 0 100%)',
-                background: 'linear-gradient(to bottom,#2fd8f5,#8b5cf6 55%,#f13fdc)',
-                opacity: 0.75,
+                background:
+                  'linear-gradient(to right,#070a14 0%,#070a14 30%,rgba(7,10,20,0.88) 46%,rgba(7,10,20,0.35) 78%,rgba(7,10,20,0.15) 100%)',
               }}
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#070a14]/85 via-transparent to-[#070a14]/55" />
 
             {/*
              * Le voile du téléphone.

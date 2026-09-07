@@ -32,16 +32,45 @@ export default async function Home() {
            * « SLOT CATALOGUE » au-dessus d'un titre qui dit déjà de quoi il
            * s'agit ne fait qu'ajouter une ligne avant l'argument.
            */}
-          <h1 className="font-titre text-[34px] font-black uppercase leading-[0.86] tracking-[0.005em] text-white sm:text-[50px] md:text-[60px] lg:text-[72px]">
-            Discover your next
-            <br />
-            reel adventure
-          </h1>
+          <div className="relative">
+            {/*
+             * Les deux amorces, à gauche des lignes du titre.
+             *
+             * Elles sont de hauteurs différentes — un tiers de la capitale sur
+             * la première ligne, deux tiers sur la seconde. Les faire égales
+             * produirait un guillemet ; inégales, elles se lisent comme le
+             * départ d'un tracé, ce qui est le vocabulaire du reste de la page.
+             * Purement décoratives, donc invisibles aux lecteurs d'écran.
+             */}
+            <span
+              className="pointer-events-none absolute -left-3 top-[6%] hidden h-[11%] w-[3px] bg-neon-cyan sm:block"
+              aria-hidden
+            />
+            <span
+              className="pointer-events-none absolute -left-3 top-[54%] hidden h-[24%] w-[3px] bg-neon-magenta sm:block"
+              aria-hidden
+            />
 
-          {/* Une seule ligne : sur deux, le bloc perd sa densité et le bouton
-              descend hors du premier écran. */}
+            {/*
+             * La lueur du titre est légère et volontairement peu colorée.
+             * Un halo trop marqué transforme un titre en enseigne et lui fait
+             * perdre sa lisibilité aux petites tailles — c'est le premier
+             * élément lu, il doit rester net avant d'être lumineux.
+             */}
+            <h1
+              className="font-titre text-[34px] font-black uppercase leading-[0.86] tracking-[0.005em] text-white sm:text-[50px] md:text-[60px] lg:text-[72px]"
+              style={{ textShadow: '0 0 24px rgba(255,255,255,0.22), 0 0 52px rgba(47,216,245,0.16)' }}
+            >
+              Discover your next
+              <br />
+              reel adventure
+            </h1>
+          </div>
+
+          {/* Une seule ligne : sur deux, le bloc perd sa densité et les boutons
+              descendent hors du premier écran. */}
           <p className="mt-4 max-w-[36rem] font-corps text-[17px] leading-snug text-texte-doux">
-            Thousands of free slots, demos and expert reviews — every number sourced.
+            Unleash thousands of free slots, demos, and expert reviews.
           </p>
 
           <div className="mt-5 flex flex-wrap gap-3">
@@ -54,7 +83,27 @@ export default async function Home() {
           </div>
         </div>
 
-        <ChampRecherche className="mt-6 max-w-[646px] sm:mt-7" />
+        {/*
+           * 515 px, et non 646.
+           *
+           * Le rapport largeur-pilule / largeur-titre vaut 0,87 sur la
+           * maquette complète et 0,86 sur le zoom — les deux références
+           * concordent. Le mien valait 1,09 : la barre dépassait le titre au
+           * lieu de finir sous lui, et c'est elle qui devenait le point le
+           * plus large du bloc. Une mesure prise sur un rapport, pas sur une
+           * largeur absolue : c'est le seul chiffre qui survive au changement
+           * de taille de police.
+           */}
+          {/*
+           * 547 px : 499 px de pilule, plus 20 à gauche et 28 à droite.
+           *
+           * Le chiffre vient d'une mesure faite sur **la même chaîne de texte**
+           * dans les deux rendus — le placeholder. Comparer des largeurs de
+           * bloc entre deux captures d'échelles inconnues ne donne rien ;
+           * comparer le même mot rendu dans la même police donne le facteur
+           * exact, et tout le reste s'en déduit.
+           */}
+          <ChampRecherche className="mt-5 max-w-[547px] sm:mt-6" />
       </Accroche>
 
       {/* ── Les deux panneaux ────────────────────────────────────────────── */}
