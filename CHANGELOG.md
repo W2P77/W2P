@@ -8,6 +8,11 @@ Le contour cyan qui encadrait l'accroche est supprimé. Il ajoutait une boîte
 autour d'un bloc que les conduites suffisent à tenir, et il refermait la
 composition là où la référence la laisse ouverte sur l'image.
 
+La barre descend ensuite de 8 px de plus, et la conduite l'accompagne : la
+descendre seule aurait creusé l'écart entre le trait et la pilule, et le
+décrochement se serait remis à monter trop haut. Les deux se règlent ensemble
+ou pas du tout.
+
 Effet de bord utile : le champ de recherche portait une marge négative
 (`-ml-2`) dont la seule raison d'être était de **rejoindre le bord gauche de ce
 cadre**. Sans lui, la pilule s'aligne simplement sur le titre — ce qui était
