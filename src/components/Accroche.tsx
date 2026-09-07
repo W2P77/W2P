@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { BorneNeon } from './BorneNeon';
-import { Conduite } from './DecorNeon';
+import { Conduite, ConduiteDecrochee } from './DecorNeon';
 
 /**
  * L'accroche de la page d'accueil.
@@ -178,13 +178,19 @@ export function Accroche({ children }: { children: React.ReactNode }) {
         <span className="absolute bottom-4 right-0 h-px w-[23px] origin-right rotate-45 bg-neon-magenta/60" />
       </div>
 
-      <div className="relative z-20 mx-auto max-w-[1440px] px-6 pb-8 pt-9 lg:pb-10 lg:pt-11">
+      <div className="relative z-20 mx-auto max-w-[1440px] px-6 pb-6 pt-9 lg:pb-7 lg:pt-11">
         {children}
       </div>
 
       {/* La conduite qui referme l'accroche par le bas, coudée dans l'autre
           sens que celle de l'en-tête : les deux encadrent le bloc. */}
-      <Conduite className="absolute bottom-0 left-0 z-10 h-[17px] w-full -scale-x-100" />
+      {/*
+       * Sous 1024 px la barre de recherche occupe toute la largeur : il n'y a
+       * plus de place à droite pour le palier bas, et le décrochement n'aurait
+       * plus de sens. La conduite droite reprend la main.
+       */}
+      <Conduite className="absolute bottom-0 left-0 z-10 h-[17px] w-full -scale-x-100 lg:hidden" />
+      <ConduiteDecrochee className="pointer-events-none absolute bottom-0 left-0 right-0 z-10 hidden h-[100px] lg:block" />
     </section>
   );
 }

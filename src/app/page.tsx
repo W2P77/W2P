@@ -103,7 +103,7 @@ export default async function Home() {
            * comparer le même mot rendu dans la même police donne le facteur
            * exact, et tout le reste s'en déduit.
            */}
-          <ChampRecherche className="mt-5 max-w-[547px] sm:mt-6" />
+          <ChampRecherche className="mt-6 max-w-[547px] sm:mt-7" />
       </Accroche>
 
       {/* ── Les deux panneaux ────────────────────────────────────────────── */}

@@ -2,6 +2,35 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — La conduite se décroche, elle n'est pas doublée
+
+Trois versions pour comprendre la même chose. Le champ de recherche ne doit
+porter **aucun trait à lui** : c'est la conduite du bas de l'accroche qui monte
+au-dessus de lui, redescend à 45° et reprend son niveau à droite.
+
+- **Version 1** : trois traits — haut, droite, bas — refermés en rectangle. Ça
+  se lisait comme une bordure de formulaire, et la conduite continuait tout
+  droit en dessous : deux traits là où la référence n'en montre qu'un.
+- **Version 2** : une ligne ouverte au-dessus de la pilule. Le rectangle
+  disparaissait, mais ça restait un trait **ajouté** — la conduite passait
+  toujours en dessous.
+- **Version 3** : la conduite elle-même se décroche. Un seul trait, qui
+  contourne. `ConduiteDecrochee` remplace `Conduite` au-dessus de 1024 px.
+
+**Pourquoi en segments CSS et non en SVG.** Un SVG étiré en
+`preserveAspectRatio="none"` déforme les diagonales : sur une bande de 100 px
+de haut pour 1 440 de large, un « 45° » devient un angle de quelques degrés.
+Les segments horizontaux s'étirent sans dommage ; les diagonales sont posées à
+longueur fixe (`chute × √2`) et gardent leur angle.
+
+Sous 1024 px la barre occupe toute la largeur : plus de place pour le palier
+bas, donc le décrochement n'aurait aucun sens. La conduite droite reprend la
+main.
+
+Dernier réglage : la barre descend de 12 px et le décrochement perd 10 px de
+dénivelé. Une conduite qui monte trop haut frôle les boutons et le détour se
+remarque plus que ce qu'il contourne.
+
 ## 2026-09-08 — Le décrochement est une ligne, pas un cadre
 
 Le champ de recherche paraissait posé dans une boîte noire. La cause : mes

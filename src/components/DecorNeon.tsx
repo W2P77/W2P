@@ -236,3 +236,66 @@ export function TitreSection({ children }: { children: ReactNode }) {
     </div>
   );
 }
+
+/**
+ * La conduite du bas de l'accroche, décrochée pour laisser passer la barre
+ * de recherche.
+ *
+ * ── Pourquoi elle remplace la conduite droite ─────────────────────────────
+ *
+ * Le champ de recherche doit se glisser **sous** une ligne qui existe déjà,
+ * pas sous une ligne ajoutée pour lui. J'ai d'abord dessiné un cadre autour du
+ * champ (il se lisait comme une bordure de formulaire), puis une ligne ouverte
+ * au-dessus (elle ajoutait un objet de plus). Dans les deux cas, la conduite
+ * du bas continuait tout droit en dessous, et il y avait donc deux traits là
+ * où la référence n'en montre qu'un.
+ *
+ * Ici la conduite elle-même monte au-dessus du champ sur la partie gauche,
+ * redescend à 45°, et reprend son niveau à droite. Un seul trait, qui contourne.
+ *
+ * ── Pourquoi en segments CSS et non en SVG ────────────────────────────────
+ *
+ * Un SVG étiré en `preserveAspectRatio="none"` déforme les diagonales : sur
+ * une bande de 110 px de haut pour 1 440 de large, un « 45° » devient un angle
+ * de quelques degrés. Les segments horizontaux s'étirent sans dommage, les
+ * diagonales sont posées à longueur fixe et gardent leur angle.
+ */
+const LIGNES = [
+  { haut: 0, palier: 585, chute: 84, couleur: '#f13fdc', opacite: 0.85 },
+  { haut: 7, palier: 570, chute: 80, couleur: '#2fd8f5', opacite: 0.5 },
+  { haut: 14, palier: 555, chute: 76, couleur: '#ff9d4d', opacite: 0.45 },
+];
+
+export function ConduiteDecrochee({ className = '' }: { className?: string }) {
+  return (
+    <div className={className} aria-hidden>
+      {LIGNES.map((l, i) => {
+        const commun = {
+          position: 'absolute' as const,
+          height: 1,
+          background: l.couleur,
+          opacity: l.opacite,
+        };
+        return (
+          <div key={i}>
+            {/* Le palier haut, au-dessus du champ de recherche. */}
+            <span style={{ ...commun, left: 0, top: l.haut, width: l.palier }} />
+            {/* La descente, à longueur fixe pour rester à 45°. */}
+            <span
+              style={{
+                ...commun,
+                left: l.palier,
+                top: l.haut,
+                width: l.chute * Math.SQRT2,
+                transformOrigin: 'left center',
+                transform: 'rotate(45deg)',
+              }}
+            />
+            {/* Le palier bas, jusqu'au bord droit. */}
+            <span style={{ ...commun, left: l.palier + l.chute, top: l.haut + l.chute, right: 0 }} />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
