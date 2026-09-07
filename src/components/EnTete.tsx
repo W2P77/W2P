@@ -23,6 +23,7 @@ import { useState } from 'react';
 const LIENS = [
   { label: 'HOME', href: '/' },
   { label: 'SLOT CATALOGUE', href: '/catalogue', chevron: true },
+  { label: 'NEW', href: '/new-releases' },
   { label: 'REVIEWS', href: '/reviews' },
   { label: 'DEMOS', href: '/demos' },
   { label: 'GUIDES', href: '/guides' },
