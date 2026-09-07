@@ -7,6 +7,8 @@ import { BadgePreuve, type Confiance } from '@/components/BadgePreuve';
 import { Tirets, Equerre } from '@/components/DecorNeon';
 import { jeuParSlug, memeStudio, casinosPourStudio } from '@/lib/donnees/catalogue';
 import { OuJouer } from '@/components/OuJouer';
+import { baliseJeu } from '@/lib/donnees-structurees';
+import { SITE_URL } from '@/lib/site';
 
 export const revalidate = 3600;
 
@@ -46,6 +48,10 @@ export async function generateMetadata({
   return {
     title: `Where to play ${jeu.nom} — ${rtp}, demo and full specs`,
     description: `${jeu.nom} by ${jeu.studio.nom}: ${rtp}, volatility, max win and free demo. Every number sourced — we tell you when it is not.`,
+    // La canonique est posée explicitement : la fiche est atteignable depuis
+    // le catalogue, la page du studio et la recherche, chacune pouvant traîner
+    // ses paramètres.
+    alternates: { canonical: `${SITE_URL}/slot/${jeu.studio.slug}/${jeu.slug}` },
   };
 }
 
@@ -89,6 +95,23 @@ export default async function PageJeu({
 
   return (
     <div className="min-h-screen bg-fond">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            baliseJeu({
+              slug: jeu.slug,
+              nom: jeu.nom,
+              rtpStudio: rtp,
+              rtpConfiance: jeu.rtpConfiance,
+              volatilite: jeu.volatilite,
+              gainMaxMultiple: jeu.gainMaxMultiple,
+              visuelUrl: jeu.visuelUrl,
+              studio: { nom: jeu.studio.nom, slug: jeu.studio.slug },
+            }),
+          ),
+        }}
+      />
       <EnTete />
 
       <main className="mx-auto max-w-[1200px] px-6 py-8">
