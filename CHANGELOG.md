@@ -2,6 +2,62 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Géo, logos, et la langue des faits
+
+**Filtrage par pays.** Les fiches de jeu sont rendues avec `revalidate` : leur
+HTML est mutualisé entre tous les visiteurs. Filtrer les casinos au rendu
+aurait servi le pays du premier arrivant à tous les suivants pendant une heure,
+et fait indexer par Google la sélection d'un pays au hasard. Le serveur rend
+donc la liste complète ; un middleware recopie `x-vercel-ip-country` dans un
+cookie, et le navigateur réduit la liste au pays de celui qui regarde.
+
+Trois codes ne sont pas des pays mais une absence de réponse : « XX » (IP non
+localisable), « T1 » (Tor) et « ZZ » (code CLDR de la région inconnue). Le
+dernier est le plus traître — `Intl.DisplayNames` le traduit poliment en
+« Unknown Region », et un visiteur aurait lu « Available in Unknown Region ».
+
+On ne descend jamais à zéro : quand aucun partenaire ne couvre le pays, on
+montre tout. Une page sans lien perd la visite et laisse croire que le jeu est
+introuvable, alors qu'il est seulement hors de notre sélection là-bas. Et on
+n'écrit jamais qu'un opérateur refuse un pays : `pays` décrit **notre**
+couverture, pas sa politique.
+
+**Logos.** Les 44 casinos portaient un chemin de logo, et **aucun des 44
+fichiers n'existait**. Le composant testait `if (c.logo)` : le chemin étant
+renseigné, il rendait une `<img>` cassée — exactement le cas que le repli
+devait couvrir. Un champ rempli qui ment est plus coûteux qu'un champ vide.
+
+**La langue des faits.** Les offres et les mécaniques venaient de BetsRank, en
+français, sur des fiches entièrement anglaises. 44 offres traduites (avec
+vérification mécanique qu'aucun montant ne bouge — une offre annoncée à
+15 000 € au lieu de 1 500 € est une promesse fausse faite au nom d'un
+partenaire) et 3 594 chaînes de faits.
+
+**Pièges payés :**
+
+- **`\b` ne marque pas de frontière après une lettre accentuée** en regex JS
+  sans le drapeau `u`. `/difficult[ée]\b/` ne correspond jamais au singulier :
+  le motif paraît juste, ne lève rien, et ne remplace rien. Ça a coûté
+  « jusqu'à », « difficulté » et « extensible à » — trois fois la même erreur
+  avant d'être nommée.
+- **Une traduction partielle est pire que pas de traduction.** Le premier
+  détecteur listait des mots français à rejeter ; il a laissé passer 464
+  chaînes du genre « expanding à 5x5 » et « Multipliers cumulés ». Une phrase
+  à moitié traduite a l'air d'avoir été relue. Le détecteur rejette désormais
+  **tout accent**, ce qui attrape d'un coup la famille de mots qu'une liste
+  manuelle oubliait un par un.
+- **L'ordre des règles est le fond du sujet** : « extensible à » doit être
+  consommé avant « extensible », sinon il reste un « à » orphelin greffé sur
+  un mot déjà traduit.
+- **Le `Decimal` de Prisma, deuxième fois.** Passer `OuJouer` côté client a
+  fait traverser `note` — un `Decimal` jamais affiché, sélectionné pour rien.
+  Le typage ne pouvait pas le voir : le champ était déclaré `unknown`.
+
+**Reste à faire, mesuré :** 1 580 formes portent encore du français (rapport
+via `scripts/lister-restes-francais.ts`). Ce ne sont plus des termes mais des
+phrases rédigées — chaque règle supplémentaire y gagne trois chaînes et
+augmente le risque d'en abîmer d'autres. Ça se traduit à la main, ou pas.
+
 ## 2026-09-07 — La charte : biseau, polices, tracés
 
 **Le rendu ne ressemblait pas à la maquette, et la cause n'était pas la

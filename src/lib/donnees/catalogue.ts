@@ -132,8 +132,17 @@ export async function casinosPourStudio(cleCasino: string | null) {
   return prisma.casino.findMany({
     where: { actif: true, providers: { has: cleCasino } },
     orderBy: [{ note: 'desc' }, { nom: 'asc' }],
+    /*
+     * `note` ordonne mais n'est pas sélectionné, et c'est volontaire.
+     *
+     * Prisma la rend en `Decimal`, un objet qui ne traverse pas la frontière
+     * serveur → client : le bloc « où jouer » filtre par pays côté navigateur,
+     * il est donc client, et chaque casino passé lui faisait cracher « Only
+     * plain objects can be passed to Client Components ». Le tri, lui, se fait
+     * en SQL — la colonne n'a aucune raison de remonter jusqu'à React.
+     */
     select: {
-      slug: true, nom: true, logo: true, note: true,
+      slug: true, nom: true, logo: true,
       bonusTexte: true, pays: true,
     },
   });
