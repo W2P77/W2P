@@ -31,6 +31,14 @@ export function PiedDePage() {
               <ul className="space-y-1.5">
                 <li><a href="/catalogue" className="text-texte-doux hover:text-neon-cyan">Catalogue</a></li>
                 <li><a href="/demos" className="text-texte-doux hover:text-neon-cyan">Free demos</a></li>
+                <li><a href="/reviews" className="text-texte-doux hover:text-neon-cyan">Verified slots</a></li>
+              </ul>
+            </div>
+            <div>
+              <p className="mb-2 font-semibold uppercase tracking-wide text-texte-faible">Learn</p>
+              <ul className="space-y-1.5">
+                <li><a href="/guides" className="text-texte-doux hover:text-neon-cyan">Guides</a></li>
+                <li><a href="/account" className="text-texte-doux hover:text-neon-cyan">My games</a></li>
               </ul>
             </div>
           </nav>

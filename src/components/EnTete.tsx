@@ -23,7 +23,10 @@ import { useState } from 'react';
 const LIENS = [
   { label: 'HOME', href: '/' },
   { label: 'SLOT CATALOGUE', href: '/catalogue', chevron: true },
+  { label: 'REVIEWS', href: '/reviews' },
   { label: 'DEMOS', href: '/demos' },
+  { label: 'GUIDES', href: '/guides' },
+  { label: 'ACCOUNT', href: '/account' },
 ];
 
 export function EnTete() {
@@ -49,7 +52,7 @@ export function EnTete() {
           </span>
         </Link>
 
-        <nav className="ml-auto hidden items-center gap-7 lg:flex">
+        <nav className="ml-auto hidden items-center gap-7 xl:flex">
           {LIENS.map((l) => (
             <Link
               key={l.href}
@@ -67,7 +70,7 @@ export function EnTete() {
         <button
           type="button"
           onClick={() => setOuvert((o) => !o)}
-          className="ml-auto grid h-9 w-9 place-items-center rounded border border-neon-cyan/50 text-neon-cyan lg:hidden"
+          className="ml-auto grid h-9 w-9 place-items-center rounded border border-neon-cyan/50 text-neon-cyan xl:hidden"
           aria-expanded={ouvert}
           aria-label={ouvert ? 'Close menu' : 'Open menu'}
         >
@@ -76,7 +79,7 @@ export function EnTete() {
       </div>
 
       {ouvert && (
-        <nav className="border-t border-fond-bordure bg-fond-panneau lg:hidden">
+        <nav className="border-t border-fond-bordure bg-fond-panneau xl:hidden">
           {LIENS.map((l) => (
             <Link
               key={l.href}
