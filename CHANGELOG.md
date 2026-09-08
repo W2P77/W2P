@@ -2,6 +2,31 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Les captures s'agrandissent au clic
+
+Les captures les plus utiles sont les panneaux de règles : table de gains,
+plage de multiplicateurs, RTP. Dans une grille à deux colonnes, ce texte fait
+quatre pixels de haut — l'image est là mais elle ne se lit pas, et une capture
+illisible ne documente rien, elle décore.
+
+Fermeture par Échap, par le fond, ou par un bouton visible : les trois, parce
+qu'un visiteur qui ne trouve pas comment refermer une image plein écran quitte
+la page. Flèches gauche et droite pour parcourir les sept pages sans refermer.
+
+**Deux pièges CSS, tous deux invisibles au typecheck :**
+
+- **Le `clip-path` du panneau rognait la visionneuse.** Un `clip-path` rogne
+  ses descendants **y compris ceux en `position: fixed`** — la visionneuse
+  s'ouvrait tronquée à l'intérieur du panneau au lieu de couvrir l'écran. Le
+  même piège existe avec `filter` et `transform`, qui redéfinissent le bloc
+  conteneur d'un élément fixe. La seule issue est de sortir du sous-arbre :
+  un portail vers `body`.
+- **`bg-black/92` ne produisait aucun fond.** Une opacité arbitraire ne sort
+  du générateur Tailwind que si elle figure telle quelle dans le source. La
+  page se lisait donc derrière l'image. Le voile est désormais posé en style,
+  et **opaque** : à 95 % la grille continuait de transparaître sous le panneau
+  qu'on venait d'ouvrir pour le lire.
+
 ## 2026-09-08 — Les captures passent chez Supabase Storage
 
 Bucket public `captures`, limité au WebP/PNG/JPEG et à 5 Mo par fichier. Les

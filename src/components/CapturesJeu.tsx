@@ -1,5 +1,5 @@
 import { CAPTURES } from '@/data/captures';
-import { RACINE_CAPTURES } from '@/lib/site';
+import { GalerieCaptures } from './GalerieCaptures';
 
 /**
  * Les captures faites dans la démo officielle du studio.
@@ -37,29 +37,7 @@ export function CapturesJeu({ slug }: { slug: string }) {
         shows when you open it.
       </p>
 
-      <div className="mt-5 grid gap-5 sm:grid-cols-2">
-        {lot.captures.map((c) => (
-          <figure key={c.fichier}>
-            <span className="biseau-petit block overflow-hidden border border-fond-bordure bg-fond">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={`${RACINE_CAPTURES}/${c.fichier}`}
-                alt={`${c.titre} — ${slug}`}
-                className="block w-full"
-                loading="lazy"
-              />
-            </span>
-            <figcaption className="mt-2.5">
-              <span className="block font-ui text-[13px] font-bold uppercase tracking-[0.05em] text-neon-cyan">
-                {c.titre}
-              </span>
-              <span className="mt-1 block font-corps text-[13px] leading-relaxed text-texte-doux">
-                {c.legende}
-              </span>
-            </figcaption>
-          </figure>
-        ))}
-      </div>
+      <GalerieCaptures captures={lot.captures} jeu={slug} />
     </section>
   );
 }

@@ -1,0 +1,28 @@
+import { chromium } from 'playwright';
+import fs from 'node:fs';
+const CH = '/Users/joris/Library/Caches/ms-playwright/chromium-1140/chrome-mac/Chromium.app/Contents/MacOS/Chromium';
+const OUT = '/private/tmp/claude-501/-Users-joris-Documents-GitHub-BetsRank/6091ffbe-aa2e-4af1-ac40-cd360a2e860a/scratchpad/hacksaw';
+const id = process.argv[2], ver = process.argv[3], tag = process.argv[4];
+const url = `https://static-live.hacksawgaming.com/${id}/${ver}/index.html?language=en&channel=desktop&gameid=${id}&mode=2&token=demo&lobbyurl=https%3A%2F%2Fwww.hacksawgaming.com&currency=EUR&partner=demo&env=https://rgs-demo.hacksawgaming.com/api&realmoneyenv=https://rgs-demo.hacksawgaming.com/api`;
+console.log('URL:', url);
+const b = await chromium.launch({ executablePath: CH, args: ['--autoplay-policy=no-user-gesture-required'] });
+const ctx = await b.newContext({ viewport: { width: 1280, height: 800 } });
+const page = await ctx.newPage();
+const api = [];
+page.on('request', r => { if (/api|rgs/i.test(r.url())) api.push({ dir:'>', url:r.url(), body:(r.postData()||'').slice(0,600) }); });
+page.on('response', async r => {
+  if (!/api|rgs/i.test(r.url())) return;
+  let t=''; try { t = (await r.text()).slice(0, 4000); } catch {}
+  api.push({ dir:'<', status:r.status(), url:r.url(), body:t });
+});
+page.on('console', m => { const t=m.text(); if(/error|fail|rtp/i.test(t)) console.log('CONSOLE:', t.slice(0,200)); });
+await page.goto(url, { waitUntil: 'domcontentloaded' });
+await page.waitForTimeout(25000);
+await page.screenshot({ path: `${OUT}/${tag}-direct.png` });
+fs.writeFileSync(`${OUT}/${tag}-api.json`, JSON.stringify(api, null, 1));
+console.log('\n=== API ===');
+for (const a of api) console.log(a.dir, a.status||'', a.url.slice(0,140), '\n   ', a.body.slice(0,700).replace(/\n/g,' '));
+console.log('\n=== innerText ===');
+console.log((await page.evaluate(()=>document.body.innerText)).slice(0,1500));
+console.log('\n=== canvas count ===', await page.evaluate(()=>document.querySelectorAll('canvas').length));
+await b.close();
