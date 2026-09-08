@@ -158,9 +158,20 @@ export default async function PageJeu({
               </div>
             )}
 
-            <OuJouer jeu={jeu.nom} studio={jeu.studio.nom} casinos={casinos} />
-
+            {/*
+             * Les captures avant les partenaires, et pas l'inverse.
+             *
+             * La liste des casinos était placée juste sous le visuel : le
+             * visiteur tombait sur huit boutons « Play » avant d'avoir lu une
+             * seule information sur le jeu. C'est l'ordre d'un comparateur,
+             * pas celui d'une fiche — et il dessert les deux, parce qu'un
+             * lecteur sollicité avant d'être renseigné ne clique pas.
+             *
+             * On documente d'abord, on oriente ensuite.
+             */}
             <CapturesJeu slug={jeu.slug} />
+
+            <OuJouer jeu={jeu.nom} studio={jeu.studio.nom} casinos={casinos} />
 
             {jeu.demoUrl && (
               <a

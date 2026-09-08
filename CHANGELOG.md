@@ -2,6 +2,15 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Les partenaires passent après la documentation
+
+La liste des casinos était placée juste sous le visuel : le visiteur tombait
+sur huit boutons « Play » avant d'avoir lu une seule information sur le jeu.
+C'est l'ordre d'un comparateur, pas celui d'une fiche — et il dessert les deux,
+parce qu'un lecteur sollicité avant d'être renseigné ne clique pas.
+
+On documente d'abord, on oriente ensuite.
+
 ## 2026-09-08 — Captures dans la démo : la preuve tient dans le jeu
 
 Six captures faites dans la démo officielle de Pragmatic Play sur Gates of
