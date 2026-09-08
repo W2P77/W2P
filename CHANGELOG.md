@@ -2,6 +2,28 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Les captures passent chez Supabase Storage
+
+Bucket public `captures`, limité au WebP/PNG/JPEG et à 5 Mo par fichier. Les
+neuf captures de Gates of Olympus y sont, la fiche les sert depuis là, et le
+dépôt ne les porte plus.
+
+**Pourquoi pas dans Git.** Six captures pèsent 1 Mo en WebP ; sur 1 951 jeux
+l'ordre de grandeur est de 1,7 Go. Git garde chaque version d'un binaire dans
+l'historique pour toujours — un dépôt qu'on ne peut plus cloner est un dépôt
+perdu. Les jaquettes (54 Mo) passaient encore ; les captures, non.
+
+**L'URL de base est une constante, pas une variable d'environnement.** Elle
+apparaît telle quelle dans chaque image servie au visiteur : elle n'a rien d'un
+secret. En faire une variable ajouterait une façon de casser la production —
+variable oubliée sur Vercel, et toutes les captures tombent en 404 — pour
+protéger ce qui est déjà public. Seul le téléversement demande la clé, et il
+tourne en local.
+
+`x-upsert` est actif : relancer une capture remplace l'ancienne au lieu
+d'échouer. Sans ça, corriger une image demanderait une suppression manuelle —
+et on finirait par ne plus corriger.
+
 ## 2026-09-08 — Les partenaires passent après la documentation
 
 La liste des casinos était placée juste sous le visuel : le visiteur tombait

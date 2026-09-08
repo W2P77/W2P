@@ -10,3 +10,7 @@ next-env.d.ts
 .DS_Store
 .vercel
 coverage
+
+# Aire de travail des captures : elles vivent chez Supabase Storage,
+# pas dans l'historique Git (1,7 Go attendus sur tout le catalogue).
+public/images/captures/

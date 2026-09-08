@@ -1,4 +1,5 @@
 import { CAPTURES } from '@/data/captures';
+import { RACINE_CAPTURES } from '@/lib/site';
 
 /**
  * Les captures faites dans la démo officielle du studio.
@@ -42,7 +43,7 @@ export function CapturesJeu({ slug }: { slug: string }) {
             <span className="biseau-petit block overflow-hidden border border-fond-bordure bg-fond">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={`/images/captures/${c.fichier}`}
+                src={`${RACINE_CAPTURES}/${c.fichier}`}
                 alt={`${c.titre} — ${slug}`}
                 className="block w-full"
                 loading="lazy"
