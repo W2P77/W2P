@@ -2,6 +2,35 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Les derniers logos, et une garde qui se faisait avoir
+
+Trois logos de plus depuis les sites officiels : Endorphina (SVG 1983×908),
+BGaming (SVG) et Play'n GO. **25 studios sur 27** en portent un.
+
+**Le contrôle de luminance s'est fait avoir, et c'est le plus instructif.**
+Il calculait la luminance *moyenne* des pixels opaques. Le logo BGaming est un
+mot en noir accompagné d'un petit carré jaune vif : minoritaire en surface,
+très lumineux, le jaune tirait la moyenne à 91 — au-dessus du seuil — alors que
+les neuf dixièmes du dessin étaient invisibles sur fond noir. Le logo est passé,
+et seule une vérification à l'œil l'a rattrapé.
+
+Un contrôle qu'un seul détail suffit à tromper ne protège de rien. Il raisonne
+maintenant sur la **médiane**, qui décrit ce que l'œil voit : si plus de la
+moitié du tracé est sombre, le logo est sombre, quel que soit l'éclat du reste.
+Le passage à la médiane a aussi révélé que Play'n GO était à 70 pile — la
+moyenne le surévaluait sans qu'on le sache.
+
+BGaming n'a que deux couleurs, sept tracés noirs et sept jaunes : le noir est
+passé en blanc, ce qui donne la version inversée du logo sans toucher ni à sa
+forme ni à son jaune de marque.
+
+**Deux studios restent sans logo, et c'est un choix.** Booming Games bloque
+toute lecture automatisée de son site ; Playson ne sert qu'une coquille
+JavaScript. Habanero expose bien une icône, mais elle fait 94 px et ne montre
+qu'un écusson sans le nom : agrandie à la toile de 400 px elle serait molle, et
+un « H » seul dans une liste dont le but est d'identifier un fournisseur ne
+remplit pas sa fonction. Le nom en texte fait mieux que l'image.
+
 ## 2026-09-08 — La conduite passe derrière le logo
 
 Elle **commençait** à droite du logo, en biseau. Résultat : un trait qui naît

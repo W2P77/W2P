@@ -11,7 +11,7 @@
  *
  * 2. **Un logo sombre est invisible sur ce site.** Le fond est noir : un logo
  *    en noir sur transparent disparaît, et rien ne le signale — la case paraît
- *    simplement vide. Le script mesure donc la luminance moyenne des pixels
+ *    simplement vide. Le script mesure donc la luminance médiane des pixels
  *    opaques et refuse d'écrire en dessous du seuil, en le disant.
  *
  *    Le garde-fou a servi dès le premier passage : Wazdan publie son logo en
@@ -37,17 +37,29 @@ const TOILE = { largeur: 400, hauteur: 160 };
 /** En dessous, le logo se fond dans le fond noir de la page. */
 const LUMINANCE_MINIMALE = 70;
 
-async function luminanceMoyenne(mem: Buffer): Promise<number> {
+/**
+ * La luminance **médiane** des pixels opaques, pas la moyenne.
+ *
+ * La moyenne s'est fait avoir dès le second lot : le logo BGaming est un mot
+ * en noir avec un petit carré jaune vif. Le jaune, minoritaire en surface mais
+ * très lumineux, tirait la moyenne à 91 — au-dessus du seuil — alors que les
+ * neuf dixièmes du dessin étaient invisibles sur fond noir. Un contrôle qu'un
+ * seul détail suffit à tromper ne protège de rien.
+ *
+ * La médiane décrit ce que l'œil voit réellement : si plus de la moitié du
+ * tracé est sombre, le logo est sombre, quel que soit l'éclat du reste.
+ */
+async function luminanceMediane(mem: Buffer): Promise<number> {
   const { data, info } = await sharp(mem).raw().toBuffer({ resolveWithObject: true });
-  let somme = 0;
-  let opaques = 0;
+  const valeurs: number[] = [];
   for (let i = 0; i < data.length; i += info.channels) {
     const alpha = info.channels === 4 ? data[i + 3] : 255;
     if (alpha < 128) continue;
-    somme += 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
-    opaques++;
+    valeurs.push(0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]);
   }
-  return opaques === 0 ? 0 : somme / opaques;
+  if (valeurs.length === 0) return 0;
+  valeurs.sort((x, y) => x - y);
+  return valeurs[Math.floor(valeurs.length / 2)];
 }
 
 async function main() {
@@ -81,7 +93,7 @@ async function main() {
       .png()
       .toBuffer();
 
-    const lum = Math.round(await luminanceMoyenne(rendu));
+    const lum = Math.round(await luminanceMediane(rendu));
     if (lum < LUMINANCE_MINIMALE) {
       trop_sombres.push(`${slug} (luminance ${lum}) — invisible sur fond noir, non écrit`);
       continue;
