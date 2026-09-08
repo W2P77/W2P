@@ -199,32 +199,20 @@ async function main() {
     args: ['--autoplay-policy=no-user-gesture-required'],
   });
 
-  const resultats: Resultat[] = [];
-  for (let i = 0; i < jeux.length; i += PARALLELE) {
-    const lot = await Promise.all(
-      jeux.slice(i, i + PARALLELE).map((j) =>
-        capturerUnJeu(nav, { ...j, demoUrl: j.demoUrl! }, adaptateur),
-      ),
-    );
-    for (const r of lot) if (r) resultats.push(r);
-    console.log(`  ${Math.min(i + PARALLELE, jeux.length)}/${jeux.length}`);
-  }
-  await nav.close();
-
-  console.log('');
-  for (const r of resultats) {
-    const marque = r.rtp != null ? `RTP ${r.rtp}` : 'RTP non lu';
-    console.log(`  ${r.slug.padEnd(34)} ${r.captures.length} captures · ${marque}${r.ecart ? `  ⚠ ${r.ecart}` : ''}`);
-  }
-
-  if (!appliquer) {
-    console.log('\nSIMULATION — rien n’a été téléversé ni écrit. Ajouter --appliquer.');
-    await prisma.$disconnect();
-    return;
-  }
-
-  let publies = 0;
-  for (const r of resultats) {
+  /**
+   * Publier chaque jeu dès qu'il est prêt, et non à la fin du lot.
+   *
+   * La première version capturait les quarante jeux, puis téléversait, puis
+   * écrivait. Une coupure à la trente-neuvième perdait quarante minutes de
+   * travail — et sur les 592 jeux qui restent, dix heures. Un traitement long
+   * doit être **interruptible sans perte** : c'est ce qui permet de l'arrêter
+   * pour autre chose, ce qui arrive tout le temps.
+   *
+   * Le champ `capturesLe` sert de marque-page : le programme ne reprend que
+   * les jeux qui ne l'ont pas.
+   */
+  const publier = async (r: Resultat) => {
+    if (!appliquer) return;
     for (const c of r.captures) await televerser(join(ATELIER, c.fichier), c.fichier);
     const jeu = jeux.find((j) => j.slug === r.slug)!;
     await prisma.jeu.update({
@@ -232,8 +220,9 @@ async function main() {
       data: {
         captures: r.captures,
         capturesLe: new Date(),
-        // Le RTP n'est écrit que s'il a été lu. Sinon la fiche garde ce
-        // qu'elle avait, et les captures sont publiées quand même.
+        // Le RTP n'est écrit que s'il a été lu, et qu'il ne contredit pas la
+        // base. Sinon la fiche garde ce qu'elle avait, et les captures sont
+        // publiées quand même : elles valent par elles-mêmes.
         ...(r.rtp != null && !r.ecart
           ? {
               rtpStudio: r.rtp,
@@ -248,10 +237,39 @@ async function main() {
         ...(r.gainMax != null ? { gainMaxMultiple: Math.round(r.gainMax) } : {}),
       },
     });
-    publies++;
+    // Le dossier de travail ne garde rien : les images vivent chez Supabase.
+    for (const c of r.captures) rmSync(join(ATELIER, c.fichier), { force: true });
+  };
+
+  const resultats: Resultat[] = [];
+  for (let i = 0; i < jeux.length; i += PARALLELE) {
+    const lot = await Promise.all(
+      jeux.slice(i, i + PARALLELE).map((j) =>
+        capturerUnJeu(nav, { ...j, demoUrl: j.demoUrl! }, adaptateur),
+      ),
+    );
+    for (const r of lot) {
+      if (!r) continue;
+      resultats.push(r);
+      await publier(r);
+      const marque = r.rtp != null ? `RTP ${r.rtp}` : 'RTP non lu';
+      console.log(`  ${r.slug.padEnd(34)} ${marque}${r.ecart ? `  ⚠ ${r.ecart}` : ''}`);
+    }
+    console.log(`  — ${Math.min(i + PARALLELE, jeux.length)}/${jeux.length} —`);
   }
+  await nav.close();
+
+  if (!appliquer) {
+    for (const r of resultats) {
+      console.log(`  ${r.slug.padEnd(34)} ${r.captures.length} captures · ${r.rtp ?? 'RTP non lu'}`);
+    }
+    console.log('\nSIMULATION — rien n’a été téléversé ni écrit. Ajouter --appliquer.');
+    await prisma.$disconnect();
+    return;
+  }
+
   const verifies = await prisma.jeu.count({ where: { rtpConfiance: 'STUDIO' } });
-  console.log(`\n${publies} jeux publiés. ${verifies} fiches en source studio.`);
+  console.log(`\n${resultats.length} jeux publiés. ${verifies} fiches en source studio.`);
   await prisma.$disconnect();
 }
 

@@ -67,6 +67,12 @@ que l'accueil apparaisse**, sa présence prouvant que le jeu écoute, puis de
 cliquer jusqu'à ce qu'il disparaisse. On n'attend pas une durée, on attend un
 état.
 
+**Chaque jeu est publié dès qu'il est prêt**, et non à la fin du lot. La
+première version capturait les quarante jeux, puis téléversait, puis écrivait :
+une coupure à la trente-neuvième perdait quarante minutes — et sur les 592 jeux
+restants, dix heures. Un traitement long doit être interruptible sans perte,
+parce qu'on l'interrompt toujours. Le champ `capturesLe` sert de marque-page.
+
 Les captures vivent en base (`jeux.captures`, colonne JSON) plutôt qu'en
 fichier statique : à 598 jeux et neuf captures chacun, publier une image ne doit
 pas demander un commit.
