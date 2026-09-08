@@ -38,7 +38,27 @@ en phrases pour l'écarter : elle effaçait tout, l'OCR ne restituant aucun poin
 On s'appuie donc sur la formulation — « of **this game** is » contre « when
 **using** » — qui distingue les deux sans ponctuation.
 
-**L'écran d'accueil, deux échecs avant de comprendre.** Un clic à position fixe
+**L'écran d'accueil : la touche Espace, après trois erreurs.** Un clic à
+position fixe échouait un jeu sur deux — le bouton de lancement se déplace
+selon la mise en page. Six positions essayées dès la 22ᵉ seconde n'ont rien
+changé : le problème n'était pas *où* cliquer mais *quand*, ces jeux mettant
+plus de 22 s à charger. Une détection de l'accueil par OCR pour attendre le bon
+moment n'a rien lu non plus — son texte est décoratif, courbé, ombré, et le
+moteur en tire « TO START (UU », là où le panneau de règles se lit
+parfaitement.
+
+La réponse était écrite dans le panneau lui-même : « SPACE and ENTER buttons on
+the keyboard can be used to start and stop the spin. » Le gros bouton rond de
+l'accueil **n'est pas cliquable** — c'est une illustration dans la phrase
+« PRESS ⟳ TO START PLAYING! ». Vérifié à l'écran avant d'y croire.
+
+**Un jeu dont le panneau ne s'est pas ouvert n'est pas marqué comme fait.**
+Sans ce contrôle, il produisait neuf captures de son carrousel d'accueil,
+publiées comme documentation et jamais réessayées. Le mot « RTP » ne figure que
+dans le panneau : sa présence prouve qu'on y est entré. Le jeu reste en file
+sinon — la reprise devient automatique.
+
+**Ancienne note conservée :** Un clic à position fixe
 échouait un jeu sur deux : le bouton de lancement se déplace selon la mise en
 page. Six positions essayées dès la 22ᵉ seconde n'ont rien changé — le vrai
 problème n'était pas *où* cliquer mais *quand* : ces jeux mettent plus de 22 s

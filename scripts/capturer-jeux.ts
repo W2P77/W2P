@@ -93,6 +93,20 @@ async function capturerUnJeu(
   const faits = await lireLesRegles(pngRegles);
 
   /*
+   * Le panneau s'est-il seulement ouvert ?
+   *
+   * Sans ce contrôle, un jeu resté sur son écran d'accueil produisait neuf
+   * captures du carrousel, marquées « faites » — donc publiées comme
+   * documentation et jamais réessayées. Le mot « RTP » ne figure que dans le
+   * panneau de règles : sa présence prouve qu'on y est entré.
+   */
+  const panneauOuvert = faits.pages.some((p) => /RTP|GAME RULES|PAYTABLE/i.test(p.texte));
+  if (!panneauOuvert) {
+    console.log(`  ! ${jeu.slug} — panneau de règles jamais atteint, jeu laissé en file`);
+    return null;
+  }
+
+  /*
    * Les légendes ne reprennent **jamais** le texte OCR brut.
    *
    * L'OCR se trompe : « 96.02" » au lieu de « 96.02% », des mots avalés, des
