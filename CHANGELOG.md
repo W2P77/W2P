@@ -2,6 +2,42 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Débordement mobile, et trois partenaires retirés
+
+**La fiche de jeu débordait de 50 px sur iPhone** — 440 px de large dans une
+fenêtre de 390. La cause n'était pas ce qui dépassait à l'écran : un élément de
+grille a , il refuse donc de descendre sous la largeur
+minimale de son contenu. Un seul descendant large — ici les lignes de
+partenaires, qui alignent un logo de 96 px, un nom et un bouton — suffit à
+élargir **toute la colonne**, et le site entier se met à défiler latéralement.
+
+Corrigé par  sur les colonnes et  sur les
+grilles imbriquées. Les neuf pages du site mesurent désormais exactement la
+largeur de la fenêtre à 390 px.
+
+**Hermes, Europe777 et Staxino passent inactifs** : les accords ne sont pas
+renouvelés. Les laisser visibles enverrait du trafic vers des partenaires qui
+ne rémunèrent plus — chaque clic est une perte sèche.
+
+## 2026-09-08 — Débordement mobile, et trois partenaires retirés
+
+**La fiche de jeu débordait de 50 px sur iPhone** — 440 px de large dans une
+fenêtre de 390. La cause n'était pas ce qui dépassait à l'écran : un élément de
+grille porte `min-width: auto`, il refuse donc de descendre sous la largeur
+minimale de son contenu. Un seul descendant large — ici les lignes de
+partenaires, qui alignent un logo de 96 px, un nom et un bouton — suffit à
+élargir **toute la colonne**, et le site entier se met à défiler latéralement.
+
+Corrigé par `min-w-0` sur les colonnes et `grid-cols-[minmax(0,1fr)]` sur les
+grilles imbriquées. Les neuf pages du site mesurent désormais exactement la
+largeur de la fenêtre à 390 px, vérifié en émulation iPhone et non à la fenêtre
+redimensionnée — Chromium sans tête impose un minimum de 500 px, ce qui masque
+précisément ce défaut.
+
+**Hermes, Europe777 et Staxino passent inactifs** : les accords ne sont pas
+renouvelés. Les laisser visibles enverrait du trafic vers des partenaires qui
+ne rémunèrent plus — chaque clic est une perte sèche.
+
 ## 2026-09-08 — Le logo du studio sur la fiche, et deux logos illisibles
 
 **Le logo du studio ouvre le panneau de données**, à 56 px — la première

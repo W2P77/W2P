@@ -61,7 +61,7 @@ export function GalerieCaptures({ captures, jeu }: { captures: Capture[]; jeu: s
 
   return (
     <>
-      <div className="mt-5 grid gap-5 sm:grid-cols-2">
+      <div className="mt-5 grid grid-cols-[minmax(0,1fr)] gap-5 sm:grid-cols-2">
         {captures.map((c, i) => (
           <figure key={c.fichier}>
             <button

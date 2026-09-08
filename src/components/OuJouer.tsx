@@ -107,9 +107,9 @@ export function OuJouer({
             )}
           </p>
 
-          <ul className="grid gap-2.5 sm:grid-cols-2">
+          <ul className="grid grid-cols-[minmax(0,1fr)] gap-2.5 sm:grid-cols-2">
             {liste.map((c) => (
-              <li key={c.slug}>
+              <li key={c.slug} className="min-w-0">
                 <a
                   href={`/go/${c.slug}?slot=${encodeURIComponent(jeu)}`}
                   target="_blank"

@@ -126,8 +126,19 @@ export default async function PageJeu({
           </a>
         </nav>
 
+        {/*
+         * `min-w-0` sur les deux colonnes, et ce n'est pas cosmétique.
+         *
+         * Un élément de grille a `min-width: auto` : il refuse de descendre
+         * sous la largeur minimale de son contenu. Il suffit donc d'un seul
+         * descendant large — ici la liste des partenaires, dont chaque ligne
+         * aligne un logo de 96 px, un nom et un bouton — pour que **toute la
+         * colonne** s'élargisse. Sur iPhone, la page mesurait 440 px de large
+         * dans une fenêtre de 390 : tout le site défilait latéralement, et le
+         * coupable n'était pas ce qui débordait à l'écran.
+         */}
         <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-          <div>
+          <div className="min-w-0">
             <h1 className="font-titre text-[30px] font-black uppercase leading-[0.95] tracking-tight text-white sm:text-[40px]">
               Where to play {jeu.nom}
             </h1>
@@ -187,7 +198,7 @@ export default async function PageJeu({
           </div>
 
           {/* ── Les chiffres, avec leur provenance ─────────────────────── */}
-          <aside className="panneau relative h-fit p-5">
+          <aside className="panneau relative h-fit min-w-0 p-5">
             <Equerre position="hd" couleur="cyan" />
 
             {/*
