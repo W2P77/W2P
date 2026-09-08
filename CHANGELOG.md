@@ -2,6 +2,27 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Le site déclarait vivre à une adresse morte
+
+`SITE_URL` valait `https://where2play.info` en dur. **Ce domaine ne résout
+pas.** Le site annonçait donc à Google que ses 1 987 URLs de sitemap, ses
+canoniques et ses données structurées pointaient vers un hôte inexistant.
+
+L'absence d'aperçu au partage n'était que le symptôme visible : les réseaux
+sociaux allaient chercher `og:image` sur ce même domaine mort. Le problème de
+fond était l'indexation.
+
+L'adresse se déduit désormais de l'environnement, et **se corrige toute seule** :
+Vercel renseigne `VERCEL_PROJECT_PRODUCTION_URL` avec le domaine de production
+du projet — l'adresse `.vercel.app` tant qu'aucun domaine n'est branché, puis le
+domaine personnalisé dès qu'il l'est. Rien à changer ce jour-là. Un
+`NEXT_PUBLIC_SITE_URL` explicite garde la priorité si besoin.
+
+Le repli local passe de `where2play.info` à `localhost:3000` : en
+développement, aucune autre adresse n'est atteignable, et pointer vers un
+domaine qu'on ne contrôle pas encore n'aide personne.
+
+
 ## 2026-09-08 — Chaîne de capture : lire les faits dans le jeu lui-même
 
 598 jeux Pragmatic ont désormais leur **vraie URL de démo**, extraite du

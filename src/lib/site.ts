@@ -1,13 +1,35 @@
 /**
  * L'adresse publique du site, en un seul endroit.
  *
- * Elle sert au sitemap, aux canoniques et aux données structurées. Recopiée
- * dans chacun, elle finirait par diverger — et une canonique fausse fait plus
- * de mal que pas de canonique du tout.
+ * Elle sert au sitemap, aux canoniques, aux données structurées et à l'image
+ * de partage. Recopiée dans chacun, elle finirait par diverger — et une
+ * canonique fausse fait plus de mal que pas de canonique du tout.
+ *
+ * ── Pourquoi elle n'est plus écrite en dur ────────────────────────────────
+ *
+ * Elle valait `https://where2play.info`, un domaine **qui ne résout pas**. Le
+ * site déclarait donc à Google que ses 1 987 URLs vivaient à une adresse
+ * morte, et les réseaux sociaux allaient chercher l'image de partage sur un
+ * hôte inexistant — d'où l'absence d'aperçu au partage, qui n'était que le
+ * symptôme visible du problème.
+ *
+ * L'ordre ci-dessous se corrige tout seul : Vercel renseigne
+ * `VERCEL_PROJECT_PRODUCTION_URL` avec le **domaine de production du projet**,
+ * c'est-à-dire l'adresse `.vercel.app` tant qu'aucun domaine n'est branché,
+ * puis le domaine personnalisé dès qu'il l'est. Rien à changer ce jour-là.
  */
-export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://where2play.info'
-).replace(/\/$/, '');
+function racineDuSite(): string {
+  const explicite = process.env.NEXT_PUBLIC_SITE_URL;
+  if (explicite) return explicite;
+
+  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (vercel) return `https://${vercel}`;
+
+  // Développement local : rien d'autre ne serait atteignable.
+  return 'http://localhost:3000';
+}
+
+export const SITE_URL = racineDuSite().replace(/\/$/, '');
 
 export const SITE_NOM = 'where2play.info';
 
