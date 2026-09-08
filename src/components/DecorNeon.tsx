@@ -269,43 +269,65 @@ export function ConduiteDecrochee({ className = '' }: { className?: string }) {
  * l'attaque en biseau est dessinée en segments CSS à longueur fixe, qui
  * gardent leur angle quelle que soit la largeur.
  */
-const ATTAQUE = [
-  { y: 3, couleur: '#f13fdc', opacite: 0.9 },
-  { y: 7, couleur: '#2fd8f5', opacite: 0.55 },
-  { y: 12, couleur: '#ff9d4d', opacite: 0.5 },
+/**
+ * Les trois lignes de l'en-tête : niveau de droite, niveau de gauche.
+ *
+ * `y` est la hauteur à droite du logo — celle du SVG `Conduite`, qui reprend
+ * ensuite. `yBas` est la hauteur à gauche, sous le logo. L'écart entre les
+ * deux donne la longueur de la diagonale, qui reste à 45° par construction.
+ */
+const LIGNES_TETE = [
+  { y: 3, yBas: 13, couleur: '#f13fdc', opacite: 0.9 },
+  { y: 7, yBas: 16, couleur: '#2fd8f5', opacite: 0.55 },
+  { y: 12, yBas: 19, couleur: '#ff9d4d', opacite: 0.5 },
 ];
 
 export function ConduiteEnTete({
   depart,
   className = '',
 }: {
-  /** Distance en pixels entre le bord gauche et le début du trait. */
+  /** Abscisse, en pixels, où la ligne a fini de remonter derrière le logo. */
   depart: number;
   className?: string;
 }) {
   return (
     <div className={`relative ${className}`} aria-hidden>
-      {ATTAQUE.map((a, i) => {
-        const longueur = (17 - a.y) * Math.SQRT2;
+      {LIGNES_TETE.map((l, i) => {
+        const denivele = l.yBas - l.y;
+        const commun = {
+          position: 'absolute' as const,
+          height: 1,
+          background: l.couleur,
+          opacity: l.opacite,
+        };
         return (
-          <span
-            key={i}
-            style={{
-              position: 'absolute',
-              left: depart,
-              top: a.y,
-              width: longueur,
-              height: 1,
-              background: a.couleur,
-              opacity: a.opacite,
-              transformOrigin: 'left center',
-              // Le trait monte depuis le bas du bandeau : il a l'air de sortir
-              // de derrière le logo plutôt que de commencer dans le vide.
-              transform: 'rotate(-45deg) scaleX(-1)',
-            }}
-          />
+          <div key={i}>
+            {/*
+             * Le passage sous le logo.
+             *
+             * Première version : la ligne **commençait** à droite du logo, en
+             * biseau. Elle avait alors l'air sectionnée — un trait qui naît au
+             * milieu de la page ne va nulle part. Ici elle vient du bord
+             * gauche, passe derrière le dessin (qui est en `z-10`, donc
+             * au-dessus) et ressort de l'autre côté. C'est le logo qui
+             * l'interrompt, pas elle qui s'arrête.
+             */}
+            <span style={{ ...commun, left: 0, top: l.yBas, width: depart - denivele }} />
+            {/* La remontée, à longueur fixe pour tenir les 45°. */}
+            <span
+              style={{
+                ...commun,
+                left: depart - denivele,
+                top: l.yBas,
+                width: denivele * Math.SQRT2,
+                transformOrigin: 'left center',
+                transform: 'rotate(-45deg)',
+              }}
+            />
+          </div>
         );
       })}
+      {/* À droite du logo, le tracé reprend son dessin habituel. */}
       <div className="absolute inset-y-0 right-0" style={{ left: depart }}>
         <Conduite className="h-full w-full" />
       </div>

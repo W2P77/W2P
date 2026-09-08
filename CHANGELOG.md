@@ -2,6 +2,20 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — La conduite passe derrière le logo
+
+Elle **commençait** à droite du logo, en biseau. Résultat : un trait qui naît
+au milieu de la page et ne vient de nulle part — il avait l'air sectionné.
+
+Elle vient maintenant du bord gauche, à un niveau plus bas, passe derrière le
+dessin (qui est en `z-10`, donc au-dessus) et remonte à 45° une fois dépassé.
+C'est le logo qui l'interrompt, pas elle qui s'arrête — et la différence se
+voit immédiatement, même sans savoir la nommer.
+
+Les trois lignes descendent à des hauteurs différentes (13, 16, 19 px) : un
+niveau bas commun les aurait fondues en un seul trait sous le logo, et le
+faisceau se serait reconstitué en sortant, comme sorti de nulle part.
+
 ## 2026-09-08 — La bande de tracés disparaît de l'en-tête
 
 Les deux motifs de circuit imprimé aux coins du bandeau sont supprimés.
