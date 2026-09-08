@@ -2,6 +2,48 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Les jaquettes : 35 % → 95 %, et cinq détecteurs abandonnés
+
+**1 855 jeux sur 1 951 ont désormais une jaquette**, contre 692 au départ.
+Aucune ne porte le filigrane d'un concurrent — vérifié, pas supposé.
+
+**Cinq détecteurs successifs, et pourquoi chacun a échoué.** Le calque
+« SlotCatalog.com » existe à plusieurs échelles, sur des fonds clairs comme
+sombres, et l'artwork des jeux contient lui-même du vert.
+
+1. **Par la taille de l'image** : « au-delà de 400 px, c'est filigrané ». Faux
+   dans les deux sens — `bonanza.webp` fait 480 px et est propre, `fruits.webp`
+   porte le calque à 600×600 quand `aztec-twist.webp`, même dimension, ne l'a
+   pas. Ce tri jetait mille images utilisables.
+2. **Par le vert dans une boîte en pixels fixes** : séparation parfaite sur
+   quinze images, puis un filigrane d'une autre échelle est passé à côté de la
+   boîte.
+3. **Par la teinte exacte du vert** : `booze-bash` porte un disque vert dans
+   son artwork et sortait à 23 %, quand un vrai filigrane sur fond clair
+   tombait à 0,5 %.
+4. **Par la signature blanc-puis-vert** : le score, dilué sur toute la bande,
+   plaçait de vrais filigranes à 1,4 sous une image propre à 1,27.
+5. **Par la géométrie du mot sur bande glissante** : quinze détections sur
+   quinze — et deux ratés sur douze images prises au hasard.
+
+**Le problème n'était pas le réglage.** On cherchait à *reconnaître* une chose
+dont on connaît déjà la position. Le calque est toujours ancré en haut à
+gauche et ne descend jamais au-delà de 15 % de la hauteur : on le supprime en
+**recadrant**, ce qui ne demande de reconnaître rien du tout. Le prix est une
+bande de fond en haut de la jaquette ; le gain est double — plus aucun
+filigrane possible, et les 652 images qu'on écartait par précaution
+redeviennent utilisables.
+
+**Ce que la vérification a révélé au passage :** 134 jaquettes filigranées
+étaient déjà publiées, dont plusieurs du lot d'amorçage. Le site affichait la
+marque d'un concurrent depuis le début, et aucun tri par la taille ne pouvait
+le voir.
+
+Le détecteur survit comme **filet de contrôle** : il a signalé 19 images après
+le recadrage, dont une vraie (le bas du calque avait survécu à la coupe). Deux
+recoupes ont ramené le compte à trois, supprimées — trois jaquettes sur 1 858
+contre la garantie de ne rien publier, l'échange est évident.
+
 ## 2026-09-08 — Les derniers logos, et une garde qui se faisait avoir
 
 Trois logos de plus depuis les sites officiels : Endorphina (SVG 1983×908),
