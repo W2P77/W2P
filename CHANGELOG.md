@@ -2,6 +2,42 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Le logo complet, et la conduite qui s'écarte
+
+Le nouveau fichier porte son propre mot-marque : le « where2play.info » en HTML
+qui l'accompagnait affichait donc **la marque deux fois, dans deux
+typographies différentes**. Il est retiré.
+
+Le logo déborde volontairement sous le bandeau (`-mb-[46px]`). Le garder entier
+dans la hauteur de l'en-tête aurait imposé de l'épaissir de 45 px ou de réduire
+le logo — c'est la conduite qui s'écarte : elle démarre **après** lui, attaquée
+par un biseau à 45° qui monte depuis le bas du bandeau, comme si le trait
+sortait de derrière le dessin.
+
+**Pourquoi ce départ ne pouvait pas être écrit dans le SVG.** `Conduite` est
+étirée en `preserveAspectRatio="none"` : ses coordonnées sont proportionnelles
+à la largeur de la fenêtre, alors que le logo occupe une largeur fixe en
+pixels. Un départ à « 143 unités sur 1200 » collerait au logo à 1440 px de
+large et le laisserait à 70 px de lui à 1920 — l'écart grandirait avec l'écran
+sans que rien ne le signale. Le décalage est donc appliqué en pixels sur le
+conteneur, et le biseau dessiné en segments CSS à longueur fixe.
+
+## 2026-09-08 — Le sitemap survit à une base injoignable
+
+Le premier déploiement Vercel a échoué sur `/sitemap.xml` :
+`Can't reach database server at 127.0.0.1:5432`. Sans `DATABASE_URL` dans
+l'environnement, Prisma retombe sur localhost, la requête lève pendant le
+build, et **tout le déploiement s'arrête** — le site entier reste hors ligne à
+cause d'une route annexe.
+
+La base injoignable produit désormais un sitemap réduit aux pages fixes, avec
+un avertissement explicite dans le journal de build. Les fiches y reviennent à
+la première revalidation.
+
+Ce repli ne remplace pas la configuration : sans la variable, les pages de jeux
+n'ont rien à afficher au runtime non plus. Il évite seulement qu'une variable
+oubliée se traduise par un site absent plutôt que par un message lisible.
+
 ## 2026-09-08 — L'emblème remplace le logo tracé
 
 Le logo livré est un **lockup** : emblème néon, mot-marque et baseline « SLOT

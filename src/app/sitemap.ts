@@ -18,13 +18,42 @@ export const revalidate = 3600;
  * `lastModified` vient de la date de mise à jour réelle de la fiche : une date
  * du jour sur toutes les URLs apprend à Google à ne plus la croire.
  */
+/**
+ * ── Pourquoi la base est interrogée sous `try` ────────────────────────────
+ *
+ * Ce fichier est rendu **pendant le build**. Le premier déploiement Vercel a
+ * échoué ici : sans `DATABASE_URL` dans l'environnement, Prisma retombe sur
+ * `127.0.0.1:5432`, la requête lève, et **tout le build s'arrête** — le site
+ * entier reste hors ligne à cause d'une seule route annexe.
+ *
+ * Une variable d'environnement manquante doit rester une erreur visible, pas
+ * un site indisponible. La base injoignable produit donc un sitemap réduit
+ * aux pages fixes, avec un avertissement dans le journal de build. Les fiches
+ * y reviennent à la première revalidation, une heure plus tard.
+ *
+ * Ce repli ne dispense évidemment pas de configurer la variable : sans elle,
+ * les pages de jeux n'ont rien à afficher au runtime non plus.
+ */
+async function contenuDeLaBase() {
+  try {
+    return await Promise.all([
+      prisma.jeu.findMany({
+        select: { slug: true, majLe: true, studio: { select: { slug: true } } },
+      }),
+      prisma.studio.findMany({ select: { slug: true, majLe: true } }),
+    ]);
+  } catch (erreur) {
+    console.warn(
+      '[sitemap] Base injoignable — sitemap réduit aux pages fixes. ' +
+        'Vérifier DATABASE_URL (pooler, port 6543).',
+      erreur instanceof Error ? erreur.message : erreur,
+    );
+    return [[], []] as const;
+  }
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [jeux, studios] = await Promise.all([
-    prisma.jeu.findMany({
-      select: { slug: true, majLe: true, studio: { select: { slug: true } } },
-    }),
-    prisma.studio.findMany({ select: { slug: true, majLe: true } }),
-  ]);
+  const [jeux, studios] = await contenuDeLaBase();
 
   return [
     { url: `${SITE_URL}/`, changeFrequency: 'daily', priority: 1 },

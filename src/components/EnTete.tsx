@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { Conduite, TraceCircuit } from './DecorNeon';
+import { ConduiteEnTete, TraceCircuit } from './DecorNeon';
 
 /**
  * L'en-tête, et son menu mobile.
@@ -31,6 +31,16 @@ const LIENS = [
   { label: 'ACCOUNT', href: '/account' },
 ];
 
+/**
+ * Où commence la conduite, en pixels depuis le bord.
+ *
+ * Le logo fait 110 px de haut pour un rapport 1,40 — soit 154 px de large — et
+ * la page ouvre sur 24 px de marge. 196 laisse donc une vingtaine de pixels
+ * entre le logo et l'attaque du trait : assez pour qu'ils ne se touchent pas,
+ * assez peu pour qu'ils se lisent ensemble.
+ */
+const DEPART_CONDUITE = 196;
+
 export function EnTete() {
   const chemin = usePathname();
   const [ouvert, setOuvert] = useState(false);
@@ -52,40 +62,26 @@ export function EnTete() {
       </div>
 
       <div className="mx-auto flex max-w-[1440px] items-center gap-8 px-6 pb-2.5 pt-1 lg:pt-0">
-        <Link href="/" className="flex shrink-0 items-end gap-2.5">
+        <Link href="/" className="relative z-10 flex shrink-0 items-center">
           {/*
-           * L'emblème est découpé du logo complet, pas le logo entier.
+           * Le logo complet, sans mot-marque HTML à côté.
            *
-           * Le fichier livré est un lockup — emblème, mot-marque et baseline
-           * « SLOT REVIEW & GUIDES ». À la hauteur d'un en-tête (50 px), la
-           * baseline serait un pâté de 4 px de haut : illisible, et elle
-           * salirait le bloc au lieu de l'informer. Le mot-marque reste donc
-           * du texte HTML — net à toute taille, sélectionnable, et lu par les
-           * moteurs — et seul l'emblème vient de l'image.
+           * La version précédente juxtaposait l'emblème découpé et un
+           * « where2play.info » en texte : le nouveau fichier porte déjà son
+           * mot-marque, et le doubler affichait la marque deux fois, dans deux
+           * typographies différentes.
            *
-           * Le rapport 1,41:1 est celui du découpage : forcer un carré
-           * ajouterait des marges transparentes et rétrécirait le dessin.
+           * Il déborde volontairement sous le bandeau (`-mb-[38px]`) : le
+           * garder entier dans la hauteur de l'en-tête aurait obligé à
+           * l'épaissir de 40 px ou à réduire le logo. C'est la conduite qui
+           * s'écarte — elle démarre après lui, en biseau.
            */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/embleme-w2p.webp"
-            alt=""
-            className="h-11 w-[62px] shrink-0 object-contain sm:h-[52px] sm:w-[73px]"
+            src="/images/marque-w2p.webp"
+            alt="where2play"
+            className="-mb-[30px] h-[82px] w-auto shrink-0 sm:-mb-[46px] sm:h-[110px]"
           />
-          <span className="flex flex-col">
-            <span className="font-titre text-[21px] font-extrabold leading-none tracking-[0.005em] text-white sm:text-[26px] lg:text-[30px]">
-              where<span className="text-neon-magenta">2</span>play
-              <span className="font-normal text-texte-doux">.info</span>
-            </span>
-            {/* Les quatre points de la maquette : une ponctuation, pas un
-                indicateur. Ils ancrent le mot-marque au bandeau de circuit
-                au-dessus, et c'est leur seule fonction. */}
-            <span className="mt-1 hidden gap-[5px] pl-[2px] sm:flex" aria-hidden>
-              {[0.9, 0.7, 0.5, 0.35].map((o, i) => (
-                <span key={i} className="h-[3px] w-[3px] rounded-full bg-neon-cyan" style={{ opacity: o }} />
-              ))}
-            </span>
-          </span>
         </Link>
 
         <nav className="ml-auto hidden items-center gap-7 xl:flex">
@@ -141,7 +137,7 @@ export function EnTete() {
       )}
 
       {/* La conduite néon qui court sous la barre et se coude à 45°. */}
-      <Conduite className="h-[17px] w-full" />
+      <ConduiteEnTete depart={DEPART_CONDUITE} className="h-[17px] w-full" />
     </header>
   );
 }

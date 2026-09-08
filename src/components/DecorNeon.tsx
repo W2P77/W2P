@@ -299,3 +299,62 @@ export function ConduiteDecrochee({ className = '' }: { className?: string }) {
     </div>
   );
 }
+
+/**
+ * La conduite de l'en-tête, qui démarre après le logo.
+ *
+ * ── Pourquoi elle ne peut pas être un simple SVG étiré ────────────────────
+ *
+ * `Conduite` est un SVG en `preserveAspectRatio="none"` : ses coordonnées sont
+ * **proportionnelles** à la largeur de la fenêtre. Le logo, lui, occupe une
+ * largeur **fixe** en pixels. Faire partir le trait à « 143 unités sur 1200 »
+ * le calerait sur le logo à 1440 px de large et le laisserait à 70 px du
+ * logo à 1920 — l'écart grandirait avec l'écran, sans que rien ne le signale.
+ *
+ * D'où ce conteneur : le SVG est décalé d'un nombre de pixels fixe, et
+ * l'attaque en biseau est dessinée en segments CSS à longueur fixe, qui
+ * gardent leur angle quelle que soit la largeur.
+ */
+const ATTAQUE = [
+  { y: 3, couleur: '#f13fdc', opacite: 0.9 },
+  { y: 7, couleur: '#2fd8f5', opacite: 0.55 },
+  { y: 12, couleur: '#ff9d4d', opacite: 0.5 },
+];
+
+export function ConduiteEnTete({
+  depart,
+  className = '',
+}: {
+  /** Distance en pixels entre le bord gauche et le début du trait. */
+  depart: number;
+  className?: string;
+}) {
+  return (
+    <div className={`relative ${className}`} aria-hidden>
+      {ATTAQUE.map((a, i) => {
+        const longueur = (17 - a.y) * Math.SQRT2;
+        return (
+          <span
+            key={i}
+            style={{
+              position: 'absolute',
+              left: depart,
+              top: a.y,
+              width: longueur,
+              height: 1,
+              background: a.couleur,
+              opacity: a.opacite,
+              transformOrigin: 'left center',
+              // Le trait monte depuis le bas du bandeau : il a l'air de sortir
+              // de derrière le logo plutôt que de commencer dans le vide.
+              transform: 'rotate(-45deg) scaleX(-1)',
+            }}
+          />
+        );
+      })}
+      <div className="absolute inset-y-0 right-0" style={{ left: depart }}>
+        <Conduite className="h-full w-full" />
+      </div>
+    </div>
+  );
+}
