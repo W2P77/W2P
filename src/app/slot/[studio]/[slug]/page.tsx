@@ -212,7 +212,7 @@ export default async function PageJeu({
                 <img
                   src={jeu.studio.logoUrl}
                   alt={jeu.studio.nom}
-                  className="h-9 w-auto max-w-[160px] object-contain object-left opacity-90 transition hover:opacity-100"
+                  className="h-14 w-auto max-w-[210px] object-contain object-left transition hover:opacity-80"
                 />
               </Link>
             )}

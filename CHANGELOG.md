@@ -4,7 +4,9 @@ Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commi
 
 ## 2026-09-08 — Le logo du studio sur la fiche, et deux logos illisibles
 
-**Le logo du studio ouvre le panneau de données.** Le nom figurait déjà en
+**Le logo du studio ouvre le panneau de données**, à 56 px — la première
+version à 36 px se lisait comme une vignette décorative plutôt que comme une
+signature. Le nom figurait déjà en
 ligne « PROVIDER » — le logo ne le double pas : il se reconnaît avant d'être
 lu, et sur une fiche dont l'argument est la provenance des données, dire de qui
 elles viennent avant de les donner n'est pas décoratif.
