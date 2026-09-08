@@ -2,6 +2,23 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — La bande de tracés disparaît de l'en-tête
+
+Les deux motifs de circuit imprimé aux coins du bandeau sont supprimés.
+
+Ils venaient de la maquette, où le logo n'était qu'un emblème simple. Le logo
+actuel **porte déjà son propre décor de circuit** : deux motifs du même
+vocabulaire, à vingt pixels l'un de l'autre, se disputaient l'attention au lieu
+de s'additionner. Ce n'est pas une question de surcharge — c'est que le second
+rendait le premier moins lisible, donc moins efficace.
+
+Effet utile : le bandeau se resserre de 17 px, ce qui remonte le logo d'autant
+sans qu'il faille toucher à sa taille.
+
+`TraceCircuit` n'était appelé que là. Le composant est supprimé plutôt que
+laissé en réserve : un décor orphelin dans un fichier de charte est un décor
+que personne ne saura plus pourquoi il existe.
+
 ## 2026-09-08 — Le logo complet, et la conduite qui s'écarte
 
 Le nouveau fichier porte son propre mot-marque : le « where2play.info » en HTML

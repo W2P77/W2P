@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { ConduiteEnTete, TraceCircuit } from './DecorNeon';
+import { ConduiteEnTete } from './DecorNeon';
 
 /**
  * L'en-tête, et son menu mobile.
@@ -49,19 +49,15 @@ export function EnTete() {
   return (
     <header className="relative z-30 bg-[#080b16]">
       {/*
-       * Les tracés de circuit occupent leur propre bande, au-dessus de la
-       * barre. Posés en absolu derrière elle, ils passaient sous le dernier
-       * lien de navigation — « ACCOUNT » se lisait sur un enchevêtrement de
-       * traits. Un décor qui abîme la lisibilité d'un lien n'est plus un
-       * décor, et le régler en baissant l'opacité n'aurait fait que le rendre
-       * sale au lieu d'illisible.
+       * Plus de bande de tracés au-dessus de la barre.
+       *
+       * Ils venaient de la maquette, où le logo était un simple emblème. Le
+       * logo actuel porte déjà son propre décor de circuit imprimé : deux
+       * motifs du même vocabulaire, à 20 px l'un de l'autre, se disputaient
+       * l'attention au lieu de s'additionner. Le supprimer resserre aussi le
+       * bandeau de 17 px, ce qui remonte le logo d'autant.
        */}
-      <div className="relative hidden h-[17px] lg:block" aria-hidden>
-        <TraceCircuit className="absolute left-0 top-0 h-[17px] w-[130px] opacity-80" />
-        <TraceCircuit cote="droite" className="absolute right-0 top-0 h-[17px] w-[130px] opacity-80" />
-      </div>
-
-      <div className="mx-auto flex max-w-[1440px] items-center gap-8 px-6 pb-2.5 pt-1 lg:pt-0">
+      <div className="mx-auto flex max-w-[1440px] items-center gap-8 px-6 pb-2 pt-1.5">
         <Link href="/" className="relative z-10 flex shrink-0 items-center">
           {/*
            * Le logo complet, sans mot-marque HTML à côté.
@@ -80,7 +76,7 @@ export function EnTete() {
           <img
             src="/images/marque-w2p.webp"
             alt="where2play"
-            className="-mb-[30px] h-[82px] w-auto shrink-0 sm:-mb-[46px] sm:h-[110px]"
+            className="-mb-[24px] h-[82px] w-auto shrink-0 sm:-mb-[38px] sm:h-[110px]"
           />
         </Link>
 

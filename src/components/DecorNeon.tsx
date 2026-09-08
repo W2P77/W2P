@@ -98,52 +98,6 @@ export function Chevrons({ inverse = false }: { inverse?: boolean }) {
 }
 
 /**
- * Un tracé de circuit imprimé.
- *
- * ── Pourquoi il est dessiné et non répété ─────────────────────────────────
- *
- * Un motif qui se répète se lit comme une texture ; un circuit se lit parce
- * qu'il va quelque part. Les coudes sont donc à 45°, comme la découpe des
- * panneaux, et chaque ligne se termine sur un nœud — sans terminaison, un
- * trait qui s'arrête au milieu du vide a l'air d'un bug d'affichage.
- */
-export function TraceCircuit({
-  cote = 'gauche',
-  className = '',
-}: {
-  cote?: 'gauche' | 'droite';
-  className?: string;
-}) {
-  const traits = [
-    { d: 'M0 8 H46 L58 20 H150', c: '#2fd8f5', o: 0.85 },
-    { d: 'M0 20 H30 L40 30 H92', c: '#f13fdc', o: 0.6 },
-    { d: 'M0 32 H18 L28 42 H70 L78 34 H132', c: '#ff9d4d', o: 0.55 },
-    { d: 'M0 44 H58', c: '#8b5cf6', o: 0.45 },
-  ];
-  const noeuds = [
-    { x: 150, y: 8, c: '#2fd8f5' },
-    { x: 92, y: 30, c: '#f13fdc' },
-    { x: 132, y: 34, c: '#ff9d4d' },
-  ];
-  return (
-    <svg
-      viewBox="0 0 160 52"
-      className={className}
-      fill="none"
-      aria-hidden
-      style={{ transform: cote === 'droite' ? 'scaleX(-1)' : undefined }}
-    >
-      {traits.map((t, i) => (
-        <path key={i} d={t.d} stroke={t.c} strokeOpacity={t.o} strokeWidth="1.4" />
-      ))}
-      {noeuds.map((n, i) => (
-        <rect key={i} x={n.x - 2} y={n.y - 2} width="4" height="4" fill={n.c} />
-      ))}
-    </svg>
-  );
-}
-
-/**
  * La conduite néon qui longe un bord et se coude en biseau.
  *
  * C'est l'élément que la maquette répète le plus : un double trait cyan et
