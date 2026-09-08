@@ -71,7 +71,21 @@ Les captures vivent en base (`jeux.captures`, colonne JSON) plutôt qu'en
 fichier statique : à 598 jeux et neuf captures chacun, publier une image ne doit
 pas demander un commit.
 
-**Marque :** favicon et icône Apple tirés de l'emblème, image de partage social
+**Marque :** favicon « W2P » — les trois lettres se lisent à 24 px, ce que
+l'emblème ne pouvait pas : un dessin détaillé réduit à 16 px devient une tache,
+quelle que soit sa qualité.
+
+Le fichier fourni portait un **halo pâle opaque sur 14 % de sa surface** — le
+rendu du néon aplati sur un fond clair, puis partiellement détouré. Invisible
+sur blanc, il serait apparu comme une salissure grise sur l'onglet sombre d'un
+navigateur. Il est effacé en dégradé, en visant ce qui est **à la fois clair et
+désaturé** : les lettres sont soit très colorées, soit très sombres, donc
+épargnées. Un seuil net aurait laissé un contour découpé à la place du halo.
+
+Icône Apple sur fond sombre de la charte — ce format ne supporte pas la
+transparence et l'aurait remplie de blanc.
+
+Image de partage social au format 1200×630, image de partage social
 au format 1200×630. La balise `og:image` n'est émise que si le fichier existe —
 une balise pointant vers une 404 est pire que pas de balise, les réseaux
 mettant l'échec en cache longtemps après l'arrivée du fichier.
