@@ -2,6 +2,21 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Le nom du jeu sur les vignettes
+
+Conséquence directe du recadrage : les 15 % coupés en haut sont très souvent
+l'endroit où le studio place le titre. Beaucoup de jaquettes ne montrent plus
+que le décor — et « la voiture violette » ne se cherche pas dans un catalogue.
+
+Le nom n'est donc pas un doublon de l'image : **il la remplace là où elle ne
+dit plus rien**. Deux lignes au maximum, hauteur fixe — sans elle, un titre
+long et un titre court donnent deux cartes de tailles différentes et la grille
+se désaligne.
+
+La zone d'image passe de 16/10 à 16/9, le format réel des jaquettes recadrées :
+en 16/10 elles étaient encadrées de bandes noires en haut et en bas, ce qui
+faisait paraître le recadrage comme un défaut d'affichage.
+
 ## 2026-09-08 — Les jaquettes : 35 % → 95 %, et cinq détecteurs abandonnés
 
 **1 855 jeux sur 1 951 ont désormais une jaquette**, contre 692 au départ.

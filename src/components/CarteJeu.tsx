@@ -78,7 +78,7 @@ export function CarteJeu({ jeu, index = 0 }: { jeu: JeuVignette; index?: number 
            * reconnaître dans une grille. Un léger bord noir vaut mieux qu'un
            * « BASS / NANZA ».
            */}
-          <span className="relative block aspect-[16/10] overflow-hidden bg-fond">
+          <span className="relative block aspect-[16/9] overflow-hidden bg-fond">
             {jeu.visuelUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -109,6 +109,27 @@ export function CarteJeu({ jeu, index = 0 }: { jeu: JeuVignette; index?: number 
             )}
             <span className="absolute left-1.5 top-1.5">
               <BadgePreuve niveau={jeu.rtpConfiance as Confiance} taille="petit" />
+            </span>
+          </span>
+
+          {/*
+           * Le nom du jeu, en texte, sous la jaquette.
+           *
+           * Les visuels sont recadrés de 15 % en haut pour supprimer le
+           * filigrane d'un concurrent — et c'est très souvent là que le studio
+           * place le titre. Beaucoup de jaquettes ne montrent donc plus que le
+           * décor, et « la voiture violette » ne se cherche pas dans un
+           * catalogue. Le nom devient la seule façon fiable de reconnaître une
+           * carte : il n'est pas un doublon de l'image, il la remplace là où
+           * elle ne dit plus rien.
+           *
+           * Deux lignes au maximum, hauteur fixe : sans elle, un titre long et
+           * un titre court donnent deux cartes de tailles différentes et la
+           * grille se désaligne.
+           */}
+          <span className="block h-[38px] px-2.5 pt-2">
+            <span className="line-clamp-2 font-ui text-[12px] font-semibold leading-[1.25] text-white">
+              {jeu.nom}
             </span>
           </span>
 
