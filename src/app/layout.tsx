@@ -1,4 +1,9 @@
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+
 import type { Metadata } from 'next';
+
+import { SITE_URL } from '@/lib/site';
 import { Barlow, Chakra_Petch, Saira_Condensed } from 'next/font/google';
 import './globals.css';
 
@@ -43,13 +48,40 @@ const corps = Barlow({
  * `lang="fr"` restait de l'amorçage : il annonçait du français aux lecteurs
  * d'écran et aux moteurs sur des pages entièrement rédigées en anglais.
  */
+const TITRE = 'where2play — where to play the slots you are looking for';
+const DESCRIPTION =
+  'RTP, volatility, max win and free demos. Every number says where it comes from, and how well it is verified.';
+
+/*
+ * L'image de partage n'est déclarée que si le fichier existe.
+ *
+ * Une balise `og:image` qui pointe vers une 404 est pire que pas de balise :
+ * les réseaux sociaux mettent en cache l'échec, et le lien reste sans vignette
+ * longtemps après que le fichier est arrivé. On vérifie donc la présence au
+ * rendu, côté serveur — la même précaution que pour le visuel d'accroche.
+ */
+const OG = ['png', 'jpg', 'jpeg', 'webp']
+  .map((ext) => `/images/og.${ext}`)
+  .find((chemin) => existsSync(join(process.cwd(), 'public', chemin)));
+
 export const metadata: Metadata = {
-  title: {
-    default: 'where2play — where to play the slots you are looking for',
-    template: '%s · where2play',
+  metadataBase: new URL(SITE_URL),
+  title: { default: TITRE, template: '%s · where2play' },
+  description: DESCRIPTION,
+  openGraph: {
+    type: 'website',
+    siteName: 'where2play',
+    title: TITRE,
+    description: DESCRIPTION,
+    url: SITE_URL,
+    ...(OG ? { images: [{ url: OG, width: 1200, height: 630, alt: 'where2play' }] } : {}),
   },
-  description:
-    'RTP, volatility, max win and free demos. Every number says where it comes from, and how well it is verified.',
+  twitter: {
+    card: OG ? 'summary_large_image' : 'summary',
+    title: TITRE,
+    description: DESCRIPTION,
+    ...(OG ? { images: [OG] } : {}),
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

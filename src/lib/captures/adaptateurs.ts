@@ -22,6 +22,9 @@
  * pourquoi `verifierLaCapture` existe — on compare les captures entre elles,
  * et deux images identiques trahissent un clic qui n'a rien fait.
  */
+import sharp from 'sharp';
+import { createWorker } from 'tesseract.js';
+
 import type { Page } from 'playwright';
 
 export interface Adaptateur {
@@ -36,15 +39,81 @@ export interface Adaptateur {
   capturerLAchat(page: Page, cliche: (nom: string) => Promise<void>): Promise<boolean>;
 }
 
+/**
+ * L'écran d'accueil est-il encore affiché ?
+ *
+ * On lit la bande basse plutôt que l'image entière : elle est petite, à fort
+ * contraste, et porte les deux seules mentions qui distinguent l'accueil du
+ * jeu. Une reconnaissance sur cette bande coûte moins d'une seconde, contre
+ * une dizaine sur la capture complète — et c'est la différence entre un
+ * contrôle qu'on fait à chaque essai et un contrôle qu'on renonce à faire.
+ */
+async function accueilEncoreLa(page: Page): Promise<boolean> {
+  const bande = await page.screenshot({ clip: { x: 200, y: 600, width: 880, height: 180 } });
+  const prepare = await sharp(bande).grayscale().normalise().resize({ width: 1760 }).png().toBuffer();
+  const ouvrier = await createWorker('eng');
+  try {
+    const { data } = await ouvrier.recognize(prepare);
+    return /START PLAYING|DON'?T SHOW|NEXT TIME/i.test(data.text);
+  } finally {
+    await ouvrier.terminate();
+  }
+}
+
 export const PRAGMATIC: Adaptateur = {
   studio: 'pragmatic-play',
   chargementMs: 22_000,
 
+  /**
+   * Ferme l'écran d'accueil — en **attendant** qu'il soit là, puis en
+   * vérifiant qu'il est parti.
+   *
+   * ── Deux versions ratées, et ce qu'elles apprennent ────────────────────
+   *
+   * 1. **Un clic à position fixe.** (1122, 527) est le bouton de lancement de
+   *    Gates of Olympus. Le bouton se déplace selon la mise en page — 74 % de
+   *    la largeur ici, 80 % là — et un jeu sur deux restait sur son carrousel.
+   *    Les captures ressemblaient à des réussites : elles montraient toutes
+   *    l'accueil, et le RTP n'était simplement jamais lu.
+   *
+   * 2. **Six positions essayées dès la 22ᵉ seconde.** Le vrai problème n'était
+   *    pas *où* cliquer mais *quand* : ces jeux mettent plus de 22 s à
+   *    charger, et les six clics tombaient tous pendant le chargement, où
+   *    ils ne sont pas écoutés. Une fois épuisés, plus rien ne se passait.
+   *
+   * D'où l'ordre correct : **attendre que l'accueil apparaisse** — sa présence
+   * prouve que le jeu est chargé et écoute —, puis cliquer jusqu'à ce qu'il
+   * disparaisse. C'est le contraire d'une temporisation : on n'attend pas une
+   * durée, on attend un état.
+   */
   async ouvrirLeJeu(page) {
-    // Le gros bouton rond de droite ferme le carrousel d'accueil. Un clic au
-    // centre ne suffit pas : le carrousel défile et reste affiché.
-    await page.mouse.click(1122, 527);
-    await page.waitForTimeout(6000);
+    // Phase 1 : le jeu a-t-il fini de charger ? L'accueil en est la preuve.
+    let charge = false;
+    for (let i = 0; i < 12; i++) {
+      if (await accueilEncoreLa(page)) {
+        charge = true;
+        break;
+      }
+      await page.waitForTimeout(4000);
+    }
+    // Certains jeux n'ont pas d'écran d'accueil du tout : rien à fermer.
+    if (!charge) return;
+
+    // Phase 2 : cliquer jusqu'à ce qu'il cède.
+    const positions: Array<[number, number]> = [
+      [1122, 527], [947, 476], [1040, 560], [900, 520], [1000, 610],
+      [780, 456], [640, 400], [947, 476],
+    ];
+    for (const [x, y] of positions) {
+      await page.mouse.click(x, y);
+      await page.waitForTimeout(2500);
+      if (!(await accueilEncoreLa(page))) {
+        // Le jeu vient d'apparaître : on le laisse finir son animation
+        // d'entrée avant de capturer, sinon la première image est un fondu.
+        await page.waitForTimeout(3000);
+        return;
+      }
+    }
   },
 
   async capturerLesRegles(page, cliche) {

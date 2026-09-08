@@ -2,6 +2,61 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Chaîne de capture : lire les faits dans le jeu lui-même
+
+598 jeux Pragmatic ont désormais leur **vraie URL de démo**, extraite du
+`data-game-src` de la fiche produit. Le champ `demoUrl` contenait jusqu'ici la
+page de présentation du studio : le bouton « démo » tenait sa promesse à
+l'inspection et la trahissait à l'usage.
+
+**Le RTP se lit dans l'image, faute de mieux — et c'est mieux qu'il n'y paraît.**
+Trois voies ont été essayées et écartées avant d'en arriver là :
+
+- **Le réseau** ne transporte que les gabarits de phrase
+  (`"The theoretical RTP of this game is {0}%"`), jamais la valeur.
+- **Le graphe de scène** est inaccessible : le jeu tourne dans une iframe et
+  n'expose aucun global portant un `stage`.
+- **`logo_info.js`** publie bien des RTP, mais tous suffixés `_cv` : ce sont
+  les paliers opérateur, pas le défaut studio.
+
+Reste le panneau de règles. Ce n'est pas un pis-aller : c'est la seule chose que
+le studio affiche vraiment au joueur, donc la seule qu'on puisse citer.
+L'OCR en tire le RTP, les mises minimale et maximale, la volatilité **annoncée
+par le studio**, le gain maximum et sa fréquence.
+
+**Ce qui est refusé.** Chaque valeur est bornée à ce qui est physiquement
+possible, et une lecture hors bornes est jetée plutôt que corrigée. Un « 96.50 »
+lu « 9650 » deviendrait une donnée fausse publiée **en source studio**, soit le
+pire résultat possible sur ce site.
+
+**Deux formulations, et un piège de ponctuation.** Le même studio écrit tantôt
+« The theoretical RTP of this game is 96.00% », tantôt « The maximum RTP of
+this game is 96.03% » suivi d'un minimum — une **plage**, qui correspond à
+`rtpStudio` + `rtpPaliers`. Et le panneau annonce aussi le RTP « when using
+BUY FREE SPINS », un autre mode de jeu. Une première version découpait le texte
+en phrases pour l'écarter : elle effaçait tout, l'OCR ne restituant aucun point.
+On s'appuie donc sur la formulation — « of **this game** is » contre « when
+**using** » — qui distingue les deux sans ponctuation.
+
+**L'écran d'accueil, deux échecs avant de comprendre.** Un clic à position fixe
+échouait un jeu sur deux : le bouton de lancement se déplace selon la mise en
+page. Six positions essayées dès la 22ᵉ seconde n'ont rien changé — le vrai
+problème n'était pas *où* cliquer mais *quand* : ces jeux mettent plus de 22 s
+à charger et n'écoutent pas les clics avant. L'ordre correct est d'**attendre
+que l'accueil apparaisse**, sa présence prouvant que le jeu écoute, puis de
+cliquer jusqu'à ce qu'il disparaisse. On n'attend pas une durée, on attend un
+état.
+
+Les captures vivent en base (`jeux.captures`, colonne JSON) plutôt qu'en
+fichier statique : à 598 jeux et neuf captures chacun, publier une image ne doit
+pas demander un commit.
+
+**Marque :** favicon et icône Apple tirés de l'emblème, image de partage social
+au format 1200×630. La balise `og:image` n'est émise que si le fichier existe —
+une balise pointant vers une 404 est pire que pas de balise, les réseaux
+mettant l'échec en cache longtemps après l'arrivée du fichier.
+
+
 ## 2026-09-08 — Débordement mobile, et trois partenaires retirés
 
 **La fiche de jeu débordait de 50 px sur iPhone** — 440 px de large dans une

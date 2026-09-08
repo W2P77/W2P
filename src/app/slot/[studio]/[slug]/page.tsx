@@ -181,7 +181,11 @@ export default async function PageJeu({
              *
              * On documente d'abord, on oriente ensuite.
              */}
-            <CapturesJeu slug={jeu.slug} />
+            <CapturesJeu
+              jeu={jeu.nom}
+              captures={jeu.captures}
+              faitesLe={jeu.capturesLe}
+            />
 
             <OuJouer jeu={jeu.nom} studio={jeu.studio.nom} casinos={casinos} />
 

@@ -30,47 +30,15 @@ export interface CapturesDeJeu {
   captures: Capture[];
 }
 
-export const CAPTURES: Record<string, CapturesDeJeu> = {
-  'gates-of-olympus': {
-    faitesLe: '2026-09-08',
-    source: 'demogamesfree.pragmaticplay.net',
-    captures: [
-      {
-        fichier: 'gates-of-olympus-base.webp',
-        titre: 'The base game',
-        legende:
-          'Six reels, five rows, and no paylines: symbols pay anywhere on the screen, and the count of matching symbols sets the win. The free spins purchase sits top left, priced at 100× the current bet.',
-      },
-      {
-        fichier: 'gates-of-olympus-regles-1.webp',
-        titre: 'Symbol values',
-        legende:
-          'The full pay table at a €2.00 bet, from the crown down to the blue gem, in three bands — 8 to 9, 10 to 11, and 12 to 30 matching symbols. The scatter pays on any position and is present on all reels.',
-      },
-      {
-        fichier: 'gates-of-olympus-regles-2.webp',
-        titre: 'Tumble and multipliers',
-        legende:
-          'Winning symbols disappear and are replaced from above until no new win forms. Multiplier symbols land randomly in both the base game and free spins, from 2× to 500×, and the values on screen are added together and applied at the end of the tumble sequence.',
-      },
-      {
-        fichier: 'gates-of-olympus-regles-3.webp',
-        titre: 'Free spins and ante bet',
-        legende:
-          'Four or more scatters award 15 free spins. During the round, every multiplier symbol that lands on a win is added to a running total. The ante bet raises the stake to 25× and doubles the chance of a natural trigger — and it disables the buy feature.',
-      },
-      {
-        fichier: 'gates-of-olympus-regles-4.webp',
-        titre: 'The studio states its own RTP',
-        legende:
-          'The rules panel gives 96.50% for the base game, 96.50% with the ante bet, and 96.50% with the bought feature — three figures, one value. Minimum bet €0.20, maximum €300.00, volatility stated as medium by the studio.',
-      },
-      {
-        fichier: 'gates-of-olympus-achat.webp',
-        titre: 'Buying the feature',
-        legende:
-          'At a €2.00 bet the purchase costs €200 — the 100× multiple the rules announce. The confirmation step is shown here as the game presents it, before any spin is committed.',
-      },
-    ],
-  },
-};
+/*
+ * Les captures elles-mêmes vivent en base, colonne `jeux.captures`.
+ *
+ * Elles ont commencé ici, en dur, le temps de la première fiche. À 598 jeux
+ * et neuf captures chacun, un fichier statique serait un demi-mégaoctet
+ * régénéré à chaque passage du programme de capture — et il faudrait le
+ * commiter pour publier une image. La base fait ça mieux, et la publication
+ * ne consomme plus de build.
+ *
+ * Ce fichier ne garde que les types, partagés entre le script qui écrit et le
+ * composant qui lit.
+ */

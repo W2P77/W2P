@@ -105,6 +105,18 @@ model Jeu {
   demoUrl            String?   @map("demo_url")
   visuelUrl          String?   @map("visuel_url")
 
+  /// Les captures faites dans la démo officielle du studio.
+  ///
+  /// Tableau d'objets `{ fichier, titre, legende }`. En JSON plutôt qu'en
+  /// table dédiée : on ne les interroge jamais autrement que « toutes celles
+  /// de ce jeu », et une table imposerait une jointure à chaque fiche pour un
+  /// besoin que le champ couvre entièrement.
+  captures      Json?
+  /// Le jour de la capture. Un studio peut livrer une nouvelle version d'un
+  /// jeu avec d'autres valeurs : une capture sans date prétend valoir pour
+  /// toujours.
+  capturesLe    DateTime? @map("captures_le")
+
   confiance Confiance @default(AUCUNE)
   creeLe    DateTime  @default(now()) @map("cree_le")
   majLe     DateTime  @updatedAt @map("maj_le")
