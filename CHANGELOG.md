@@ -2,6 +2,37 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Captures dans la démo : la preuve tient dans le jeu
+
+Six captures faites dans la démo officielle de Pragmatic Play sur Gates of
+Olympus — jeu de base, table de gains, mécanique de tumble, règles des tours
+gratuits, panneau de RTP, achat de bonus — affichées sur la fiche avec leurs
+légendes et **la date de capture**.
+
+**La trouvaille n'était pas celle qu'on cherchait.** On visait des visuels
+originaux ; on a trouvé une **source primaire**. Le panneau de règles affiche
+« The theoretical RTP of the game is 96.50% », puis le même chiffre avec l'ante
+bet et avec l'achat de bonus. C'est le jeu lui-même qui parle — meilleur qu'un
+communiqué, et impossible à contester. Gates of Olympus passe donc de
+« non vérifié » à **STUDIO-VERIFIED**, sa source étant le panneau lui-même.
+
+**Comment on y accède.** La fiche produit du studio contient l'URL de démo
+réelle dans un attribut `data-game-src`, avec le `gameSymbol` du jeu — donc
+extractible. Le champ `demoUrl` de la base, lui, contient aujourd'hui la fiche
+produit, pas la démo : le bouton « démo » des fiches renvoie vers une page de
+présentation, ce qui reste à corriger.
+
+**Ce que les légendes ne font pas.** Elles ne transcrivent pas les valeurs de
+symboles ligne à ligne. Recopier vingt-sept petits nombres lus dans une image
+est exactement la manière dont une erreur entre dans une fiche — et le site est
+construit sur l'idée inverse. La capture montre, le texte résume ce qui est
+écrit en gros : RTP, mises minimale et maximale, plage de multiplicateurs, coût
+de l'achat.
+
+**Coût mesuré, pour décider de la suite.** Six captures pèsent 1 Mo en WebP
+(27 Mo en PNG). Sur 1 951 jeux, l'ordre de grandeur est de 1,7 Go — hors du
+dépôt Git, donc à ranger dans un stockage objet avant toute industrialisation.
+
 ## 2026-09-08 — Le nom du jeu sur les vignettes
 
 Conséquence directe du recadrage : les 15 % coupés en haut sont très souvent

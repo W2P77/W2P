@@ -7,6 +7,7 @@ import { BadgePreuve, type Confiance } from '@/components/BadgePreuve';
 import { Tirets, Equerre } from '@/components/DecorNeon';
 import { jeuParSlug, memeStudio, casinosPourStudio } from '@/lib/donnees/catalogue';
 import { OuJouer } from '@/components/OuJouer';
+import { CapturesJeu } from '@/components/CapturesJeu';
 import { BoutonEnregistrer } from '@/components/BoutonEnregistrer';
 import { baliseJeu } from '@/lib/donnees-structurees';
 import { SITE_URL } from '@/lib/site';
@@ -158,6 +159,8 @@ export default async function PageJeu({
             )}
 
             <OuJouer jeu={jeu.nom} studio={jeu.studio.nom} casinos={casinos} />
+
+            <CapturesJeu slug={jeu.slug} />
 
             {jeu.demoUrl && (
               <a
