@@ -2,6 +2,31 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-08 — Le logo du studio sur la fiche, et deux logos illisibles
+
+**Le logo du studio ouvre le panneau de données.** Le nom figurait déjà en
+ligne « PROVIDER » — le logo ne le double pas : il se reconnaît avant d'être
+lu, et sur une fiche dont l'argument est la provenance des données, dire de qui
+elles viennent avant de les donner n'est pas décoratif.
+
+**Le pied de page porte le logo au lieu du mot-marque en texte.** L'en-tête
+portait déjà l'image ; garder une version typographique en bas donnait deux
+traitements de la même marque sur une seule page — l'un soigné, l'autre
+approximatif.
+
+**Un audit des 25 logos en a révélé deux illisibles**, et ils n'étaient pas
+passés par la garde de luminance parce qu'ils venaient du premier import,
+antérieur à elle :
+
+- **Big Time Gaming** (médiane 54) : leur site publie une version blanche
+  officielle, reprise telle quelle.
+- **Nolimit City** (médiane 2) : logo **polychrome** — 62 % de noir, 10 % de
+  blanc, 9 % de jaune. Le recolorer en blanc, comme on l'a fait pour Wazdan,
+  aurait détruit le dessin en fondant deux couleurs sur trois. Il est donc
+  posé sur une **plaque claire**, ce qui préserve exactement sa marque. C'est
+  le traitement que les chartes des studios prévoient elles-mêmes pour ce cas,
+  et il vaut mieux qu'un logo réinventé ou absent.
+
 ## 2026-09-08 — Les captures s'agrandissent au clic
 
 Les captures les plus utiles sont les panneaux de règles : table de gains,

@@ -16,10 +16,19 @@ export function PiedDePage() {
       <div className="mx-auto max-w-[1400px] px-6 py-8">
         <div className="flex flex-wrap items-start justify-between gap-8">
           <div className="max-w-sm">
-            <p className="font-titre text-[17px] font-bold tracking-tight text-white">
-              where<span className="text-neon-cyan">2</span>play
-              <span className="text-texte-doux">.info</span>
-            </p>
+            {/*
+             * Le logo, et non plus le mot-marque en texte.
+             *
+             * L'en-tête porte déjà l'image ; garder une version typographique
+             * ici donnait deux traitements de la même marque sur une seule
+             * page — celui du haut soigné, celui du bas approximatif.
+             */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/marque-w2p.webp"
+              alt="where2play"
+              className="mb-3 h-[86px] w-auto"
+            />
             <p className="mt-2 text-[12px] leading-relaxed text-texte-doux">
               A slot catalogue that tells you where every number comes from —
               studio-published, cross-checked, or not verified at all.

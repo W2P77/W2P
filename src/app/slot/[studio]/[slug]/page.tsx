@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { EnTete } from '@/components/EnTete';
@@ -188,6 +189,34 @@ export default async function PageJeu({
           {/* ── Les chiffres, avec leur provenance ─────────────────────── */}
           <aside className="panneau relative h-fit p-5">
             <Equerre position="hd" couleur="cyan" />
+
+            {/*
+             * Le logo du studio ouvre le panneau de données.
+             *
+             * Le nom figurait déjà plus bas, en ligne « PROVIDER ». Le logo ne
+             * le double pas : il se reconnaît avant d'être lu, et c'est ce qui
+             * rattache le chiffre à celui qui le publie — sur une fiche dont
+             * l'argument est la provenance des données, dire de qui elles
+             * viennent avant de les donner n'est pas décoratif.
+             *
+             * Trois studios sur 27 n'ont pas de logo : le panneau s'ouvre
+             * alors directement sur le titre, sans case vide.
+             */}
+            {jeu.studio.logoUrl && (
+              <Link
+                href={`/slot/${jeu.studio.slug}`}
+                className="mb-4 block border-b border-fond-bordure pb-4"
+                aria-label={jeu.studio.nom}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={jeu.studio.logoUrl}
+                  alt={jeu.studio.nom}
+                  className="h-9 w-auto max-w-[160px] object-contain object-left opacity-90 transition hover:opacity-100"
+                />
+              </Link>
+            )}
+
             <h2 className="mb-4 font-titre text-[15px] font-bold uppercase tracking-wide text-white">
               Game data
             </h2>
