@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Lien } from '@/components/Lien';
 import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
+import { textes } from '@/i18n/textes';
 
 import { metadonneesDePage } from '@/lib/metadonnees';
 import { notFound } from 'next/navigation';
@@ -64,9 +65,11 @@ export default async function PageStudio({
   params,
   searchParams,
 }: {
-  params: Promise<{ studio: string }>;
+  params: Promise<{ studio: string; langue: string }>;
   searchParams: Promise<{ page?: string }>;
 }) {
+  const { langue: brutT } = await params;
+  const t = textes(estUneLangue(brutT) ? brutT : LANGUE_DEFAUT);
   const [{ studio }, { page: pageBrute }] = await Promise.all([params, searchParams]);
   const page = Math.max(1, Number(pageBrute ?? 1));
   const s = await studioParSlug(studio, page);
@@ -81,7 +84,7 @@ export default async function PageStudio({
       <EnTete />
       <main className="mx-auto max-w-[1400px] px-6 py-8">
         <nav className="mb-4 font-mono text-[11px] text-texte-faible">
-          <Lien href="/catalogue" className="hover:text-neon-cyan">Catalogue</Lien>
+          <Lien href="/catalogue" className="hover:text-neon-cyan">{t.titreCatalogue}</Lien>
           <span className="mx-2">/</span>
           <span className="text-texte-doux">{s.nom}</span>
         </nav>
@@ -103,7 +106,7 @@ export default async function PageStudio({
         </div>
 
         {pages > 1 && (
-          <nav className="mt-8 flex items-center justify-center gap-3" aria-label="Pagination">
+          <nav className="mt-8 flex items-center justify-center gap-3" aria-label={t.pagination}>
             {page > 1 && (
               <Lien
                 href={`/slot/${s.slug}?page=${page - 1}`}

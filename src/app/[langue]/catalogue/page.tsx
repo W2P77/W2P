@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Lien } from '@/components/Lien';
 import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
+import { remplir, textes } from '@/i18n/textes';
 
 import { metadonneesDePage } from '@/lib/metadonnees';
 import { EnTete } from '@/components/EnTete';
@@ -33,6 +34,7 @@ export async function generateMetadata({
   const sp = await searchParams;
   const { langue: brutLangue } = await params;
   const langue = estUneLangue(brutLangue) ? brutLangue : LANGUE_DEFAUT;
+  const t = textes(langue);
   const filtre = sp.q || sp.studio || sp.volatilite || sp.preuve || sp.rtpMin || sp.page;
 
   const description =
@@ -54,7 +56,7 @@ export async function generateMetadata({
 
   return metadonneesDePage({
     langue,
-    titre: 'Slot catalogue — RTP, volatility and demos',
+    titre: t.titrePageCatalogue,
     description,
     chemin: '/catalogue',
   });
@@ -62,10 +64,14 @@ export async function generateMetadata({
 
 export default async function Catalogue({
   searchParams,
+  params,
 }: {
   searchParams: Promise<Record<string, string | undefined>>;
+  params: Promise<{ langue: string }>;
 }) {
   const sp = await searchParams;
+  const { langue: brutL } = await params;
+  const t = textes(estUneLangue(brutL) ? brutL : LANGUE_DEFAUT);
   const [resultat, studios] = await Promise.all([
     chercherJeux({
       q: sp.q,
@@ -96,7 +102,7 @@ export default async function Catalogue({
       <main className="mx-auto max-w-[1400px] px-6 py-8">
         <div className="mb-5 flex items-center gap-4">
           <h1 className="font-titre text-[24px] font-black uppercase tracking-tight text-white">
-            Slot catalogue
+            {t.titreCatalogue}
           </h1>
           <Tirets />
           <span className="font-mono text-[12px] text-texte-faible">
@@ -128,9 +134,9 @@ export default async function Catalogue({
           <div className="panneau p-8 text-center">
             <p className="text-[15px] text-texte">
               {sp.q ? (
-                <>No slot matches “{sp.q}”.</>
+                <>{remplir(t.aucunResultatPour, { terme: sp.q ?? '' })}</>
               ) : (
-                <>No slot matches these filters.</>
+                <>{t.aucunResultat}</>
               )}
             </p>
             <p className="mx-auto mt-2 max-w-md text-[13px] text-texte-doux">
@@ -139,8 +145,8 @@ export default async function Catalogue({
                 : 'Try widening one criterion — the minimum RTP is the one that excludes the most games.'}
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-2.5">
-              <Lien href="/catalogue" className="tube tube-cyan">Clear all filters</Lien>
-              <Lien href="/demos" className="tube tube-magenta">Browse free demos</Lien>
+              <Lien href="/catalogue" className="tube tube-cyan">{t.effacerFiltres}</Lien>
+              <Lien href="/demos" className="tube tube-magenta">{t.parcourirDemos}</Lien>
             </div>
           </div>
         ) : (
@@ -152,7 +158,7 @@ export default async function Catalogue({
         )}
 
         {aUnFiltre && resultat.pages > 1 && (
-          <nav className="mt-8 flex items-center justify-center gap-2" aria-label="Pagination">
+          <nav className="mt-8 flex items-center justify-center gap-2" aria-label={t.pagination}>
             {resultat.page > 1 && (
               <Lien href={lien(resultat.page - 1)} className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan">
                 ← Previous

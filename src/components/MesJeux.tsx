@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { CarteJeu, type JeuVignette } from './CarteJeu';
 import { Lien } from '@/components/Lien';
+import { useLangue } from '@/i18n/useLangue';
 
 /**
  * Les jeux mis de côté par le visiteur.
@@ -41,6 +42,7 @@ export function basculerJeu(jeu: JeuVignette): boolean {
 }
 
 export function MesJeux() {
+  const { t } = useLangue();
   const [jeux, setJeux] = useState<JeuVignette[] | null>(null);
 
   // Lu après le montage : `localStorage` n'existe pas au rendu serveur, et
@@ -48,13 +50,13 @@ export function MesJeux() {
   useEffect(() => setJeux(lireMesJeux()), []);
 
   if (jeux === null) {
-    return <p className="font-mono text-[12px] text-texte-faible">Loading…</p>;
+    return <p className="font-mono text-[12px] text-texte-faible">{t.chargement}</p>;
   }
 
   if (jeux.length === 0) {
     return (
       <div className="panneau p-8 text-center">
-        <p className="text-[14px] text-texte-doux">You have not saved any game yet.</p>
+        <p className="text-[14px] text-texte-doux">{t.aucunFavori}</p>
         <Lien href="/catalogue" className="tube tube-cyan mt-5 inline-block">
           Browse the catalogue
         </Lien>

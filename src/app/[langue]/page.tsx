@@ -129,7 +129,7 @@ export default async function Home({ params }: { params: Promise<{ langue: strin
         </Panneau>
 
         <Panneau teinte="cyan" className="p-6">
-          <TitreSection>Latest guides &amp; reviews</TitreSection>
+          <TitreSection>{t.derniersGuides}</TitreSection>
           <ListeGuides />
 
           <div className="mt-5 border-t border-fond-bordure pt-5">

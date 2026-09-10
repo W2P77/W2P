@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
+import { textes } from '@/i18n/textes';
 import { metadonneesDePage } from '@/lib/metadonnees';
 import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
@@ -14,16 +15,22 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { langue: brut } = await params;
   const langue = estUneLangue(brut) ? brut : LANGUE_DEFAUT;
+  const t = textes(langue);
   return metadonneesDePage({
-    titre: 'Guides — how to read slot data',
-    description:
-      'How RTP tiers, bonus buy returns and volatility labels actually work — written from what we measured building the catalogue.',
+    titre: t.titrePageGuides,
+    description: t.descPageGuides,
     chemin: '/guides',
     langue,
   });
 }
 
-export default function Guides() {
+export default async function Guides({
+  params,
+}: {
+  params: Promise<{ langue: string }>;
+}) {
+  const { langue: brutL } = await params;
+  const t = textes(estUneLangue(brutL) ? brutL : LANGUE_DEFAUT);
   return (
     <div className="min-h-screen bg-fond">
       <EnTete />
@@ -35,8 +42,7 @@ export default function Guides() {
           <Tirets />
         </div>
         <p className="mb-7 max-w-2xl text-[13px] text-texte-doux">
-          Written from what we measured while building this catalogue — not from
-          what other sites say.
+          {t.accrocheGuides}
         </p>
 
         <ul className="space-y-3">

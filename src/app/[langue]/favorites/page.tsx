@@ -4,6 +4,7 @@ import { PiedDePage } from '@/components/PiedDePage';
 import { Tirets } from '@/components/DecorNeon';
 import { MesJeux } from '@/components/MesJeux';
 import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
+import { textes } from '@/i18n/textes';
 import { metadonneesDePage } from '@/lib/metadonnees';
 
 export async function generateMetadata({
@@ -12,15 +13,23 @@ export async function generateMetadata({
   params: Promise<{ langue: string }>;
 }): Promise<Metadata> {
   const { langue: brut } = await params;
+  const langue = estUneLangue(brut) ? brut : LANGUE_DEFAUT;
+  const t = textes(langue);
   return metadonneesDePage({
-    titre: 'Favorites',
-    description: 'The slots you saved, kept on your device.',
+    titre: t.titrePageFavoris,
+    description: t.descPageFavoris,
     chemin: '/favorites',
-    langue: estUneLangue(brut) ? brut : LANGUE_DEFAUT,
+    langue,
   });
 }
 
-export default function Favoris() {
+export default async function Favoris({
+  params,
+}: {
+  params: Promise<{ langue: string }>;
+}) {
+  const { langue: brutL } = await params;
+  const t = textes(estUneLangue(brutL) ? brutL : LANGUE_DEFAUT);
   return (
     <div className="min-h-screen bg-fond">
       <EnTete />
@@ -32,8 +41,7 @@ export default function Favoris() {
           <Tirets />
         </div>
         <p className="mb-6 max-w-2xl text-[13px] text-texte-doux">
-          Saved on this device only. No account, no email, nothing sent to us —
-          a catalogue does not need to know who you are.
+          {t.accrocheFavoris}
         </p>
         <MesJeux />
       </main>

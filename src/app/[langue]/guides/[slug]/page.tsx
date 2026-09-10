@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Lien } from '@/components/Lien';
 import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
+import { textes } from '@/i18n/textes';
 
 import { metadonneesDePage } from '@/lib/metadonnees';
 import { notFound } from 'next/navigation';
@@ -28,7 +29,9 @@ export async function generateMetadata({
   });
 }
 
-export default async function Guide({ params }: { params: Promise<{ slug: string }> }) {
+export default async function Guide({ params }: { params: Promise<{ slug: string; langue: string }> }) {
+  const { langue: brutT } = await params;
+  const t = textes(estUneLangue(brutT) ? brutT : LANGUE_DEFAUT);
   const { slug } = await params;
   const g = guideParSlug(slug);
   if (!g) notFound();
@@ -38,7 +41,7 @@ export default async function Guide({ params }: { params: Promise<{ slug: string
       <EnTete />
       <main className="mx-auto max-w-[760px] px-6 py-8">
         <nav className="mb-5 font-mono text-[11px] text-texte-faible">
-          <Lien href="/guides" className="hover:text-neon-cyan">Guides</Lien>
+          <Lien href="/guides" className="hover:text-neon-cyan">{t.navGuides}</Lien>
         </nav>
 
         <h1 className="font-titre text-[28px] font-black uppercase leading-[1.05] tracking-tight text-white sm:text-[34px]">
@@ -61,7 +64,7 @@ export default async function Guide({ params }: { params: Promise<{ slug: string
         </article>
 
         <div className="mt-10 flex gap-3">
-          <Lien href="/catalogue" className="tube tube-cyan">Browse the catalogue</Lien>
+          <Lien href="/catalogue" className="tube tube-cyan">{t.parcourirCatalogue}</Lien>
         </div>
       </main>
       <PiedDePage />

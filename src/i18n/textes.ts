@@ -84,6 +84,41 @@ const EN = {
     '{jeu} by {studio}: {rtp}% RTP, volatility, max win and a free demo. Every number says where it comes from.',
   descriptionJeuSansRtp:
     '{jeu} by {studio}: volatility, max win and a free demo. We say plainly when a number is not yet sourced.',
+
+  // ── Pages de section : titre, description, accroche ────────────────────
+  titrePageCatalogue: 'Slot catalogue — RTP, volatility and demos',
+  descPageCatalogue: 'Every slot with its RTP, volatility and max win — and where each number comes from.',
+
+  titrePageDemos: 'Free slot demos — play without an account',
+  descPageDemos: 'Play hundreds of slots for free, no sign-up and no deposit. Every demo links straight to the studio, never to another site.',
+  accrocheDemos: 'Play for free, without an account and without a deposit. Every demo opens on the studio’s own page — never on another comparison site.',
+
+  titrePageAvis: 'Verified slots — RTP checked against the studio',
+  descPageAvis: 'Slots whose RTP we checked against the studio itself, with the source on file. What we could not confirm is listed as unconfirmed.',
+
+  titrePageGuides: 'Guides — how to read slot data',
+  descPageGuides: 'How RTP tiers, bonus buy returns and volatility labels actually work — written from what we measured building the catalogue.',
+  accrocheGuides: 'Written from what we measured while building this catalogue — not from what other sites say.',
+
+  titrePageNouveautes: 'New slot releases — the latest games, with their real RTP',
+  descPageNouveautes: 'Slots released recently, with the RTP the studio actually publishes — and a clear mark when we have not been able to confirm it yet.',
+
+  titrePageFavoris: 'Favorites',
+  descPageFavoris: 'The slots you saved, kept on your device.',
+  accrocheFavoris: 'Saved on this device only. No account, no email, nothing sent to us — a catalogue does not need to know who you are.',
+
+  titrePageStudio: '{studio} slots — RTP, volatility and demos',
+  descPageStudio: 'Every {studio} slot with its RTP, volatility and max win — and where each number comes from.',
+
+  derniersGuides: 'Latest guides & reviews',
+  chargement: 'Loading…',
+  rtpInconnu: 'RTP —',
+  introuvableJeu: 'Slot not found',
+  introuvableStudio: 'Provider not found',
+  introuvableGuide: 'Guide not found',
+  aucunResultatPour: 'No slot matches “{terme}”.',
+  titreCatalogue: 'Slot catalogue',
+  pageIntrouvable: 'Page not found',
 } as const;
 
 export type CleTexte = keyof typeof EN;
@@ -138,9 +173,43 @@ const FR: Record<CleTexte, string> = {
   titreJeuAvecRtp: 'Où jouer à {jeu} — RTP {rtp} %, démo gratuite et fiche',
   titreJeuSansRtp: 'Où jouer à {jeu} de {studio} — démo gratuite et fiche',
   descriptionJeuAvecRtp:
-    '{jeu} de {studio} : RTP {rtp} %, volatilité, gain maximum et démo gratuite. Chaque chiffre dit d\u2019où il vient.',
+    '{jeu} de {studio} : RTP {rtp} %, volatilité, gain maximum et démo gratuite. Chaque chiffre dit d’où il vient.',
   descriptionJeuSansRtp:
-    '{jeu} de {studio} : volatilité, gain maximum et démo gratuite. On dit franchement quand un chiffre n\u2019est pas encore sourcé.',
+    '{jeu} de {studio} : volatilité, gain maximum et démo gratuite. On dit franchement quand un chiffre n’est pas encore sourcé.',
+
+  titrePageCatalogue: 'Catalogue de machines à sous — RTP, volatilité et démos',
+  descPageCatalogue: 'Chaque machine avec son RTP, sa volatilité et son gain maximum — et d’où vient chaque chiffre.',
+
+  titrePageDemos: 'Démos gratuites — jouer sans compte',
+  descPageDemos: 'Des centaines de machines à sous en démo gratuite, sans inscription ni dépôt. Chaque démo mène directement au studio, jamais à un autre site.',
+  accrocheDemos: 'Jouer gratuitement, sans compte et sans dépôt. Chaque démo s’ouvre sur la page du studio lui-même — jamais sur un autre comparateur.',
+
+  titrePageAvis: 'Machines vérifiées — RTP contrôlé auprès du studio',
+  descPageAvis: 'Les machines dont nous avons contrôlé le RTP auprès du studio, source à l’appui. Ce que nous n’avons pas pu confirmer est annoncé comme non confirmé.',
+
+  titrePageGuides: 'Guides — comment lire les données d’une machine',
+  descPageGuides: 'Ce que valent vraiment les paliers de RTP, les rendements d’achat de bonus et les étiquettes de volatilité — écrit à partir de ce que nous avons mesuré.',
+  accrocheGuides: 'Écrit à partir de ce que nous avons mesuré en construisant ce catalogue — pas de ce que disent les autres sites.',
+
+  titrePageNouveautes: 'Nouveautés — les dernières sorties, avec leur vrai RTP',
+  descPageNouveautes: 'Les machines sorties récemment, avec le RTP que le studio publie réellement — et une mention claire quand nous n’avons pas encore pu le confirmer.',
+
+  titrePageFavoris: 'Favoris',
+  descPageFavoris: 'Les machines que tu as enregistrées, gardées sur ton appareil.',
+  accrocheFavoris: 'Enregistrées sur cet appareil uniquement. Aucun compte, aucun e-mail, rien qui nous soit envoyé — un catalogue n’a pas besoin de savoir qui tu es.',
+
+  titrePageStudio: 'Machines {studio} — RTP, volatilité et démos',
+  descPageStudio: 'Chaque machine {studio} avec son RTP, sa volatilité et son gain maximum — et d’où vient chaque chiffre.',
+
+  derniersGuides: 'Derniers guides et analyses',
+  chargement: 'Chargement…',
+  rtpInconnu: 'RTP —',
+  introuvableJeu: 'Machine introuvable',
+  introuvableStudio: 'Studio introuvable',
+  introuvableGuide: 'Guide introuvable',
+  aucunResultatPour: 'Aucune machine ne correspond à « {terme} ».',
+  titreCatalogue: 'Catalogue',
+  pageIntrouvable: 'Page introuvable',
 };
 
 const DE: Record<CleTexte, string> = {
@@ -196,6 +265,40 @@ const DE: Record<CleTexte, string> = {
     '{jeu} von {studio}: {rtp} % RTP, Volatilität, Maximalgewinn und Gratis-Demo. Jede Zahl nennt ihre Quelle.',
   descriptionJeuSansRtp:
     '{jeu} von {studio}: Volatilität, Maximalgewinn und Gratis-Demo. Wir sagen offen, wenn eine Zahl noch keine Quelle hat.',
+
+  titrePageCatalogue: 'Slot-Katalog — RTP, Volatilität und Demos',
+  descPageCatalogue: 'Jeder Slot mit RTP, Volatilität und Maximalgewinn — und woher jede Zahl stammt.',
+
+  titrePageDemos: 'Gratis-Demos — ohne Konto spielen',
+  descPageDemos: 'Hunderte Slots gratis testen, ohne Anmeldung und ohne Einzahlung. Jede Demo führt direkt zum Studio, nie zu einer anderen Seite.',
+  accrocheDemos: 'Gratis spielen, ohne Konto und ohne Einzahlung. Jede Demo öffnet auf der Seite des Studios selbst — nie auf einem anderen Vergleichsportal.',
+
+  titrePageAvis: 'Geprüfte Slots — RTP beim Studio kontrolliert',
+  descPageAvis: 'Slots, deren RTP wir beim Studio selbst kontrolliert haben, mit hinterlegter Quelle. Was wir nicht bestätigen konnten, steht als unbestätigt da.',
+
+  titrePageGuides: 'Ratgeber — Slot-Daten richtig lesen',
+  descPageGuides: 'Was RTP-Stufen, Bonuskauf-Renditen und Volatilitätsangaben wirklich bedeuten — geschrieben aus dem, was wir selbst gemessen haben.',
+  accrocheGuides: 'Geschrieben aus dem, was wir beim Aufbau dieses Katalogs gemessen haben — nicht aus dem, was andere Seiten behaupten.',
+
+  titrePageNouveautes: 'Neuheiten — die jüngsten Slots, mit echtem RTP',
+  descPageNouveautes: 'Kürzlich erschienene Slots, mit dem RTP, den das Studio tatsächlich veröffentlicht — und einem klaren Hinweis, wenn wir ihn noch nicht bestätigen konnten.',
+
+  titrePageFavoris: 'Favoriten',
+  descPageFavoris: 'Die Slots, die du gespeichert hast — auf deinem Gerät.',
+  accrocheFavoris: 'Nur auf diesem Gerät gespeichert. Kein Konto, keine E-Mail, nichts wird an uns gesendet — ein Katalog muss nicht wissen, wer du bist.',
+
+  titrePageStudio: '{studio}-Slots — RTP, Volatilität und Demos',
+  descPageStudio: 'Jeder {studio}-Slot mit RTP, Volatilität und Maximalgewinn — und woher jede Zahl stammt.',
+
+  derniersGuides: 'Neueste Ratgeber und Tests',
+  chargement: 'Lädt…',
+  rtpInconnu: 'RTP —',
+  introuvableJeu: 'Slot nicht gefunden',
+  introuvableStudio: 'Studio nicht gefunden',
+  introuvableGuide: 'Ratgeber nicht gefunden',
+  aucunResultatPour: 'Kein Slot passt zu „{terme}“.',
+  titreCatalogue: 'Slot-Katalog',
+  pageIntrouvable: 'Seite nicht gefunden',
 };
 
 const TOUT: Record<Langue, Record<CleTexte, string>> = { en: EN, fr: FR, de: DE };

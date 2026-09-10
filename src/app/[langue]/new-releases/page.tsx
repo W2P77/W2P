@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
+import { textes } from '@/i18n/textes';
 import { metadonneesDePage } from '@/lib/metadonnees';
 import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
@@ -18,10 +19,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { langue: brut } = await params;
   const langue = estUneLangue(brut) ? brut : LANGUE_DEFAUT;
+  const t = textes(langue);
   return metadonneesDePage({
-    titre: 'New slot releases — the latest games, with their real RTP',
-    description:
-      'Slots released recently, with the RTP the studio actually publishes — and a clear mark when we have not been able to confirm it yet.',
+    titre: t.titrePageNouveautes,
+    description: t.descPageNouveautes,
     chemin: '/new-releases',
     langue,
   });

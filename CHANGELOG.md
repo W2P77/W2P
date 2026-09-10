@@ -63,6 +63,40 @@ seul.
 BetsRank se propage ici en silence au semis suivant. La confrontation
 systématique vaut mieux que la confiance dans la source.
 
+## 2026-09-11 — Passe de traduction complète, et le layout racine réparé
+
+**Le layout racine cassait le site.** Next 15 exige `<html>` et `<body>` dans
+le layout **racine**, et mon passe-plat ne les portait pas. Le rendu serveur
+répondait 200 — c'est ce qui m'avait trompé — mais le runtime client levait
+« Missing `<html>` and `<body>` tags ».
+
+La sortie n'était pas d'ajouter les balises à la racine : elle ne connaît pas
+la langue, qui vit dans le segment. Il fallait **supprimer le layout et la
+page racines** pour que celui du segment devienne le layout racine. La
+redirection vers la langue par défaut part donc dans le middleware — mieux
+placée d'ailleurs : `/catalogue` mène à `/en/catalogue` sans rendre de page.
+
+**La première passe de traduction était superficielle.** Trente-huit chaînes
+repérées par un grep rapide, et il en restait autant. Un extracteur qui ignore
+les commentaires et couvre les attributs (`placeholder`, `aria-label`, `alt`)
+autant que le texte a fait remonter le reste : métadonnées des sept pages de
+section, accroches, libellés de filtres, pagination, page 404, états de
+chargement.
+
+Le compte final : **de 40 chaînes en dur à 2**, et ces deux-là sont le nom de
+la marque et un fragment de code que l'extracteur confond avec du texte.
+
+**Trois composants sont passés côté client** — page 404, bouton flottant,
+champ de recherche. Aucun ne porte d'état, mais aucun ne reçoit de `params` :
+une page 404 n'en a pas, et les deux autres sont montés depuis des pages qui
+varient. Lire la langue dans l'URL était la seule voie qui ne demandait pas de
+la faire descendre à travers toute l'arborescence.
+
+⚠️ Détail attrapé au passage : le dictionnaire contenait `n\u2019est` — une
+séquence d'échappement là où le caractère suffit. Ça compile et ça s'affiche
+juste, mais c'est illisible à la relecture et ça casse les recherches
+textuelles. Normalisé.
+
 ## 2026-09-10 — L'interface traduite, et le titre troué réparé
 
 Trente-huit chaînes d'interface dans les trois langues : navigation, pied de

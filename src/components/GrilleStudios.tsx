@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { CarteJeu, type JeuVignette } from './CarteJeu';
+import { useLangue } from '@/i18n/useLangue';
 
 /**
  * Le catalogue par fournisseur, dépliable sur place.
@@ -26,6 +27,7 @@ export interface StudioVignette {
 }
 
 export function GrilleStudios({ studios }: { studios: StudioVignette[] }) {
+  const { t } = useLangue();
   const [ouvert, setOuvert] = useState<string | null>(null);
   const [cache, setCache] = useState<Record<string, JeuVignette[]>>({});
   const [charge, setCharge] = useState<string | null>(null);
@@ -104,7 +106,7 @@ export function GrilleStudios({ studios }: { studios: StudioVignette[] }) {
               <div className="border-t border-fond-bordure p-4">
                 {charge === s.slug ? (
                   <p className="py-6 text-center font-mono text-[12px] text-texte-faible">
-                    Loading…
+                    {t.chargement}
                   </p>
                 ) : (
                   <>

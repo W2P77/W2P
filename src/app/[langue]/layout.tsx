@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 import { BANNIERE_OG } from '@/lib/metadonnees';
 import { SITE_URL } from '@/lib/site';
 import { Barlow, Chakra_Petch, Saira_Condensed } from 'next/font/google';
-import '../globals.css';
+import './../globals.css';
 
 /*
  * ── Trois fontes, trois rôles ─────────────────────────────────────────────

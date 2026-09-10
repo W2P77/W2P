@@ -1,3 +1,5 @@
+import { useLangue } from '@/i18n/useLangue';'use client';
+
 /**
  * Le champ de recherche de l'accroche.
  *
@@ -25,6 +27,7 @@
  * plutôt qu'un champ de formulaire parmi d'autres.
  */
 export function ChampRecherche({ className = '' }: { className?: string }) {
+  const { t } = useLangue();
   return (
     /*
      * Plus de marge négative : elle servait à rejoindre le bord gauche du
@@ -60,8 +63,8 @@ export function ChampRecherche({ className = '' }: { className?: string }) {
             <input
               type="search"
               name="q"
-              placeholder="Search by slot name or provider..."
-              aria-label="Search by slot name or provider"
+              placeholder={t.rechercherPlaceholder}
+              aria-label={t.rechercher}
               className="w-full bg-transparent font-corps text-[15px] leading-tight text-texte outline-none placeholder:text-texte-faible sm:text-[16px]"
             />
             <button

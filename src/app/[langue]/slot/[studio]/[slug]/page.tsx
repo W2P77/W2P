@@ -160,7 +160,7 @@ export default async function PageJeu({
 
       <main className="mx-auto max-w-[1200px] px-6 py-8">
         <nav className="mb-5 font-mono text-[11px] text-texte-faible">
-          <Lien href="/catalogue" className="hover:text-neon-cyan">Catalogue</Lien>
+          <Lien href="/catalogue" className="hover:text-neon-cyan">{t.titreCatalogue}</Lien>
           <span className="mx-2">/</span>
           <Lien href={`/slot/${jeu.studio.slug}`} className="hover:text-neon-cyan">
             {jeu.studio.nom}

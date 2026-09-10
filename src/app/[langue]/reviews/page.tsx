@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
+import { textes } from '@/i18n/textes';
 import { metadonneesDePage } from '@/lib/metadonnees';
 import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
@@ -17,10 +18,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { langue: brut } = await params;
   const langue = estUneLangue(brut) ? brut : LANGUE_DEFAUT;
+  const t = textes(langue);
   return metadonneesDePage({
-    titre: 'Verified slots — RTP checked against the studio',
-    description:
-      'Slots whose RTP we checked against the studio itself, with the source on file. What we could not confirm is listed as unconfirmed.',
+    titre: t.titrePageAvis,
+    description: t.descPageAvis,
     chemin: '/reviews',
     langue,
   });

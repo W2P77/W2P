@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
+import { useLangue } from '@/i18n/useLangue';
 
 /**
  * Les filtres du catalogue.
@@ -45,6 +46,7 @@ export function BarreFiltres({
 }: {
   studios: { slug: string; nom: string; _count: { jeux: number } }[];
 }) {
+  const { t } = useLangue();
   const router = useRouter();
   const params = useSearchParams();
 
@@ -79,11 +81,11 @@ export function BarreFiltres({
           name="q"
           type="search"
           defaultValue={params.get('q') ?? ''}
-          placeholder="Search by slot name or provider..."
+          placeholder={t.rechercherPlaceholder}
           className="w-full bg-transparent text-[13px] outline-none placeholder:text-texte-faible"
-          aria-label="Search by slot name or provider"
+          aria-label={t.rechercher}
         />
-        <button type="submit" className="text-neon-cyan" aria-label="Search">⌕</button>
+        <button type="submit" className="text-neon-cyan" aria-label={t.rechercher}>⌕</button>
       </form>
 
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
@@ -93,7 +95,7 @@ export function BarreFiltres({
           onChange={(e) => majParam('studio', e.target.value)}
           aria-label="Provider"
         >
-          <option value="">All providers</option>
+          <option value="">{t.tousStudios}</option>
           {studios.map((s) => (
             <option key={s.slug} value={s.slug}>
               {s.nom} ({s._count.jeux})

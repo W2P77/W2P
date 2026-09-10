@@ -1,4 +1,7 @@
+'use client';
+
 import { Lien } from '@/components/Lien';
+import { useLangue } from '@/i18n/useLangue';
 /**
  * Le bouton flottant d'aide.
  *
@@ -7,11 +10,12 @@ import { Lien } from '@/components/Lien';
  * ordinaire, et ce qui le rattache au reste de la charte.
  */
 export function BoutonFlottant() {
+  const { t } = useLangue();
   return (
     <Lien
       href="/guides"
       className="group fixed bottom-6 right-6 z-40 hidden h-14 w-14 place-items-center sm:grid"
-      aria-label="Read the guides"
+      aria-label={t.lireGuides}
     >
       <svg viewBox="0 0 56 56" className="absolute inset-0 h-full w-full" fill="none" aria-hidden>
         {/* Cadre ouvert : quatre équerres, pas un rectangle. */}

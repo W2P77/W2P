@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Lien } from '@/components/Lien';
 
 import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
+import { textes } from '@/i18n/textes';
 import { metadonneesDePage } from '@/lib/metadonnees';
 import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
@@ -18,10 +19,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { langue: brut } = await params;
   const langue = estUneLangue(brut) ? brut : LANGUE_DEFAUT;
+  const t = textes(langue);
   return metadonneesDePage({
-    titre: 'Free slot demos — play without an account',
-    description:
-      'Play hundreds of slots for free, no sign-up and no deposit. Every demo links straight to the studio, never to another site.',
+    titre: t.titrePageDemos,
+    description: t.descPageDemos,
     chemin: '/demos',
     langue,
   });
@@ -29,9 +30,13 @@ export async function generateMetadata({
 
 export default async function Demos({
   searchParams,
+  params,
 }: {
   searchParams: Promise<{ page?: string }>;
+  params: Promise<{ langue: string }>;
 }) {
+  const { langue: brutL } = await params;
+  const t = textes(estUneLangue(brutL) ? brutL : LANGUE_DEFAUT);
   const { page: pageBrute } = await searchParams;
   const page = Math.max(1, Number(pageBrute ?? 1));
   const parPage = 24;
@@ -65,8 +70,7 @@ export default async function Demos({
           <span className="font-mono text-[12px] text-texte-faible">{total} games</span>
         </div>
         <p className="mb-6 max-w-2xl text-[13px] text-texte-doux">
-          Play for free, without an account and without a deposit. Every demo
-          opens on the studio&apos;s own page — never on another comparison site.
+          {t.accrocheDemos}
         </p>
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
@@ -76,7 +80,7 @@ export default async function Demos({
         </div>
 
         {pages > 1 && (
-          <nav className="mt-8 flex items-center justify-center gap-3" aria-label="Pagination">
+          <nav className="mt-8 flex items-center justify-center gap-3" aria-label={t.pagination}>
             {page > 1 && (
               <Lien href={`/demos?page=${page - 1}`} className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan">
                 ← Previous
