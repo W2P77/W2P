@@ -12,6 +12,7 @@ import { CapturesJeu } from '@/components/CapturesJeu';
 import { BoutonEnregistrer } from '@/components/BoutonEnregistrer';
 import { baliseJeu } from '@/lib/donnees-structurees';
 import { metadonneesDePage } from '@/lib/metadonnees';
+import { estPublieable } from '@/lib/publication';
 import { SITE_URL } from '@/lib/site';
 
 export const revalidate = 3600;
@@ -56,7 +57,18 @@ export async function generateMetadata({
    * bannière du site prend le relais — mieux vaut une vignette générique que
    * pas de vignette.
    */
-  return metadonneesDePage({
+  /*
+   * Une fiche sans RTP vient de l'inventaire des catalogues studio : on sait
+   * que le jeu existe, rien de plus. Elle reste consultable — un visiteur qui
+   * la cherche mérite de la trouver — mais elle n'est pas proposée aux
+   * moteurs. `follow` reste vrai : ses liens vers le studio et le catalogue
+   * gardent leur valeur.
+   */
+  const horsIndex = estPublieable(jeu) ? {} : { robots: { index: false, follow: true } };
+
+  return {
+    ...horsIndex,
+    ...metadonneesDePage({
     titre: `Where to play ${jeu.nom} — ${rtp}, demo and full specs`,
     description: `${jeu.nom} by ${jeu.studio.nom}: ${rtp}, volatility, max win and free demo. Every number sourced — we tell you when it is not.`,
     // La canonique est posée explicitement : la fiche est atteignable depuis
@@ -66,7 +78,8 @@ export async function generateMetadata({
     image: jeu.visuelUrl
       ? { url: `${SITE_URL}${jeu.visuelUrl}`, largeur: 600, hauteur: 337, alt: jeu.nom }
       : null,
-  });
+    }),
+  };
 }
 
 

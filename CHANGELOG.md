@@ -44,6 +44,59 @@ capture de base publiée, aucun RTP inventé, plus de repassage.
 ⚠️ Attrapé en relisant : l'adaptateur renvoyait bien le cas, mais le script ne
 le distinguait pas de zéro — la détection était donc restée sans effet.
 
+## 2026-09-10 — Le catalogue confronté à celui des studios
+
+`checklist-catalogue.ts` dit ce qui manque **sur les fiches qu'on a**. Il ne
+pouvait rien dire des jeux qu'on n'a pas : l'information n'est pas dans notre
+base. `inventorier-studios.ts` va la chercher là où elle fait autorité — le
+site du studio.
+
+L'écart était plus large que prévu :
+
+    studio          publiés  chez nous  manquants
+    playn-go            417        180        254
+    bgaming             343        227        121
+    nolimit-city        143        136         15
+    hacksaw-gaming      145        161         33
+
+**337 fiches créées**, portant uniquement un slug, un nom déduit de l'URL et
+leur studio. Aucun RTP, aucune volatilité : on ne sait rien de ces jeux, et le
+seul fait honnête dont on dispose est qu'ils existent.
+
+⚠️ **Le seuil de publication.** Ces fiches restent hors index et hors sitemap
+tant qu'elles n'ont pas de RTP. Sans ça, on déclarait à Google des centaines
+de pages vides d'un coup, et un site jugé sur la moyenne de ses pages perd le
+classement de ses meilleures. Le critère est un champ, pas un drapeau : un
+drapeau se pose à la main et s'oublie à la main, il finirait par mentir dans
+les deux sens. Le seuil se lève tout seul dès qu'une fiche devient utile.
+
+Le niveau de preuve n'entre pas dans ce calcul : une fiche au RTP non recoupé
+est utile et le dit franchement à l'écran. C'est l'absence de donnée qui
+disqualifie, pas la faiblesse de la source.
+
+**Quatre studios, quatre stratégies, aucune généralisable :**
+
+· BGaming expose un `game-sitemap.xml` dédié.
+· Nolimit City passe par un **index** de sitemaps — sans descendre d'un
+  niveau, on lit les URL des sous-sitemaps et on conclut qu'il ne publie
+  aucun jeu. Il en liste 143.
+· Play'n GO range ses jeux sous `/additional-game-content/`, pas sous
+  `/games/` : le motif attendu rendait zéro sur un sitemap qui en contient 417.
+· Hacksaw ne descend pas jusqu'aux jeux dans son sitemap ; c'est la page de
+  listing qui les porte.
+
+Le sitemap est préféré au listing partout où il existe : il est publié *pour*
+être énuméré, complet par construction, et coûte une requête là où un listing
+paginé en coûte cinquante.
+
+⚠️ **`Jeu.slug` est unique globalement, pas par studio.** Deux éditeurs
+publiant un jeu du même nom entrent en collision — `plinko` chez Hacksaw et
+BGaming, `jogo-do-bicho` chez BGaming et InOut. Le script les signale au lieu
+de les contourner : un slug pris est une question à trancher, pas un incident.
+L'URL portant déjà le studio (`/slot/[studio]/[slug]`), l'unicité devrait
+sans doute être `@@unique([studioId, slug])` — c'est une migration, elle
+n'est pas prise ici.
+
 ## 2026-09-10 — Les 1 951 fiches déclaraient toutes l'accueil au partage
 
 Next **fusionne** les métadonnées d'une page avec celles du layout racine. Un

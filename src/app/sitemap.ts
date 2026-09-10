@@ -37,7 +37,22 @@ export const revalidate = 3600;
 async function contenuDeLaBase() {
   try {
     return await Promise.all([
+      /*
+       * Le filtre n'est pas un détail de performance.
+       *
+       * L'inventaire des catalogues studio crée des fiches dont on ne sait
+       * que l'existence. Les proposer au crawl noierait les fiches
+       * renseignées sous des centaines de pages vides — et un site jugé sur
+       * la moyenne de ses pages perd le classement de ses meilleures. Elles
+       * y entrent d'elles-mêmes dès qu'elles ont un RTP, sans que personne
+       * ait à y repasser.
+       *
+       * Le critère est celui de `estPublieable()`, exprimé ici en requête :
+       * les deux doivent rester d'accord, sinon le sitemap promet une page
+       * que son `robots` refuse.
+       */
       prisma.jeu.findMany({
+        where: { rtpStudio: { not: null } },
         select: { slug: true, majLe: true, studio: { select: { slug: true } } },
       }),
       prisma.studio.findMany({ select: { slug: true, majLe: true } }),
