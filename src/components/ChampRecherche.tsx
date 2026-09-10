@@ -1,4 +1,6 @@
-import { useLangue } from '@/i18n/useLangue';'use client';
+'use client';
+
+import { useLangue } from '@/i18n/useLangue';
 
 /**
  * Le champ de recherche de l'accroche.
