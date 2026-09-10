@@ -88,6 +88,58 @@ function nombre(brut: string): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+/*
+ * Un moteur partagé, pour la *recherche* du panneau.
+ *
+ * `lireLesRegles` recadre sur l'emplacement du panneau : c'est ce qui rend sa
+ * lecture fiable, mais cela suppose le panneau déjà ouvert et à sa place.
+ * Pendant qu'on le cherche, on ne sait pas encore s'il y en a un — donc on lit
+ * l'écran entier, et on se contente d'y reconnaître un en-tête.
+ *
+ * Le moteur est gardé entre les appels : son initialisation coûte plus cher
+ * que la reconnaissance elle-même, et on l'appelle une fois par position
+ * essayée.
+ */
+let ouvrierPartage: Awaited<ReturnType<typeof createWorker>> | null = null;
+
+/**
+ * Lit la **bande haute** d'une capture. Sert à reconnaître ce qui est ouvert.
+ *
+ * Le recadrage n'est pas une économie de confort : lire les 1280×800 coûtait
+ * une quinzaine de secondes, et on appelle cette fonction jusqu'à quatre fois
+ * par jeu pendant la recherche de l'icône — soit près de quatre heures
+ * ajoutées sur le catalogue Pragmatic. La bande suffit : tout ce qu'on
+ * cherche s'y trouve, l'en-tête « GAME RULES » (y≈62 sur l'habillage large,
+ * y≈96 sur l'étroit) comme le bouton « BUY FREE SPINS » (y≈165).
+ */
+export async function lireLEcran(cheminPng: string): Promise<string> {
+  ouvrierPartage ??= await createWorker('eng');
+  const prepare = await sharp(cheminPng)
+    .extract({ left: 0, top: 30, width: 1280, height: 190 })
+    .grayscale()
+    .normalise()
+    .resize({ width: 1920 })
+    .png()
+    .toBuffer();
+  const { data } = await ouvrierPartage.recognize(prepare);
+  return data.text;
+}
+
+/** Libère le moteur partagé. À appeler en fin de campagne. */
+export async function fermerLeLecteur(): Promise<void> {
+  if (!ouvrierPartage) return;
+  await ouvrierPartage.terminate();
+  ouvrierPartage = null;
+}
+
+/**
+ * L'en-tête qui prouve qu'on est entré dans le panneau de règles.
+ *
+ * Partagé entre la recherche (ci-dessus) et le contrôle final du script :
+ * c'est le même critère, il ne doit pas diverger.
+ */
+export const EN_TETE_PANNEAU = /RTP|GAME RULES|PAYTABLE/i;
+
 export async function lireLesRegles(cheminsPng: string[]): Promise<FaitsLus> {
   const ouvrier = await createWorker('eng');
   const pages: FaitsLus['pages'] = [];
@@ -100,9 +152,13 @@ export async function lireLesRegles(cheminsPng: string[]): Promise<FaitsLus> {
        * qui ne contiennent que du bruit ; sans l'agrandissement, le texte fait
        * 11 px de haut et la lecture des décimales devient hasardeuse — or
        * c'est exactement la décimale qui distingue 96,5 de 96,06.
+       *
+       * La hauteur va jusqu'à 680 px, et pas 620 : sur l'habillage étroit
+       * le panneau descend plus bas, et c'est justement en bas que se
+       * trouve la ligne du RTP.
        */
       const prepare = await sharp(chemin)
-        .extract({ left: 130, top: 60, width: 1020, height: 560 })
+        .extract({ left: 130, top: 60, width: 1020, height: 620 })
         .grayscale()
         .normalise()
         .resize({ width: 2040 })

@@ -2,6 +2,60 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-10 — La capture ne connaissait qu'un habillage sur deux
+
+Trois défauts en cascade, tous du même genre : le script cliquait à une
+position fixe et ne vérifiait jamais ce qu'il avait obtenu.
+
+**Pragmatic sert deux habillages.** Le **large** (Gates of Olympus, 5 Lions
+Dance) occupe toute la largeur, son icône « i » est à x=133 et son panneau de
+règles est paginé à la flèche. L'**étroit** — les classiques à trois rouleaux —
+cadre le jeu au centre sur ~400 px, l'icône suit le cadre (x=466 sur 777 Rush,
+et la largeur varie d'un jeu à l'autre), et le panneau n'est pas paginé du
+tout : il défile.
+
+Ce que ça coûtait :
+
+1. **L'icône cherchée à une coordonnée fixe** ratait tout l'habillage étroit en
+   silence : sept captures du jeu de base. Le garde-fou les rejetait sans rien
+   apprendre, donc ils revenaient échouer au lot suivant, indéfiniment.
+2. **La flèche « suivant » cliquée sur l'habillage étroit** tombe hors du
+   panneau — et le referme. La première capture était bonne, les six suivantes
+   montraient le jeu de base.
+3. **La boîte d'achat était capturée sur des jeux qui n'en ont pas**, et
+   publiée sous la légende « Buying the feature » : une image du jeu de base
+   présentée comme une confirmation d'achat, sur une machine sans tours
+   gratuits.
+
+L'adaptateur cherche donc l'icône en **vérifiant après chaque clic**, et la
+position qui a marché lui dit lequel des deux habillages il a en face. Le
+bouton d'achat est lu à l'écran avant d'être cliqué.
+
+**Le nombre de crans a été mesuré, pas deviné.** Une sonde a compté ce qu'il
+faut pour faire apparaître la ligne du RTP sur l'habillage étroit : **douze
+crans de molette**. Sept s'arrêtaient juste avant — le jeu repartait sans son
+RTP alors que le panneau était bien ouvert et que tout le reste marchait. On
+descend maintenant cran par cran (18) mais on ne photographie qu'un cran sur
+trois : dix-huit images quasi identiques sur une fiche n'ont aucun intérêt,
+sept vues qui se suivent en ont.
+
+**Les doublons sont écartés sur comparaison d'images**, et le seuil est
+calibré. Une empreinte de l'image entière mentait dans les deux sens : le
+panneau étroit n'occupant que 400 px sur 1280, une page entièrement différente
+n'y pesait que 3,6 — sous le seuil, donc jetée avec le RTP ; et sur
+l'habillage large une page légitime descendait à 6,6, à un cheveu du même
+couperet. Recadrée sur la colonne centrale — la seule que les deux habillages
+partagent — la mesure donne 15 à 40 pour un vrai changement de page contre 0,1
+quand rien ne bouge.
+
+Dernier détail, mais il pesait des heures : la détection lisait les 1280×800
+par OCR à chaque position essayée, soit une quinzaine de secondes × 4
+candidats × 619 jeux. Recadrée sur la bande où l'en-tête apparaît, elle coûte
+quelques secondes.
+
+⚠️ Le navigateur Playwright avait disparu du cache de la machine — c'est ce qui
+faisait échouer la campagne au redémarrage. `npx playwright install chromium`.
+
 ## 2026-09-08 — Le site déclarait vivre à une adresse morte
 
 `SITE_URL` valait `https://where2play.info` en dur. **Ce domaine ne résout

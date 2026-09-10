@@ -30,11 +30,16 @@
  */
 import { config as loadEnv } from 'dotenv';
 import { mkdirSync, rmSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { basename, join, resolve } from 'node:path';
 import { chromium, type Browser } from 'playwright';
 import sharp from 'sharp';
 import { ADAPTATEURS } from '../src/lib/captures/adaptateurs';
-import { lireLesRegles } from '../src/lib/captures/lecture-regles';
+import {
+  EN_TETE_PANNEAU,
+  fermerLeLecteur,
+  lireLEcran,
+  lireLesRegles,
+} from '../src/lib/captures/lecture-regles';
 import { televerser } from '../src/lib/visuels/stockage';
 
 loadEnv({ path: resolve(process.cwd(), '.env.local'), quiet: true });
@@ -57,6 +62,43 @@ interface Resultat {
   gainMax: number | null;
   ecart: string | null;
 }
+
+/**
+ * Empreinte d'une capture : le cœur du panneau, en 16×16 niveaux de gris.
+ *
+ * ── Pourquoi recadrer avant de réduire ────────────────────────────────────
+ *
+ * Sur une empreinte de l'image entière, la mesure ment dans les deux sens.
+ * Le panneau étroit n'occupe que 400 px sur 1280 : une page entièrement
+ * différente n'y pesait que **3,6**, en dessous du seuil — les pages étaient
+ * jetées comme des doublons, et le RTP avec elles. À l'inverse, sur
+ * l'habillage large, une page légitime descendait à **6,6**, à un cheveu du
+ * même couperet.
+ *
+ * Recadré sur la colonne centrale — la seule que les deux habillages
+ * partagent — l'écart mesuré est de 15 à 40 pour un vrai changement de page,
+ * et de 0,1 quand rien n'a bougé. Il n'y a plus de zone grise.
+ */
+const COEUR_PANNEAU = { left: 440, top: 60, width: 400, height: 615 };
+
+async function empreinte(chemin: string): Promise<Buffer> {
+  return sharp(chemin)
+    .extract(COEUR_PANNEAU)
+    .grayscale()
+    .resize(16, 16, { fit: 'fill' })
+    .raw()
+    .toBuffer();
+}
+
+/** Écart moyen par pixel, de 0 (identiques) à 255. */
+function ecartMoyen(a: Buffer, b: Buffer): number {
+  let total = 0;
+  for (let i = 0; i < a.length; i++) total += Math.abs(a[i] - b[i]);
+  return total / a.length;
+}
+
+/** En dessous, c'est le même écran : mesuré à 0,1 panneau immobile. */
+const SEUIL_DOUBLON = 6;
 
 async function capturerUnJeu(
   nav: Browser,
@@ -81,14 +123,65 @@ async function capturerUnJeu(
     await page.waitForTimeout(adaptateur.chargementMs);
     await adaptateur.ouvrirLeJeu(page);
     await cliche('base');
-    await adaptateur.capturerLesRegles(page, cliche);
-    await adaptateur.capturerLAchat(page, cliche);
+
+    /*
+     * Le verdict que l'adaptateur consulte pendant qu'il cherche l'icône.
+     * La capture est jetable — elle sert à décider, pas à publier — et n'est
+     * donc pas déclarée dans `fichiers`, sinon elle partirait sur la fiche.
+     */
+    const sonde = join(dossier, 'sonde.png');
+    const regarder = async () => {
+      await page.screenshot({ path: sonde });
+      return lireLEcran(sonde);
+    };
+
+    const pages = await adaptateur.capturerLesRegles(page, cliche, regarder);
+    if (pages === 0) {
+      rmSync(sonde, { force: true });
+      console.log(`  ! ${jeu.slug} — icône des règles introuvable, jeu laissé en file`);
+      await page.close();
+      return null;
+    }
+    await adaptateur.capturerLAchat(page, cliche, regarder);
+    rmSync(sonde, { force: true });
   } catch (e) {
     console.log(`  ! ${jeu.slug} — ${e instanceof Error ? e.message.slice(0, 60) : 'erreur'}`);
     await page.close();
     return null;
   }
   await page.close();
+
+  /*
+   * Les captures en double sont écartées ici, avant tout le reste.
+   *
+   * Deux causes, une seule conséquence : un jeu de six pages cliqué sept fois
+   * repasse par la première, et un panneau qui défile bute en bas et ne bouge
+   * plus. Dans les deux cas la fiche recevrait deux fois la même image.
+   *
+   * On compare les images elles-mêmes, réduites en 16×16 gris : le nombre de
+   * pages n'est écrit nulle part qu'on puisse lire, et le fond des jeux est
+   * animé — deux captures du **même** écran diffèrent donc un peu. D'où un
+   * seuil plutôt qu'une égalité stricte.
+   *
+   * Le tri se fait avant l'OCR pour que `faits.pages[i]` et les fichiers
+   * restent alignés : c'est cet index qui décide quelle légende est chiffrée.
+   */
+  const gardes: string[] = [];
+  let precedente: Buffer | null = null;
+  for (const chemin of pngRegles) {
+    const actuelle = await empreinte(chemin);
+    if (precedente && ecartMoyen(precedente, actuelle) < SEUIL_DOUBLON) {
+      const nom = basename(chemin, '.png');
+      rmSync(chemin, { force: true });
+      const i = fichiers.indexOf(nom);
+      if (i >= 0) fichiers.splice(i, 1);
+      continue;
+    }
+    gardes.push(chemin);
+    precedente = actuelle;
+  }
+  pngRegles.length = 0;
+  pngRegles.push(...gardes);
 
   const faits = await lireLesRegles(pngRegles);
 
@@ -100,7 +193,7 @@ async function capturerUnJeu(
    * documentation et jamais réessayées. Le mot « RTP » ne figure que dans le
    * panneau de règles : sa présence prouve qu'on y est entré.
    */
-  const panneauOuvert = faits.pages.some((p) => /RTP|GAME RULES|PAYTABLE/i.test(p.texte));
+  const panneauOuvert = faits.pages.some((p) => EN_TETE_PANNEAU.test(p.texte));
   if (!panneauOuvert) {
     console.log(`  ! ${jeu.slug} — panneau de règles jamais atteint, jeu laissé en file`);
     return null;
@@ -264,12 +357,14 @@ async function main() {
       console.log(`  ${r.slug.padEnd(34)} ${r.captures.length} captures · ${r.rtp ?? 'RTP non lu'}`);
     }
     console.log('\nSIMULATION — rien n’a été téléversé ni écrit. Ajouter --appliquer.');
+    await fermerLeLecteur();
     await prisma.$disconnect();
     return;
   }
 
   const verifies = await prisma.jeu.count({ where: { rtpConfiance: 'STUDIO' } });
   console.log(`\n${resultats.length} jeux publiés. ${verifies} fiches en source studio.`);
+  await fermerLeLecteur();
   await prisma.$disconnect();
 }
 

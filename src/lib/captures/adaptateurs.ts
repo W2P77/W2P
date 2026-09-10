@@ -24,16 +24,35 @@
  */
 import type { Page } from 'playwright';
 
+import { EN_TETE_PANNEAU } from './lecture-regles';
+
 export interface Adaptateur {
   studio: string;
   /** Le temps de chargement du jeu, mesuré et non deviné. */
   chargementMs: number;
   /** Ferme l'écran d'accueil, s'il y en a un. */
   ouvrirLeJeu(page: Page): Promise<void>;
-  /** Ouvre le panneau de règles et renvoie le nombre de pages capturées. */
-  capturerLesRegles(page: Page, cliche: (nom: string) => Promise<void>): Promise<number>;
+  /**
+   * Ouvre le panneau de règles et renvoie le nombre de captures prises —
+   * les doublons en sont écartés plus loin, sur comparaison d'images.
+   *
+   * `lireLEcran` rend le texte de ce qui est affiché à l'instant. Sans lui,
+   * l'adaptateur cliquerait à l'aveugle — c'est ce qu'il faisait, et il
+   * capturait sept fois le jeu de base en croyant feuilleter les règles.
+   * Renvoie 0 s'il n'a pas su ouvrir le panneau.
+   */
+  capturerLesRegles(
+    page: Page,
+    cliche: (nom: string) => Promise<void>,
+    lireLEcran: () => Promise<string>,
+  ): Promise<number>;
+
   /** Ouvre la boîte d'achat de bonus. Renvoie faux si le jeu n'en propose pas. */
-  capturerLAchat(page: Page, cliche: (nom: string) => Promise<void>): Promise<boolean>;
+  capturerLAchat(
+    page: Page,
+    cliche: (nom: string) => Promise<void>,
+    lireLEcran: () => Promise<string>,
+  ): Promise<boolean>;
 }
 
 export const PRAGMATIC: Adaptateur = {
@@ -70,23 +89,120 @@ export const PRAGMATIC: Adaptateur = {
     await page.waitForTimeout(4000);
   },
 
-  async capturerLesRegles(page, cliche) {
-    await page.mouse.click(133, 745); // l'icône « i », en bas à gauche
-    await page.waitForTimeout(4500);
-    // Sept pages chez Pragmatic. On les capture toutes plutôt que de s'arrêter
-    // à celle qui porte le RTP : les autres donnent les mécaniques, et une
-    // seconde visite coûterait un chargement complet.
-    for (let n = 1; n <= 7; n++) {
-      await cliche(`regles-${n}`);
-      await page.mouse.click(256, 625); // la flèche « page suivante »
-      await page.waitForTimeout(2200);
+  /**
+   * Trouve l'icône « i », feuillette, referme.
+   *
+   * ── Pragmatic sert deux habillages, et tout en découle ─────────────────
+   *
+   * **Large** (Gates of Olympus, 5 Lions Dance) : le jeu occupe toute la
+   * largeur, l'icône « i » colle au bord gauche à x=133, et le panneau de
+   * règles est **paginé** — une flèche « suivant » en bas à gauche, « Page
+   * 1/6 » en bas à droite.
+   *
+   * **Étroit** (les classiques à trois rouleaux, comme 777 Rush) : le jeu est
+   * cadré au centre sur ~400 px, l'icône suit le cadre — x=466 ici, et la
+   * largeur du cadre change d'un jeu à l'autre. Le panneau, lui, n'est pas
+   * paginé du tout : il **défile**.
+   *
+   * Les deux erreurs que ça a coûtées, et qu'on ne refera pas :
+   *
+   * 1. Une coordonnée fixe pour l'icône. Elle marchait sur l'habillage large
+   *    et ratait l'autre en silence — le script capturait sept fois le jeu de
+   *    base. Le garde-fou du script les rejetait sans rien apprendre : ils
+   *    revenaient échouer au lot suivant, indéfiniment.
+   * 2. La flèche « suivant » cliquée sur l'habillage étroit. À (256, 625) on
+   *    tombe **hors du panneau**, ce qui le referme : la première capture
+   *    était bonne, les six suivantes montraient le jeu de base.
+   *
+   * D'où : on cherche l'icône en vérifiant après chaque clic, et la position
+   * qui a marché nous dit lequel des deux habillages on a en face.
+   */
+  async capturerLesRegles(page, cliche, lireLEcran) {
+    /*
+     * Chaque candidat porte l'habillage qu'il désigne. Le large d'abord :
+     * c'est la grande majorité du catalogue, la recherche n'y coûte rien.
+     */
+    const CANDIDATS: Array<{ x: number; large: boolean }> = [
+      { x: 133, large: true },
+      { x: 466, large: false }, // cadre ~400 px
+      { x: 380, large: false }, // cadre plus large
+      { x: 520, large: false }, // cadre plus étroit
+    ];
+
+    let large: boolean | null = null;
+    for (const candidat of CANDIDATS) {
+      await page.mouse.click(candidat.x, 745);
+      await page.waitForTimeout(4500);
+      if (EN_TETE_PANNEAU.test(await lireLEcran())) {
+        large = candidat.large;
+        break;
+      }
+      // Un clic manqué tombe sur le décor et n'ouvre rien ; Échap referme ce
+      // qu'un clic malheureux aurait pu ouvrir avant d'essayer plus loin.
+      await page.keyboard.press('Escape');
+      await page.waitForTimeout(800);
     }
-    await page.mouse.click(1178, 49); // fermer le panneau
-    await page.waitForTimeout(2500);
-    return 7;
+    if (large === null) return 0;
+
+    /*
+     * Sept captures, quel que soit l'habillage — mais pas par le même moyen.
+     *
+     * **Large** : le panneau est paginé, une flèche par page. Certains jeux
+     * n'en ont que six ; le septième clic repasse par la première et le
+     * doublon est écarté en aval, sur comparaison d'images.
+     *
+     * **Étroit** : le panneau défile, et il est long. Mesuré sur 777 Rush,
+     * il faut **douze crans de molette** pour faire apparaître la ligne
+     * « The theoretical RTP of this game is 96.50% » — c'est-à-dire la seule
+     * qu'on vienne chercher. Sept crans s'arrêtaient juste avant, et le jeu
+     * repartait sans son RTP alors que le panneau était bien ouvert.
+     *
+     * D'où le découplage : on descend cran par cran, mais on ne photographie
+     * qu'un cran sur trois. Capturer chaque cran donnerait dix-huit images
+     * quasi identiques sur la fiche ; en sauter deux sur trois donne sept
+     * vues qui se suivent sans se répéter, et la dernière prise après la
+     * boucle garantit qu'on montre le bas du panneau.
+     */
+    const CAPTURES = 7;
+
+    if (large) {
+      for (let n = 1; n <= CAPTURES; n++) {
+        await cliche(`regles-${n}`);
+        await page.mouse.click(256, 625); // la flèche « page suivante »
+        await page.waitForTimeout(2200);
+      }
+    } else {
+      const CRANS = 18;
+      const UN_CRAN_SUR = 3;
+      // La molette agit là où est le curseur : il faut le poser dans le
+      // panneau, que le clic sur l'icône a laissé bien plus bas.
+      await page.mouse.move(640, 380);
+      for (let n = 0; n < CRANS; n++) {
+        if (n % UN_CRAN_SUR === 0) await cliche(`regles-${n / UN_CRAN_SUR + 1}`);
+        await page.mouse.wheel(0, 420);
+        await page.waitForTimeout(1200);
+      }
+      await cliche(`regles-${CAPTURES}`); // le bas du panneau
+      // Sur l'habillage étroit, un clic hors du cadre referme le panneau —
+      // c'est précisément ce que faisait la flèche par erreur.
+      await page.mouse.click(100, 400);
+    }
+
+    if (large) await page.mouse.click(1178, 49); // la croix, en haut à droite
+    await page.waitForTimeout(2000);
+    return CAPTURES;
   },
 
-  async capturerLAchat(page, cliche) {
+  /**
+   * La boîte d'achat de bonus, **si le jeu en propose une**.
+   *
+   * Sans ce contrôle, on cliquait dans le vide, on capturait le jeu de base,
+   * et on le publiait sous la légende « Buying the feature » : une image
+   * fausse sur la fiche d'un jeu qui n'a même pas de tours gratuits. Le
+   * bouton porte son nom à l'écran, on se contente de vérifier qu'il est là.
+   */
+  async capturerLAchat(page, cliche, lireLEcran) {
+    if (!/BUY/i.test(await lireLEcran())) return false;
     await page.mouse.click(100, 165); // « BUY FREE SPINS », en haut à gauche
     await page.waitForTimeout(3500);
     await cliche('achat');
