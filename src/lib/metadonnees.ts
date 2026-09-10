@@ -42,6 +42,7 @@ export function metadonneesDePage({
   description,
   chemin,
   image,
+  imageGeneree,
 }: {
   titre: string;
   description: string;
@@ -49,6 +50,15 @@ export function metadonneesDePage({
   chemin: string;
   /** Visuel propre à la page. Sans lui, la bannière du site prend le relais. */
   image?: { url: string; largeur: number; hauteur: number; alt: string } | null;
+  /**
+   * Laisse le champ `images` entièrement vide.
+   *
+   * À réserver aux pages qui portent un fichier `opengraph-image` : Next
+   * fabrique alors la carte lui-même et pose la balise. Déclarer une image
+   * ici la court-circuiterait — c'est celle du helper qui gagnerait, et la
+   * route ne servirait jamais.
+   */
+  imageGeneree?: boolean;
 }): Metadata {
   const adresse = `${SITE_URL}${chemin}`;
 
@@ -58,7 +68,7 @@ export function metadonneesDePage({
    * champ ne rend pas la bannière du site, il ne rend rien du tout, et le
    * lien partagé perd sa vignette. Le repli doit donc être explicite ici.
    */
-  const visuel = image ?? {
+  const visuel = imageGeneree ? null : image ?? {
     url: `${SITE_URL}${BANNIERE_OG}`,
     largeur: 1200,
     hauteur: 630,
@@ -75,15 +85,19 @@ export function metadonneesDePage({
       description,
       url: adresse,
       siteName: 'where2spin',
-      images: [
-        { url: visuel.url, width: visuel.largeur, height: visuel.hauteur, alt: visuel.alt },
-      ],
+      ...(visuel
+        ? {
+            images: [
+              { url: visuel.url, width: visuel.largeur, height: visuel.hauteur, alt: visuel.alt },
+            ],
+          }
+        : {}),
     },
     twitter: {
       card: 'summary_large_image',
       title: titre,
       description,
-      images: [visuel.url],
+      ...(visuel ? { images: [visuel.url] } : {}),
     },
   };
 }

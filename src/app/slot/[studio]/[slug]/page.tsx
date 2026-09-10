@@ -75,9 +75,10 @@ export async function generateMetadata({
     // le catalogue, la page du studio et la recherche, chacune pouvant traîner
     // ses paramètres.
     chemin: `/slot/${jeu.studio.slug}/${jeu.slug}`,
-    image: jeu.visuelUrl
-      ? { url: `${SITE_URL}${jeu.visuelUrl}`, largeur: 600, hauteur: 337, alt: jeu.nom }
-      : null,
+    // La carte de partage est fabriquée par `opengraph-image.tsx`, au format
+    // exact et sur le fond de la marque. Déclarer une image ici la
+    // court-circuiterait.
+    imageGeneree: true,
     }),
   };
 }
