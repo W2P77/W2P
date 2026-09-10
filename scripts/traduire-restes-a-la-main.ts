@@ -48,12 +48,17 @@ const TABLE = resolve(process.cwd(), 'src/data/traductions-faits.json');
  * « 1 000x » il n'y a aucune frontière de mot entre le zéro et le x, tous
  * deux caractères de mot. La première version laissait donc passer tous les
  * milliers, c'est-à-dire précisément les plafonds de gain.
+ *
+ * Le `(?<=\d)` compte tout autant. Sans lui, « 3-4-4-4-3, 576 ways » perdait
+ * l'espace après la virgule, puis la virgule elle-même, et les deux nombres
+ * se collaient en « 3576 » : une traduction juste était refusée parce que la
+ * normalisation, et elle seule, avait inventé un nombre.
  */
 function nombres(texte: string): string[] {
   return (
     texte
-      .replace(/[\s\u00a0\u202f](?=\d{3}(?!\d))/g, '')
-      .replace(/,(?=\d{3}(?!\d))/g, '')
+      .replace(/(?<=\d)[\s\u00a0\u202f](?=\d{3}(?!\d))/g, '')
+      .replace(/(?<=\d),(?=\d{3}(?!\d))/g, '')
       .match(/\d+(?:[.,]\d+)?/g) ?? []
   ).map((n) => n.replace(',', '.'));
 }
