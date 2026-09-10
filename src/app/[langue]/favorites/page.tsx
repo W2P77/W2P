@@ -3,20 +3,31 @@ import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
 import { Tirets } from '@/components/DecorNeon';
 import { MesJeux } from '@/components/MesJeux';
+import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
+import { metadonneesDePage } from '@/lib/metadonnees';
 
-export const metadata: Metadata = {
-  title: 'My games',
-  description: 'The slots you saved, kept on your device.',
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ langue: string }>;
+}): Promise<Metadata> {
+  const { langue: brut } = await params;
+  return metadonneesDePage({
+    titre: 'Favorites',
+    description: 'The slots you saved, kept on your device.',
+    chemin: '/favorites',
+    langue: estUneLangue(brut) ? brut : LANGUE_DEFAUT,
+  });
+}
 
-export default function Compte() {
+export default function Favoris() {
   return (
     <div className="min-h-screen bg-fond">
       <EnTete />
       <main className="mx-auto max-w-[1400px] px-6 py-8">
         <div className="mb-2 flex items-center gap-4">
           <h1 className="font-titre text-[24px] font-black uppercase tracking-tight text-white">
-            My games
+            Favorites
           </h1>
           <Tirets />
         </div>

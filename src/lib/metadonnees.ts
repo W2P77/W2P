@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 
+import { cheminPublic } from '@/i18n/chemins';
+import { LANGUES, LANGUE_DEFAUT, type Langue } from '@/i18n/langues';
 import { SITE_URL } from '@/lib/site';
 
 /**
@@ -41,13 +43,20 @@ export function metadonneesDePage({
   titre,
   description,
   chemin,
+  langue,
   image,
   imageGeneree,
 }: {
   titre: string;
   description: string;
-  /** Chemin absolu depuis la racine, avec le `/` initial. */
+  /**
+   * Chemin **interne**, avec le `/` initial et sans langue : `/favorites`,
+   * `/slot/x/y`. La langue et la traduction du premier segment sont posées
+   * ici — les écrire à l'appel les figerait dans une seule langue.
+   */
   chemin: string;
+  /** La langue de la page. */
+  langue: Langue;
   /** Visuel propre à la page. Sans lui, la bannière du site prend le relais. */
   image?: { url: string; largeur: number; hauteur: number; alt: string } | null;
   /**
@@ -60,7 +69,26 @@ export function metadonneesDePage({
    */
   imageGeneree?: boolean;
 }): Metadata {
-  const adresse = `${SITE_URL}${chemin}`;
+  const adresse = `${SITE_URL}${cheminPublic(chemin, langue)}`;
+
+  /*
+   * ── Les versions linguistiques, déclarées page par page ─────────────────
+   *
+   * Sans elles, `/en/catalogue`, `/fr/catalogue` et `/de/katalog` sont trois
+   * pages qui se ressemblent et se disputent le même classement : Google en
+   * garde une et ignore les autres. Déclarées comme versions d'une même page,
+   * elles se renforcent au lieu de se concurrencer.
+   *
+   * Le sitemap les porte déjà, mais un moteur qui arrive par un lien plutôt
+   * que par le sitemap ne les verrait pas — et c'est le cas le plus courant.
+   *
+   * `x-default` désigne ce qu'on sert à qui ne correspond à aucune langue
+   * déclarée : l'anglais, comme la racine.
+   */
+  const versions = Object.fromEntries(
+    LANGUES.map((l) => [l.htmlLang, `${SITE_URL}${cheminPublic(chemin, l.code)}`]),
+  );
+  versions['x-default'] = `${SITE_URL}${cheminPublic(chemin, LANGUE_DEFAUT)}`;
 
   /*
    * Le repli n'est pas décoratif. Quand une page déclare son bloc
@@ -78,7 +106,7 @@ export function metadonneesDePage({
   return {
     title: titre,
     description,
-    alternates: { canonical: adresse },
+    alternates: { canonical: adresse, languages: versions },
     openGraph: {
       type: 'article',
       title: titre,

@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { Lien } from '@/components/Lien';
+import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
 
 import { metadonneesDePage } from '@/lib/metadonnees';
 import { notFound } from 'next/navigation';
@@ -42,15 +44,16 @@ async function studioParSlug(slug: string, page: number) {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ studio: string }>;
+  params: Promise<{ studio: string; langue: string }>;
 }): Promise<Metadata> {
-  const { studio } = await params;
+  const { langue: brutLangue, studio } = await params;
   const s = await prisma.studio.findUnique({ where: { slug: studio } });
   if (!s) return { title: 'Provider not found' };
   // Cette page n'avait pas non plus de canonique : elle est atteignable
   // depuis le catalogue et la navigation, chacune pouvant traîner ses
   // paramètres de pagination.
   return metadonneesDePage({
+    langue: estUneLangue(brutLangue) ? brutLangue : LANGUE_DEFAUT,
     titre: `${s.nom} slots — RTP, volatility and demos`,
     description: `Every ${s.nom} slot with its RTP, volatility and max win — and where each number comes from.`,
     chemin: `/slot/${s.slug}`,
@@ -78,7 +81,7 @@ export default async function PageStudio({
       <EnTete />
       <main className="mx-auto max-w-[1400px] px-6 py-8">
         <nav className="mb-4 font-mono text-[11px] text-texte-faible">
-          <a href="/catalogue" className="hover:text-neon-cyan">Catalogue</a>
+          <Lien href="/catalogue" className="hover:text-neon-cyan">Catalogue</Lien>
           <span className="mx-2">/</span>
           <span className="text-texte-doux">{s.nom}</span>
         </nav>
@@ -102,23 +105,23 @@ export default async function PageStudio({
         {pages > 1 && (
           <nav className="mt-8 flex items-center justify-center gap-3" aria-label="Pagination">
             {page > 1 && (
-              <a
+              <Lien
                 href={`/slot/${s.slug}?page=${page - 1}`}
                 className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan"
               >
                 ← Previous
-              </a>
+              </Lien>
             )}
             <span className="font-mono text-[12px] text-texte-faible">
               {page} / {pages}
             </span>
             {page < pages && (
-              <a
+              <Lien
                 href={`/slot/${s.slug}?page=${page + 1}`}
                 className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan"
               >
                 Next →
-              </a>
+              </Lien>
             )}
           </nav>
         )}

@@ -63,6 +63,66 @@ seul.
 BetsRank se propage ici en silence au semis suivant. La confrontation
 systématique vaut mieux que la confiance dans la source.
 
+## 2026-09-10 — Le site passe en trois langues
+
+Anglais, français, allemand. Le choix suit les marchés réellement couverts par
+les casinos du panel — **21 en France, 12 en Allemagne**, et l'anglais pour
+l'Australie et le Royaume-Uni réunis. Ouvrir l'italien ou l'espagnol pour deux
+ou trois casinos reproduirait l'erreur que BetsRank paie déjà : 2 390 pages en
+italien pour zéro casino.
+
+**Le moment est choisi.** Rien n'est encore indexé. Les titres se changent
+n'importe quand, les URL non : ajouter le multilingue après l'indexation
+coûte des redirections et des `hreflang` à rattraper. Aujourd'hui ça ne coûte
+rien.
+
+**Un segment de langue dans l'URL, pas un cookie.** Les pages sont rendues
+avec `revalidate`, donc mises en cache **par chemin**. Une langue choisie par
+cookie, ou une réécriture vers le même chemin, ferait partager une seule
+entrée de cache aux trois langues : la première rendue serait servie à tous,
+et Google indexerait une langue au hasard. C'est le piège que le middleware
+décrivait déjà pour le pays du visiteur.
+
+**Les trois langues sont préfixées, anglais compris.** Laisser l'anglais à la
+racine donnerait deux adresses pour la même page — `/` et `/en/` — donc du
+contenu dupliqué à démêler avec des canoniques.
+
+**Les slugs sont traduits, les noms propres non.** `/fr/favoris`,
+`/de/katalog`, `/fr/avis` — mais `slot` reste `slot` : le segment est suivi du
+studio et du jeu, et `/de/spielautomat/pragmatic-play/gates-of-olympus`
+mélangerait une traduction et deux noms propres pour un gain nul. Comme 90 %
+des pages sont des fiches de jeu, la table ne compte que sept entrées.
+
+Le segment interne atteint en direct est **renvoyé en 301** vers le slug
+traduit : `/fr/favorites` mène à `/fr/favoris`. Sans ça deux adresses
+serviraient la même page.
+
+**Chaque page déclare ses versions linguistiques**, dans son `<head>` et dans
+le sitemap — 5 958 URLs, chacune avec ses trois sœurs et `x-default`. Sans
+elles, trois pages qui se ressemblent se disputent le même classement et
+Google en garde une seule.
+
+⚠️ **`ACCOUNT` devient `FAVORITES`.** Il n'y a aucun compte sur ce site : pas
+de connexion, rien. La nav annonçait « ACCOUNT », la page s'intitulait « My
+games », et le contenu ce sont les slots enregistrés **sur l'appareil du
+visiteur**. Trois choses différentes, dont une qui promettait ce qui n'existe
+pas.
+
+**Un composant `Lien` porte la langue à la place de tout le monde.** Les liens
+internes étaient répartis dans seize fichiers, moitié serveur, moitié client :
+faire descendre la langue en propriété jusqu'à chacun aurait touché toute
+l'arborescence pour une information que l'URL porte déjà. `usePathname` étant
+disponible au rendu serveur pour un composant client, l'adresse sort **déjà
+complète dans le HTML** — un lien corrigé après hydratation serait suivi par
+les moteurs dans sa version fausse.
+
+⚠️ Les balises `<a>` internes ont été converties au passage : elles
+provoquaient un rechargement complet **et** auraient perdu la langue.
+
+☑️ L'interface reste en anglais dans les trois langues : douze chaînes en dur
+à traduire. Les données des jeux, elles, sont stockées en un seul exemplaire —
+la table `Traduction` existe pour ça et reste vide sur les 2 462 fiches.
+
 ## 2026-09-10 — Pragmatic inventorié : 697 jeux publiés, 634 chez nous
 
 Cinquième adaptateur d'inventaire, et le plus gros studio du catalogue.

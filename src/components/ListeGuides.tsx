@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import { GUIDES } from '@/data/guides';
+import { Lien } from '@/components/Lien';
 
 /**
  * La colonne « Latest guides & reviews ».
@@ -40,7 +40,7 @@ export function ListeGuides() {
     <ul className="divide-y divide-fond-bordure">
       {GUIDES.map((g, i) => (
         <li key={g.slug}>
-          <Link href={`/guides/${g.slug}`} className="group flex items-start gap-3.5 py-3.5 first:pt-0">
+          <Lien href={`/guides/${g.slug}`} className="group flex items-start gap-3.5 py-3.5 first:pt-0">
             <Vignette rang={i} />
             <span className="min-w-0">
               <span className="block font-corps text-[14px] font-medium leading-snug text-texte transition-colors group-hover:text-white">
@@ -53,7 +53,7 @@ export function ListeGuides() {
                 <span className="font-ui text-[11px] text-texte-faible">{g.minutes} min</span>
               </span>
             </span>
-          </Link>
+          </Lien>
         </li>
       ))}
     </ul>

@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { Lien } from '@/components/Lien';
+import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
 
 import { metadonneesDePage } from '@/lib/metadonnees';
 import { EnTete } from '@/components/EnTete';
@@ -23,10 +25,14 @@ import { chercherJeux, studiosDuCatalogue } from '@/lib/donnees/catalogue';
  */
 export async function generateMetadata({
   searchParams,
+  params,
 }: {
   searchParams: Promise<Record<string, string | undefined>>;
+  params: Promise<{ langue: string }>;
 }): Promise<Metadata> {
   const sp = await searchParams;
+  const { langue: brutLangue } = await params;
+  const langue = estUneLangue(brutLangue) ? brutLangue : LANGUE_DEFAUT;
   const filtre = sp.q || sp.studio || sp.volatilite || sp.preuve || sp.rtpMin || sp.page;
 
   const description =
@@ -37,6 +43,7 @@ export async function generateMetadata({
   if (filtre) {
     return {
       ...metadonneesDePage({
+        langue,
         titre: sp.q ? `Search: ${sp.q}` : 'Filtered catalogue',
         description,
         chemin: '/catalogue',
@@ -46,6 +53,7 @@ export async function generateMetadata({
   }
 
   return metadonneesDePage({
+    langue,
     titre: 'Slot catalogue — RTP, volatility and demos',
     description,
     chemin: '/catalogue',
@@ -131,8 +139,8 @@ export default async function Catalogue({
                 : 'Try widening one criterion — the minimum RTP is the one that excludes the most games.'}
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-2.5">
-              <a href="/catalogue" className="tube tube-cyan">Clear all filters</a>
-              <a href="/demos" className="tube tube-magenta">Browse free demos</a>
+              <Lien href="/catalogue" className="tube tube-cyan">Clear all filters</Lien>
+              <Lien href="/demos" className="tube tube-magenta">Browse free demos</Lien>
             </div>
           </div>
         ) : (
@@ -146,17 +154,17 @@ export default async function Catalogue({
         {aUnFiltre && resultat.pages > 1 && (
           <nav className="mt-8 flex items-center justify-center gap-2" aria-label="Pagination">
             {resultat.page > 1 && (
-              <a href={lien(resultat.page - 1)} className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan">
+              <Lien href={lien(resultat.page - 1)} className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan">
                 ← Previous
-              </a>
+              </Lien>
             )}
             <span className="font-mono text-[12px] text-texte-faible">
               {resultat.page} / {resultat.pages}
             </span>
             {resultat.page < resultat.pages && (
-              <a href={lien(resultat.page + 1)} className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan">
+              <Lien href={lien(resultat.page + 1)} className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan">
                 Next →
-              </a>
+              </Lien>
             )}
           </nav>
         )}

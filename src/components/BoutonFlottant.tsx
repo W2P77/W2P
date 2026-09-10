@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { Lien } from '@/components/Lien';
 /**
  * Le bouton flottant d'aide.
  *
@@ -8,7 +8,7 @@ import Link from 'next/link';
  */
 export function BoutonFlottant() {
   return (
-    <Link
+    <Lien
       href="/guides"
       className="group fixed bottom-6 right-6 z-40 hidden h-14 w-14 place-items-center sm:grid"
       aria-label="Read the guides"
@@ -35,6 +35,6 @@ export function BoutonFlottant() {
           strokeLinejoin="round"
         />
       </svg>
-    </Link>
+    </Lien>
   );
 }

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
+import { Lien } from '@/components/Lien';
 
+import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
 import { metadonneesDePage } from '@/lib/metadonnees';
 import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
@@ -9,12 +11,21 @@ import { prisma } from '@/lib/donnees/prisma';
 
 export const revalidate = 600;
 
-export const metadata: Metadata = metadonneesDePage({
-  titre: 'Free slot demos — play without an account',
-  description:
-    'Play hundreds of slots for free, no sign-up and no deposit. Every demo links straight to the studio, never to another site.',
-  chemin: '/demos',
-});
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ langue: string }>;
+}): Promise<Metadata> {
+  const { langue: brut } = await params;
+  const langue = estUneLangue(brut) ? brut : LANGUE_DEFAUT;
+  return metadonneesDePage({
+    titre: 'Free slot demos — play without an account',
+    description:
+      'Play hundreds of slots for free, no sign-up and no deposit. Every demo links straight to the studio, never to another site.',
+    chemin: '/demos',
+    langue,
+  });
+}
 
 export default async function Demos({
   searchParams,
@@ -67,15 +78,15 @@ export default async function Demos({
         {pages > 1 && (
           <nav className="mt-8 flex items-center justify-center gap-3" aria-label="Pagination">
             {page > 1 && (
-              <a href={`/demos?page=${page - 1}`} className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan">
+              <Lien href={`/demos?page=${page - 1}`} className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan">
                 ← Previous
-              </a>
+              </Lien>
             )}
             <span className="font-mono text-[12px] text-texte-faible">{page} / {pages}</span>
             {page < pages && (
-              <a href={`/demos?page=${page + 1}`} className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan">
+              <Lien href={`/demos?page=${page + 1}`} className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan">
                 Next →
-              </a>
+              </Lien>
             )}
           </nav>
         )}

@@ -1,17 +1,27 @@
 import type { Metadata } from 'next';
 
+import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
 import { metadonneesDePage } from '@/lib/metadonnees';
 import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
 import { Tirets } from '@/components/DecorNeon';
 import { GUIDES } from '@/data/guides';
 
-export const metadata: Metadata = metadonneesDePage({
-  titre: 'Guides — how to read slot data',
-  description:
-    'How RTP tiers, bonus buy returns and volatility labels actually work — written from what we measured building the catalogue.',
-  chemin: '/guides',
-});
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ langue: string }>;
+}): Promise<Metadata> {
+  const { langue: brut } = await params;
+  const langue = estUneLangue(brut) ? brut : LANGUE_DEFAUT;
+  return metadonneesDePage({
+    titre: 'Guides — how to read slot data',
+    description:
+      'How RTP tiers, bonus buy returns and volatility labels actually work — written from what we measured building the catalogue.',
+    chemin: '/guides',
+    langue,
+  });
+}
 
 export default function Guides() {
   return (

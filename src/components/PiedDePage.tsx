@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import { Liseré } from './DecorNeon';
+import { Lien } from '@/components/Lien';
 
 /**
  * Le pied de page.
@@ -39,16 +39,16 @@ export function PiedDePage() {
             <div>
               <p className="mb-2 font-semibold uppercase tracking-wide text-texte-faible">Browse</p>
               <ul className="space-y-1.5">
-                <li><Link href="/catalogue" className="text-texte-doux hover:text-neon-cyan">Catalogue</Link></li>
-                <li><Link href="/demos" className="text-texte-doux hover:text-neon-cyan">Free demos</Link></li>
-                <li><Link href="/reviews" className="text-texte-doux hover:text-neon-cyan">Verified slots</Link></li>
+                <li><Lien href="/catalogue" className="text-texte-doux hover:text-neon-cyan">Catalogue</Lien></li>
+                <li><Lien href="/demos" className="text-texte-doux hover:text-neon-cyan">Free demos</Lien></li>
+                <li><Lien href="/reviews" className="text-texte-doux hover:text-neon-cyan">Verified slots</Lien></li>
               </ul>
             </div>
             <div>
               <p className="mb-2 font-semibold uppercase tracking-wide text-texte-faible">Learn</p>
               <ul className="space-y-1.5">
-                <li><Link href="/guides" className="text-texte-doux hover:text-neon-cyan">Guides</Link></li>
-                <li><Link href="/account" className="text-texte-doux hover:text-neon-cyan">My games</Link></li>
+                <li><Lien href="/guides" className="text-texte-doux hover:text-neon-cyan">Guides</Lien></li>
+                <li><Lien href="/favorites" className="text-texte-doux hover:text-neon-cyan">Favorites</Lien></li>
               </ul>
             </div>
           </nav>

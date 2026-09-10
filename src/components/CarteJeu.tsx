@@ -1,6 +1,6 @@
-import Link from 'next/link';
 import { BadgePreuve, type Confiance } from './BadgePreuve';
 import { EtoileEnregistrer } from './EtoileEnregistrer';
+import { Lien } from '@/components/Lien';
 
 /**
  * La vignette d'un jeu.
@@ -63,7 +63,7 @@ export function CarteJeu({ jeu, index = 0 }: { jeu: JeuVignette; index?: number 
   return (
     <div className="group/carte relative">
       <EtoileEnregistrer jeu={vignette} />
-      <Link
+      <Lien
         href={`/slot/${jeu.studio.slug ?? ''}/${jeu.slug}`}
         className="biseau-petit block transition-[filter] duration-200"
         style={{ background: degrade, padding: 2, filter: lueur }}
@@ -142,7 +142,7 @@ export function CarteJeu({ jeu, index = 0 }: { jeu: JeuVignette; index?: number 
             </span>
           </span>
         </span>
-      </Link>
+      </Lien>
     </div>
   );
 }

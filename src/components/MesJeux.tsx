@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { CarteJeu, type JeuVignette } from './CarteJeu';
+import { Lien } from '@/components/Lien';
 
 /**
  * Les jeux mis de côté par le visiteur.
@@ -54,9 +55,9 @@ export function MesJeux() {
     return (
       <div className="panneau p-8 text-center">
         <p className="text-[14px] text-texte-doux">You have not saved any game yet.</p>
-        <a href="/catalogue" className="tube tube-cyan mt-5 inline-block">
+        <Lien href="/catalogue" className="tube tube-cyan mt-5 inline-block">
           Browse the catalogue
-        </a>
+        </Lien>
       </div>
     );
   }

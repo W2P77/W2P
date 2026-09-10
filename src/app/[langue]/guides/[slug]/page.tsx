@@ -1,5 +1,6 @@
-import Link from 'next/link';
 import type { Metadata } from 'next';
+import { Lien } from '@/components/Lien';
+import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
 
 import { metadonneesDePage } from '@/lib/metadonnees';
 import { notFound } from 'next/navigation';
@@ -14,12 +15,13 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; langue: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const { langue: brutLangue, slug } = await params;
   const g = guideParSlug(slug);
   if (!g) return { title: 'Guide not found' };
   return metadonneesDePage({
+    langue: estUneLangue(brutLangue) ? brutLangue : LANGUE_DEFAUT,
     titre: g.titre,
     description: g.chapo,
     chemin: `/guides/${g.slug}`,
@@ -36,7 +38,7 @@ export default async function Guide({ params }: { params: Promise<{ slug: string
       <EnTete />
       <main className="mx-auto max-w-[760px] px-6 py-8">
         <nav className="mb-5 font-mono text-[11px] text-texte-faible">
-          <Link href="/guides" className="hover:text-neon-cyan">Guides</Link>
+          <Lien href="/guides" className="hover:text-neon-cyan">Guides</Lien>
         </nav>
 
         <h1 className="font-titre text-[28px] font-black uppercase leading-[1.05] tracking-tight text-white sm:text-[34px]">
@@ -59,7 +61,7 @@ export default async function Guide({ params }: { params: Promise<{ slug: string
         </article>
 
         <div className="mt-10 flex gap-3">
-          <a href="/catalogue" className="tube tube-cyan">Browse the catalogue</a>
+          <Lien href="/catalogue" className="tube tube-cyan">Browse the catalogue</Lien>
         </div>
       </main>
       <PiedDePage />

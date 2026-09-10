@@ -1,5 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { prisma } from '@/lib/donnees/prisma';
+import { cheminPublic } from '@/i18n/chemins';
+import { LANGUES, LANGUE_DEFAUT } from '@/i18n/langues';
 import { SITE_URL } from '@/lib/site';
 import { GUIDES } from '@/data/guides';
 
@@ -67,32 +69,63 @@ async function contenuDeLaBase() {
   }
 }
 
+/**
+ * Une entrée par page **et par langue**, chacune déclarant ses sœurs.
+ *
+ * ── Pourquoi les `alternates` ne sont pas un détail ───────────────────────
+ *
+ * Sans elles, `/en/catalogue`, `/fr/catalogue` et `/de/katalog` sont trois
+ * pages qui se ressemblent et se disputent le même classement : Google en
+ * garde une et ignore les autres. Déclarées comme versions linguistiques,
+ * elles se renforcent au lieu de se concurrencer, et chaque marché reçoit la
+ * sienne.
+ *
+ * `x-default` désigne la version servie à qui ne correspond à aucune langue
+ * déclarée — l'anglais, qui est aussi ce que sert la racine.
+ */
+function pourChaqueLangue(
+  vers: string,
+  reste: Omit<MetadataRoute.Sitemap[number], 'url' | 'alternates'>,
+): MetadataRoute.Sitemap {
+  const langues = Object.fromEntries(
+    LANGUES.map((l) => [l.htmlLang, `${SITE_URL}${cheminPublic(vers, l.code)}`]),
+  );
+
+  return LANGUES.map((l) => ({
+    url: `${SITE_URL}${cheminPublic(vers, l.code)}`,
+    ...reste,
+    alternates: {
+      languages: { ...langues, 'x-default': `${SITE_URL}${cheminPublic(vers, LANGUE_DEFAUT)}` },
+    },
+  }));
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [jeux, studios] = await contenuDeLaBase();
 
   return [
-    { url: `${SITE_URL}/`, changeFrequency: 'daily', priority: 1 },
-    { url: `${SITE_URL}/catalogue`, changeFrequency: 'daily', priority: 0.9 },
-    { url: `${SITE_URL}/demos`, changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${SITE_URL}/new-releases`, changeFrequency: 'daily', priority: 0.9 },
-    { url: `${SITE_URL}/reviews`, changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${SITE_URL}/guides`, changeFrequency: 'monthly', priority: 0.7 },
-    ...GUIDES.map((g) => ({
-      url: `${SITE_URL}/guides/${g.slug}`,
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
-    })),
-    ...studios.map((s) => ({
-      url: `${SITE_URL}/slot/${s.slug}`,
-      lastModified: s.majLe,
-      changeFrequency: 'weekly' as const,
-      priority: 0.7,
-    })),
-    ...jeux.map((j) => ({
-      url: `${SITE_URL}/slot/${j.studio.slug}/${j.slug}`,
-      lastModified: j.majLe,
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
-    })),
+    ...pourChaqueLangue('/', { changeFrequency: 'daily', priority: 1 }),
+    ...pourChaqueLangue('/catalogue', { changeFrequency: 'daily', priority: 0.9 }),
+    ...pourChaqueLangue('/demos', { changeFrequency: 'weekly', priority: 0.8 }),
+    ...pourChaqueLangue('/new-releases', { changeFrequency: 'daily', priority: 0.9 }),
+    ...pourChaqueLangue('/reviews', { changeFrequency: 'weekly', priority: 0.8 }),
+    ...pourChaqueLangue('/guides', { changeFrequency: 'monthly', priority: 0.7 }),
+    ...GUIDES.flatMap((g) =>
+      pourChaqueLangue(`/guides/${g.slug}`, { changeFrequency: 'monthly', priority: 0.6 }),
+    ),
+    ...studios.flatMap((s) =>
+      pourChaqueLangue(`/slot/${s.slug}`, {
+        lastModified: s.majLe,
+        changeFrequency: 'weekly',
+        priority: 0.7,
+      }),
+    ),
+    ...jeux.flatMap((j) =>
+      pourChaqueLangue(`/slot/${j.studio.slug}/${j.slug}`, {
+        lastModified: j.majLe,
+        changeFrequency: 'monthly',
+        priority: 0.6,
+      }),
+    ),
   ];
 }

@@ -1,5 +1,6 @@
 import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
+import { Lien } from '@/components/Lien';
 
 /**
  * La page d'erreur.
@@ -39,8 +40,8 @@ export default function Introuvable() {
         </form>
 
         <div className="mt-6 flex justify-center gap-3">
-          <a href="/catalogue" className="tube tube-cyan">Browse catalogue</a>
-          <a href="/demos" className="tube tube-magenta">Free demos</a>
+          <Lien href="/catalogue" className="tube tube-cyan">Browse catalogue</Lien>
+          <Lien href="/demos" className="tube tube-magenta">Free demos</Lien>
         </div>
       </main>
       <PiedDePage />

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
 import { metadonneesDePage } from '@/lib/metadonnees';
 import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
@@ -10,12 +11,21 @@ import { prisma } from '@/lib/donnees/prisma';
 // Une heure : c'est la page dont la fraîcheur est l'argument.
 export const revalidate = 3600;
 
-export const metadata: Metadata = metadonneesDePage({
-  titre: 'New slot releases — the latest games, with their real RTP',
-  description:
-    'Slots released recently, with the RTP the studio actually publishes — and a clear mark when we have not been able to confirm it yet.',
-  chemin: '/new-releases',
-});
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ langue: string }>;
+}): Promise<Metadata> {
+  const { langue: brut } = await params;
+  const langue = estUneLangue(brut) ? brut : LANGUE_DEFAUT;
+  return metadonneesDePage({
+    titre: 'New slot releases — the latest games, with their real RTP',
+    description:
+      'Slots released recently, with the RTP the studio actually publishes — and a clear mark when we have not been able to confirm it yet.',
+    chemin: '/new-releases',
+    langue,
+  });
+}
 
 const CHAMPS = {
   slug: true, nom: true, rtpStudio: true, rtpConfiance: true,

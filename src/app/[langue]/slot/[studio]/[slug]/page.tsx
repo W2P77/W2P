@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { EnTete } from '@/components/EnTete';
@@ -14,6 +13,8 @@ import { baliseJeu } from '@/lib/donnees-structurees';
 import { metadonneesDePage } from '@/lib/metadonnees';
 import { estPublieable } from '@/lib/publication';
 import { SITE_URL } from '@/lib/site';
+import { Lien } from '@/components/Lien';
+import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
 
 export const revalidate = 3600;
 
@@ -43,9 +44,9 @@ const VOLATILITE_EN: Record<string, string> = {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ studio: string; slug: string }>;
+  params: Promise<{ studio: string; slug: string; langue: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const { langue: brutLangue, slug } = await params;
   const jeu = await jeuParSlug(slug);
   if (!jeu) return { title: 'Slot not found' };
 
@@ -69,6 +70,7 @@ export async function generateMetadata({
   return {
     ...horsIndex,
     ...metadonneesDePage({
+    langue: estUneLangue(brutLangue) ? brutLangue : LANGUE_DEFAUT,
     titre: `Where to play ${jeu.nom} — ${rtp}, demo and full specs`,
     description: `${jeu.nom} by ${jeu.studio.nom}: ${rtp}, volatility, max win and free demo. Every number sourced — we tell you when it is not.`,
     // La canonique est posée explicitement : la fiche est atteignable depuis
@@ -145,11 +147,11 @@ export default async function PageJeu({
 
       <main className="mx-auto max-w-[1200px] px-6 py-8">
         <nav className="mb-5 font-mono text-[11px] text-texte-faible">
-          <a href="/catalogue" className="hover:text-neon-cyan">Catalogue</a>
+          <Lien href="/catalogue" className="hover:text-neon-cyan">Catalogue</Lien>
           <span className="mx-2">/</span>
-          <a href={`/slot/${jeu.studio.slug}`} className="hover:text-neon-cyan">
+          <Lien href={`/slot/${jeu.studio.slug}`} className="hover:text-neon-cyan">
             {jeu.studio.nom}
-          </a>
+          </Lien>
         </nav>
 
         {/*
@@ -244,7 +246,7 @@ export default async function PageJeu({
              * alors directement sur le titre, sans case vide.
              */}
             {jeu.studio.logoUrl && (
-              <Link
+              <Lien
                 href={`/slot/${jeu.studio.slug}`}
                 className="mb-4 block border-b border-fond-bordure pb-4"
                 aria-label={jeu.studio.nom}
@@ -255,7 +257,7 @@ export default async function PageJeu({
                   alt={jeu.studio.nom}
                   className="h-14 w-auto max-w-[210px] object-contain object-left transition hover:opacity-80"
                 />
-              </Link>
+              </Lien>
             )}
 
             <h2 className="mb-4 font-titre text-[15px] font-bold uppercase tracking-wide text-white">

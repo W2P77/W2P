@@ -1,9 +1,10 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { ConduiteEnTete } from './DecorNeon';
+import { Lien } from '@/components/Lien';
+import { SelecteurLangue } from '@/components/SelecteurLangue';
 
 /**
  * L'en-tête, et son menu mobile.
@@ -28,7 +29,7 @@ const LIENS = [
   { label: 'REVIEWS', href: '/reviews' },
   { label: 'DEMOS', href: '/demos' },
   { label: 'GUIDES', href: '/guides' },
-  { label: 'ACCOUNT', href: '/account' },
+  { label: 'FAVORITES', href: '/favorites' },
 ];
 
 /**
@@ -58,7 +59,7 @@ export function EnTete() {
        * bandeau de 17 px, ce qui remonte le logo d'autant.
        */}
       <div className="mx-auto flex max-w-[1440px] items-center gap-8 px-6 pb-2 pt-1.5">
-        <Link href="/" className="relative z-10 flex shrink-0 items-center">
+        <Lien href="/" className="relative z-10 flex shrink-0 items-center">
           {/*
            * Le logo complet, sans mot-marque HTML à côté.
            *
@@ -78,11 +79,14 @@ export function EnTete() {
             alt="where2spin"
             className="-mb-[24px] h-[82px] w-auto shrink-0 sm:-mb-[38px] sm:h-[110px]"
           />
-        </Link>
+        </Lien>
 
         <nav className="ml-auto hidden items-center gap-7 xl:flex">
+          {/* Le sélecteur ouvre la barre, avant le premier lien : c'est un
+              réglage du site, pas une destination parmi les autres. */}
+          <SelecteurLangue />
           {LIENS.map((l) => (
-            <Link
+            <Lien
               key={l.href}
               href={l.href}
               className={`relative font-ui text-[15px] font-semibold uppercase tracking-[0.05em] transition-colors ${
@@ -100,14 +104,18 @@ export function EnTete() {
                   aria-hidden
                 />
               )}
-            </Link>
+            </Lien>
           ))}
         </nav>
+
+        <div className="ml-auto flex items-center gap-2.5 xl:hidden">
+          <SelecteurLangue compact />
+        </div>
 
         <button
           type="button"
           onClick={() => setOuvert((o) => !o)}
-          className="biseau-petit ml-auto grid h-10 w-10 place-items-center border-2 border-neon-cyan/60 font-ui text-neon-cyan xl:hidden"
+          className="biseau-petit grid h-10 w-10 place-items-center border-2 border-neon-cyan/60 font-ui text-neon-cyan xl:hidden"
           aria-expanded={ouvert}
           aria-label={ouvert ? 'Close menu' : 'Open menu'}
         >
@@ -118,7 +126,7 @@ export function EnTete() {
       {ouvert && (
         <nav className="border-t border-fond-bordure bg-fond-panneau xl:hidden">
           {LIENS.map((l) => (
-            <Link
+            <Lien
               key={l.href}
               href={l.href}
               onClick={() => setOuvert(false)}
@@ -127,7 +135,7 @@ export function EnTete() {
               }`}
             >
               {l.label}
-            </Link>
+            </Lien>
           ))}
         </nav>
       )}
