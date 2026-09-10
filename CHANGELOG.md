@@ -2,6 +2,42 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — Deux tables pour arrêter de deviner : les preuves et les casinos
+
+Le site promet « Where to play Gates of Olympus » et répondait autre chose. Le
+bloc « Où jouer » raisonnait au niveau du **studio** : il listait les casinos
+qui portent du Pragmatic, pas ceux qui portent ce jeu-là. Une déduction servie
+comme une réponse — exactement ce qu'on reproche aux agrégateurs.
+
+Et un RTP juste sans sa preuve ne vaut pas plus qu'un RTP faux : `rtpSource`
+était une seule chaîne de texte par jeu, incapable de porter la source du
+gain maximum, de la volatilité ou de la grille.
+
+Deux modèles répondent à ça :
+
+- **`Preuve`** — une ligne par *champ* prouvé (`champ`, `valeurBrute`, `type`,
+  `url`, `capture`, `verifieeLe`, `verifieePar`). L'énumération `TypeDeSource`
+  classe la source par sa qualité : `REGLES_DU_JEU` (le jeu lui-même, le plus
+  haut), `STUDIO`, `DEMO_OFFICIELLE`, `OPERATEUR`, `RECOUPEE`, `TIERCE`,
+  `INCONNUE`. Un champ sans ligne de preuve est un champ non sourcé, et le dire
+  est le but.
+- **`DisponibiliteCasino`** — une ligne par (jeu, casino, pays), avec
+  `PresenceJeu` (`CONFIRMEE`, `PROBABLE`, `ABSENTE`, `INCONNUE`) et le drapeau
+  `jeuExactVerifie` : « ce casino porte du Pragmatic » et « ce casino porte
+  *ce* jeu » ne sont pas la même affirmation.
+
+Migration **purement additive** : 2 énumérations, 2 tables, 3 clés étrangères,
+2 index, 1 index unique. Aucune colonne existante touchée, aucune donnée
+supprimée — 2 462 jeux et 44 casinos vérifiés intacts après application.
+
+**Le piège du jour.** `prisma db execute` envoie le fichier comme *une seule*
+commande ; découper le script à la main pour l'appliquer ordre par ordre a
+d'abord tout perdu, parce que chaque bloc commence par sa ligne `-- CreateEnum`
+et qu'un filtre « ignorer les commentaires » les écartait tous. Le script
+annonçait « 0/0 ordres appliqués » sans échouer. Passer par `db execute` avec
+`DIRECT_DATABASE_URL` (5432, le pooler ne fait pas de DDL), puis relire
+`information_schema` — jamais la sortie du script.
+
 ## 2026-09-10 — Du charabia d'OCR publié en titre sur 17 pages
 
 Le titre d'une capture était retenu dès qu'une ligne du panneau était en

@@ -122,6 +122,8 @@ model Jeu {
   majLe     DateTime  @updatedAt @map("maj_le")
 
   traductions Traduction[]
+  preuves         Preuve[]
+  disponibilites  DisponibiliteCasino[]
 
   @@index([studioId])
   @@index([sortieLe])
@@ -149,6 +151,8 @@ model Casino {
   bonusTexte String? @map("bonus_texte")
   actif     Boolean  @default(true)
 
+  disponibilites DisponibiliteCasino[]
+
   creeLe DateTime @default(now()) @map("cree_le")
   majLe  DateTime @updatedAt @map("maj_le")
 
@@ -171,4 +175,116 @@ model Traduction {
 
   @@unique([jeuId, langue])
   @@map("traductions")
+}
+
+/// D'où vient une donnée. Le classement va du plus fort au plus faible.
+enum TypeDeSource {
+  /// Lu dans le panneau de règles du jeu, capture à l'appui.
+  REGLES_DU_JEU
+  /// Publié par le studio : fiche produit, communiqué, PDF.
+  STUDIO
+  /// Lu dans la démo officielle, hors panneau de règles.
+  DEMO_OFFICIELLE
+  /// Affiché par un opérateur. Attention : souvent un palier configuré.
+  OPERATEUR
+  /// Deux sources secondaires concordantes.
+  RECOUPEE
+  /// Une seule source secondaire.
+  TIERCE
+  /// Origine perdue ou jamais consignée.
+  INCONNUE
+}
+
+/// Ce qu'on sait de la présence d'un jeu chez un casino.
+enum PresenceJeu {
+  /// Le jeu a été vu dans le catalogue du casino, preuve à l'appui.
+  CONFIRMEE
+  /// Le casino annonce le studio, le jeu n'a pas été vu. C'est une déduction.
+  PROBABLE
+  /// Cherché et non trouvé dans son catalogue.
+  ABSENTE
+  /// Pas encore regardé.
+  INCONNUE
+}
+
+/// La preuve d'un fait, champ par champ.
+///
+/// ── Pourquoi une table et pas une colonne de plus ────────────────────────
+///
+/// `Jeu.rtpSource` porte **une** URL, pour **un** champ. Le gain maximum, la
+/// volatilité, la grille et les lignes n'ont donc aucune traçabilité : on
+/// affiche « 12 500x » sans pouvoir dire d'où il sort. Une table permet
+/// plusieurs preuves par champ — et de garder l'ancienne quand une nouvelle
+/// la contredit, ce qui est le cas intéressant.
+///
+/// Elle ne remplace pas `rtpConfiance` : ce champ reste le niveau affiché au
+/// visiteur, dérivé des preuves. Le supprimer casserait les fiches en ligne.
+model Preuve {
+  id    String @id @default(uuid()) @db.Uuid
+  jeuId String @map("jeu_id") @db.Uuid
+  jeu   Jeu    @relation(fields: [jeuId], references: [id], onDelete: Cascade)
+
+  /// Le champ de `Jeu` que cette preuve atteste : « rtpStudio », « gainMaxMultiple »…
+  champ String
+  /// La valeur telle que la source l'écrit, avant toute normalisation.
+  /// On garde le brut : « 12,500x » et « 12500 » ne se relisent pas pareil.
+  valeurBrute String @map("valeur_brute")
+
+  type      TypeDeSource
+  url       String?
+  libelle   String? @map("libelle")
+  /// La capture qui montre la valeur. C'est ce qui rend la preuve opposable.
+  capture   String?
+  /// Page ou section, quand la source est longue : « Page 4/7 », « §3.2 ».
+  reference String?
+
+  verifieeLe DateTime @default(now()) @map("verifiee_le")
+  /// Qui a vérifié : un script nommé, ou une personne. Jamais vide.
+  verifieePar String  @map("verifiee_par")
+  note        String?
+
+  creeLe DateTime @default(now()) @map("cree_le")
+
+  @@index([jeuId, champ])
+  @@map("preuves")
+}
+
+/// La présence d'un jeu précis chez un casino précis.
+///
+/// ── Pourquoi cette table existe ──────────────────────────────────────────
+///
+/// Le bloc « Où jouer » répond aujourd'hui au niveau du **studio** : sur la
+/// fiche de Gates of Olympus, il liste les casinos qui portent du Pragmatic.
+/// La page promet « Where to play Gates of Olympus » et répond autre chose —
+/// une déduction présentée comme une réponse, ce que ce site reproche
+/// précisément aux agrégateurs.
+///
+/// La déduction reste utile et n'est pas jetée : elle devient `PROBABLE`, et
+/// se distingue à l'écran d'une présence `CONFIRMEE`.
+model DisponibiliteCasino {
+  id       String @id @default(uuid()) @db.Uuid
+  jeuId    String @map("jeu_id") @db.Uuid
+  jeu      Jeu    @relation(fields: [jeuId], references: [id], onDelete: Cascade)
+  casinoId Int    @map("casino_id")
+  casino   Casino @relation(fields: [casinoId], references: [id], onDelete: Cascade)
+
+  presence PresenceJeu @default(INCONNUE)
+  /// Vrai quand c'est **ce** jeu qui a été vu, pas un homonyme. Les catalogues
+  /// de casinos regorgent de titres proches : « Big Bass Bonanza » et « Big
+  /// Bass Bonanza 1000 » sont deux jeux.
+  jeuExactVerifie Boolean @default(false) @map("jeu_exact_verifie")
+
+  preuveUrl String?   @map("preuve_url")
+  capture   String?
+  verifieeLe DateTime? @map("verifiee_le")
+  /// Le pays où la vérification a été faite : un catalogue varie par marché.
+  pays      String?
+  note      String?
+
+  creeLe DateTime @default(now()) @map("cree_le")
+  majLe  DateTime @updatedAt @map("maj_le")
+
+  @@unique([jeuId, casinoId, pays])
+  @@index([casinoId, presence])
+  @@map("disponibilites_casino")
 }
