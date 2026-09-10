@@ -2,6 +2,48 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-10 — Du charabia d'OCR publié en titre sur 17 pages
+
+Le titre d'une capture était retenu dès qu'une ligne du panneau était en
+capitales, sans jamais vérifier que c'étaient des mots. L'OCR, lui, rend
+volontiers des capitales sur du décor.
+
+Résultat, en ligne, dans des intitulés visibles **et dans l'attribut `alt` des
+images** — donc dans la surface SEO :
+
+    Qganvie rullo · Ganic ruled · Mve nvlld · Et tet a · Tas attn fa vt
+    4 t4 j tg · Livin rcell dvuinuvo · Itvividll tt lmt vinl · K 9 7 a xr fo
+    Eapanding wild with multiplier
+
+**25 titres sur 17 des 45 pages publiées.** Un titre n'est plus retenu que si
+**chacun de ses mots** appartient au vocabulaire des en-têtes Pragmatic ; sinon
+on retombe sur « Game rules, page N », qui a le mérite d'être vrai. Les chiffres
+dans un en-tête sont refusés aussi : ils trahissent une ligne de contenu happée
+au vol (« 25 free spins 20 free spins »), pas un intitulé de section.
+
+Le sens de l'erreur est ce qui compte : un titre inventé se publie, un titre
+refusé retombe sur un générique. On perd donc « Caishen random award », correct
+mais rare — et c'est le seul faux positif sur les 45 jeux.
+
+Les 45 fiches déjà en ligne ont été repassées au même filtre en base. Aucune
+recapture nécessaire, et aucun build consommé : les fiches lisent Prisma.
+
+## 2026-09-10 — Un troisième habillage Pragmatic, qui n'a pas de panneau
+
+Les classiques historiques (888 Gold et sa famille) peignent leur table de
+gains en permanence à côté des rouleaux, sous une barre de commandes grise.
+L'engrenage n'ouvre que le son et le tour rapide : **il n'y a pas de panneau de
+règles, et le RTP n'est affiché nulle part**.
+
+Les confondre avec un échec de recherche les renvoyait en file à chaque
+campagne, pour un rechargement complet et le même échec — alors que leur
+capture de base contient déjà toute leur documentation. Ils sont maintenant
+reconnus à leur barre de commandes et traités comme un résultat acquis :
+capture de base publiée, aucun RTP inventé, plus de repassage.
+
+⚠️ Attrapé en relisant : l'adaptateur renvoyait bien le cas, mais le script ne
+le distinguait pas de zéro — la détection était donc restée sans effet.
+
 ## 2026-09-10 — Le site s'appelle where2spin
 
 `where2play.com` et `.net` sont pris, et le `.net` n'est pas dormant : c'est un

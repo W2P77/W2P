@@ -33,7 +33,7 @@ import { mkdirSync, rmSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { chromium, type Browser } from 'playwright';
 import sharp from 'sharp';
-import { ADAPTATEURS } from '../src/lib/captures/adaptateurs';
+import { ADAPTATEURS, SANS_PANNEAU } from '../src/lib/captures/adaptateurs';
 import {
   EN_TETE_PANNEAU,
   fermerLeLecteur,
@@ -110,6 +110,7 @@ async function capturerUnJeu(
   mkdirSync(dossier, { recursive: true });
   const pngRegles: string[] = [];
   const fichiers: string[] = [];
+  let sansPanneau = false;
 
   const cliche = async (nom: string) => {
     const png = join(dossier, `${nom}.png`);
@@ -142,6 +143,14 @@ async function capturerUnJeu(
       await page.close();
       return null;
     }
+    /*
+     * `SANS_PANNEAU` n'est pas un échec : c'est un jeu dont l'habillage n'a
+     * pas de panneau de règles du tout, et dont la table de gains est déjà
+     * dans la capture de base. Il faut le distinguer, sinon le contrôle
+     * « le panneau s'est-il ouvert ? » plus bas le renvoie en file — et il
+     * revient échouer à chaque campagne, pour un rechargement complet.
+     */
+    sansPanneau = pages === SANS_PANNEAU;
     await adaptateur.capturerLAchat(page, cliche, regarder);
     rmSync(sonde, { force: true });
   } catch (e) {
@@ -194,7 +203,7 @@ async function capturerUnJeu(
    * panneau de règles : sa présence prouve qu'on y est entré.
    */
   const panneauOuvert = faits.pages.some((p) => EN_TETE_PANNEAU.test(p.texte));
-  if (!panneauOuvert) {
+  if (!panneauOuvert && !sansPanneau) {
     console.log(`  ! ${jeu.slug} — panneau de règles jamais atteint, jeu laissé en file`);
     return null;
   }

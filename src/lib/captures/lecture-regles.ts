@@ -60,18 +60,63 @@ export interface FaitsLus {
  * quel plutôt que de le deviner — et on le refuse s'il n'a pas l'allure d'un
  * titre, auquel cas la capture gardera un intitulé neutre.
  */
+/*
+ * Le vocabulaire des en-têtes de panneau, chez Pragmatic.
+ *
+ * ── Pourquoi une liste fermée plutôt qu'un dictionnaire ───────────────────
+ *
+ * Un titre était retenu dès qu'une ligne était en capitales, sans jamais
+ * vérifier que c'étaient des mots. L'OCR, lui, rend volontiers des capitales
+ * sur du décor : sur les 45 premiers jeux publiés, **une quinzaine de titres
+ * sur soixante-trois étaient du charabia** — « Qganvie rullo », « Mve nvlld »,
+ * « Itvividll tt lmt vinl », « K 9 7 a xr fo » — affichés en clair au lecteur
+ * et recopiés dans l'attribut `alt` des images, donc dans la surface SEO.
+ *
+ * Le sens de l'erreur compte : un titre inventé se publie, un titre refusé
+ * retombe sur « Game rules, page N », qui est vrai. On refuse donc tout ce
+ * qu'on ne reconnaît pas, quitte à perdre un intitulé correct mais rare —
+ * « Caishen random award » y passera, et ce n'est pas cher payé.
+ */
+const MOTS_DEN_TETE = new Set([
+  'a', 'and', 'ante', 'as', 'autoplay', 'award', 'bar', 'base', 'bet', 'bonus',
+  'buy', 'buying', 'cascading', 'collect', 'collection', 'colossal', 'expanding',
+  'feature', 'features', 'free', 'game', 'games', 'general', 'golden', 'hold',
+  'how', 'high', 'its', 'jackpot', 'jackpots', 'line', 'lines', 'low', 'machine',
+  'max', 'medium', 'mega', 'menu', 'mini', 'modifiers', 'money', 'multiplier',
+  'multipliers', 'nudge', 'options', 'own', 'page', 'pay', 'paylines', 'paytable',
+  'play', 'powernudge', 'purchase', 'random', 'reel', 'reels', 'respin', 'rtp',
+  'rules', 'scatter', 'settings', 'shape', 'slot', 'smash', 'special', 'spin',
+  'spins', 'states', 'sticky', 'studio', 'super', 'symbol', 'symbols', 'the',
+  'to', 'top', 'tumble', 'values', 'very', 'volatility', 'ways', 'wild', 'wilds',
+  'win', 'wins',
+]);
+
+/** Vrai si **chaque** mot est reconnu. Un seul inconnu disqualifie le titre. */
+function vocabulaireTenu(phrase: string): boolean {
+  const mots = phrase.toLowerCase().split(/[^a-z]+/).filter(Boolean);
+  return mots.length > 0 && mots.every((mot) => MOTS_DEN_TETE.has(mot));
+}
+
 function enTete(texte: string): string {
   for (const ligne of texte.split('\n').map((l) => l.trim()).slice(0, 6)) {
     const propre = ligne.replace(/[^A-Za-z0-9 &'-]/g, ' ').replace(/\s+/g, ' ').trim();
     if (propre.length < 4 || propre.length > 40) continue;
+    // Un chiffre dans un en-tête trahit une ligne de contenu happée au vol
+    // (« 25 free spins 20 free spins »), pas un intitulé de section.
+    if (/\d/.test(propre)) continue;
     const lettres = propre.replace(/[^A-Za-z]/g, '');
     if (lettres.length < 4) continue;
     const capitales = (propre.match(/[A-Z]/g) ?? []).length;
-    if (capitales / lettres.length > 0.8) {
+    if (capitales / lettres.length > 0.8 && vocabulaireTenu(propre)) {
       return propre.charAt(0) + propre.slice(1).toLowerCase();
     }
   }
   return '';
+}
+
+/** Le même filtre, applicable à un titre déjà publié. */
+export function titreFiable(titre: string): boolean {
+  return vocabulaireTenu(titre);
 }
 
 const VOLATILITES: Array<[RegExp, FaitsLus['volatilite']]> = [
@@ -99,8 +144,26 @@ function nombre(brut: string): number | null {
  * Le moteur est gardé entre les appels : son initialisation coûte plus cher
  * que la reconnaissance elle-même, et on l'appelle une fois par position
  * essayée.
+ *
+ * ── C'est la **promesse** qui est mémorisée, pas le moteur ────────────────
+ *
+ * Le script capture deux jeux en parallèle. Avec `moteur ??= await créer()`,
+ * les deux appels voient `null` pendant l'attente et en créent chacun un :
+ * le second écrase le premier, qui reste en vie avec son processus fils.
+ * `terminate()` n'en ferme alors qu'un, et **node ne rend jamais la main** —
+ * le script paraissait figé après avoir tout capturé, à 0 % de processeur.
+ *
+ * Mémoriser la promesse la publie **avant** le premier `await` : le second
+ * appel la trouve et l'attend au lieu d'ouvrir un second moteur.
  */
-let ouvrierPartage: Awaited<ReturnType<typeof createWorker>> | null = null;
+let ouvrierPartage: ReturnType<typeof createWorker> | null = null;
+
+type Bande = 'haut' | 'bas';
+
+const BANDES: Record<Bande, { left: number; top: number; width: number; height: number }> = {
+  haut: { left: 0, top: 30, width: 1280, height: 190 },
+  bas: { left: 0, top: 630, width: 1280, height: 170 },
+};
 
 /**
  * Lit la **bande haute** d'une capture. Sert à reconnaître ce qui est ouvert.
@@ -111,25 +174,33 @@ let ouvrierPartage: Awaited<ReturnType<typeof createWorker>> | null = null;
  * ajoutées sur le catalogue Pragmatic. La bande suffit : tout ce qu'on
  * cherche s'y trouve, l'en-tête « GAME RULES » (y≈62 sur l'habillage large,
  * y≈96 sur l'étroit) comme le bouton « BUY FREE SPINS » (y≈165).
+ *
+ * La bande basse sert à autre chose : reconnaître la barre de commandes de
+ * l'habillage historique, qui n'a pas de panneau de règles du tout.
  */
-export async function lireLEcran(cheminPng: string): Promise<string> {
-  ouvrierPartage ??= await createWorker('eng');
+export async function lireLEcran(
+  cheminPng: string,
+  bande: Bande = 'haut',
+): Promise<string> {
+  ouvrierPartage ??= createWorker('eng');
+  const ouvrier = await ouvrierPartage;
   const prepare = await sharp(cheminPng)
-    .extract({ left: 0, top: 30, width: 1280, height: 190 })
+    .extract(BANDES[bande])
     .grayscale()
     .normalise()
     .resize({ width: 1920 })
     .png()
     .toBuffer();
-  const { data } = await ouvrierPartage.recognize(prepare);
+  const { data } = await ouvrier.recognize(prepare);
   return data.text;
 }
 
 /** Libère le moteur partagé. À appeler en fin de campagne. */
 export async function fermerLeLecteur(): Promise<void> {
-  if (!ouvrierPartage) return;
-  await ouvrierPartage.terminate();
+  const en_cours = ouvrierPartage;
+  if (!en_cours) return;
   ouvrierPartage = null;
+  await (await en_cours).terminate();
 }
 
 /**
@@ -139,6 +210,20 @@ export async function fermerLeLecteur(): Promise<void> {
  * c'est le même critère, il ne doit pas diverger.
  */
 export const EN_TETE_PANNEAU = /RTP|GAME RULES|PAYTABLE/i;
+
+/**
+ * La barre de commandes de l'habillage **historique** de Pragmatic.
+ *
+ * Ces classiques n'ont pas de panneau de règles : la table de gains est
+ * peinte en permanence à côté des rouleaux, et l'engrenage n'ouvre que le son
+ * et le tour rapide. Il n'y a donc **aucun RTP à lire dans le jeu**.
+ *
+ * Les reconnaître n'est pas un confort. Sans ça, ils échouent à l'ouverture
+ * du panneau, repartent en file, et sont rechargés à chaque campagne pour
+ * échouer encore — alors que leur capture de base contient déjà toute leur
+ * table de gains.
+ */
+export const BARRE_HISTORIQUE = /COIN VALUE|TOTAL BET|SELECT LINES|BET MAX/i;
 
 export async function lireLesRegles(cheminsPng: string[]): Promise<FaitsLus> {
   const ouvrier = await createWorker('eng');

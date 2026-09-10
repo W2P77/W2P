@@ -24,7 +24,10 @@
  */
 import type { Page } from 'playwright';
 
-import { EN_TETE_PANNEAU } from './lecture-regles';
+/** Le jeu n'a pas de panneau de règles, et n'en aura jamais : c'est acquis. */
+export const SANS_PANNEAU = -1;
+
+import { BARRE_HISTORIQUE, EN_TETE_PANNEAU } from './lecture-regles';
 
 export interface Adaptateur {
   studio: string;
@@ -36,6 +39,10 @@ export interface Adaptateur {
    * Ouvre le panneau de règles et renvoie le nombre de captures prises —
    * les doublons en sont écartés plus loin, sur comparaison d'images.
    *
+   * Renvoie `SANS_PANNEAU` pour un jeu qui n'en a pas **par conception** :
+   * c'est un résultat, pas un échec, et le distinguer de 0 évite de remettre
+   * indéfiniment en file un jeu qui n'aura jamais rien de plus à donner.
+   *
    * `lireLEcran` rend le texte de ce qui est affiché à l'instant. Sans lui,
    * l'adaptateur cliquerait à l'aveugle — c'est ce qu'il faisait, et il
    * capturait sept fois le jeu de base en croyant feuilleter les règles.
@@ -44,14 +51,14 @@ export interface Adaptateur {
   capturerLesRegles(
     page: Page,
     cliche: (nom: string) => Promise<void>,
-    lireLEcran: () => Promise<string>,
+    lireLEcran: (bande?: 'haut' | 'bas') => Promise<string>,
   ): Promise<number>;
 
   /** Ouvre la boîte d'achat de bonus. Renvoie faux si le jeu n'en propose pas. */
   capturerLAchat(
     page: Page,
     cliche: (nom: string) => Promise<void>,
-    lireLEcran: () => Promise<string>,
+    lireLEcran: (bande?: 'haut' | 'bas') => Promise<string>,
   ): Promise<boolean>;
 }
 
@@ -142,7 +149,21 @@ export const PRAGMATIC: Adaptateur = {
       await page.keyboard.press('Escape');
       await page.waitForTimeout(800);
     }
-    if (large === null) return 0;
+    if (large === null) {
+      /*
+       * Un troisième habillage existe, et il n'a pas de panneau du tout.
+       *
+       * Les classiques historiques (888 Gold et sa famille) peignent leur
+       * table de gains en permanence à côté des rouleaux, sous une barre de
+       * commandes grise ; l'engrenage n'ouvre que le son et le tour rapide.
+       * Leur capture de base contient donc déjà toute leur documentation —
+       * et leur RTP n'est affiché nulle part, donc on n'en écrira aucun.
+       *
+       * Les confondre avec un échec de recherche les renvoyait en file à
+       * chaque campagne, pour un rechargement complet et le même échec.
+       */
+      return BARRE_HISTORIQUE.test(await lireLEcran('bas')) ? SANS_PANNEAU : 0;
+    }
 
     /*
      * Sept captures, quel que soit l'habillage — mais pas par le même moyen.

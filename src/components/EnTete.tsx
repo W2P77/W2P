@@ -74,7 +74,7 @@ export function EnTete() {
            */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/marque-w2p.webp"
+            src="/images/marque-w2s.webp"
             alt="where2spin"
             className="-mb-[24px] h-[82px] w-auto shrink-0 sm:-mb-[38px] sm:h-[110px]"
           />

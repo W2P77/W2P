@@ -16,6 +16,12 @@ const compat = new FlatCompat({ baseDirectory: dirname(fileURLToPath(import.meta
 export default [
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
   {
-    ignores: ['src/generated/**', '.next/**', 'node_modules/**'],
+    /*
+     * `next-env.d.ts` est réécrit par Next à chaque build, avec une référence
+     * triple-slash que la règle `triple-slash-reference` refuse. Le corriger
+     * n'a aucun effet : le fichier revient tel quel au build suivant. Le
+     * lint échouait donc sur une ligne que personne ne peut changer.
+     */
+    ignores: ['src/generated/**', '.next/**', 'node_modules/**', 'next-env.d.ts'],
   },
 ];
