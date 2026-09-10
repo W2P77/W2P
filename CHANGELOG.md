@@ -44,6 +44,24 @@ capture de base publiée, aucun RTP inventé, plus de repassage.
 ⚠️ Attrapé en relisant : l'adaptateur renvoyait bien le cas, mais le script ne
 le distinguait pas de zéro — la détection était donc restée sans effet.
 
+## 2026-09-10 — Pragmatic inventorié : 697 jeux publiés, 634 chez nous
+
+Cinquième adaptateur d'inventaire, et le plus gros studio du catalogue.
+
+Son index mélange **huit sitemaps d'articles et onze de jeux**. On ne descend
+que dans ceux qui portent les jeux : tirer les autres coûte dix-neuf requêtes
+là où onze suffisent, pour un résultat identique.
+
+**90 fiches créées.** Le catalogue passe de 2 372 à **2 462 fiches**, dont
+512 encore sans RTP — hors index et hors sitemap tant qu'elles n'ont rien à
+dire.
+
+Deux collisions de slug de plus, et elles éclairent le problème : Pragmatic
+publie un `baccarat` et un `multihand-blackjack`, déjà pris par Hacksaw et
+BGaming. Ce sont des jeux de table aux noms génériques — le cas se
+reproduira à chaque studio ajouté. `Jeu.slug` unique globalement n'est pas
+tenable pour un catalogue multi-studios.
+
 ## 2026-09-10 — Le catalogue confronté à celui des studios
 
 `checklist-catalogue.ts` dit ce qui manque **sur les fiches qu'on a**. Il ne

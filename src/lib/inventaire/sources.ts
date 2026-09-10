@@ -67,6 +67,32 @@ function filtrer(urls: string[], motif: RegExp): string[] {
 
 export const SOURCES: SourceStudio[] = [
   {
+    studio: 'pragmatic-play',
+    origine: 'https://www.pragmaticplay.com/sitemap_index.xml',
+    /*
+     * L'index de Pragmatic melange huit sitemaps d'articles et onze de jeux.
+     * On ne descend que dans ceux qui portent les jeux : tirer les autres
+     * coute dix-neuf requetes la ou onze suffisent, pour un resultat
+     * identique.
+     */
+    async lister(recuperer) {
+      const index = await recuperer(this.origine);
+      const sous = [...index.matchAll(/<loc>([^<]+)<\/loc>/g)]
+        .map((m) => m[1].trim())
+        .filter((u) => /games-sitemap\d*\.xml$/.test(u));
+      const tout: string[] = [];
+      for (const s of sous) {
+        try {
+          const contenu = await recuperer(s);
+          tout.push(...[...contenu.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].trim()));
+        } catch {
+          // Un sous-sitemap injoignable ne doit pas faire echouer l'inventaire.
+        }
+      }
+      return filtrer(tout, /\/games\/[^/]+\/?$/);
+    },
+  },
+  {
     studio: 'bgaming',
     origine: 'https://bgaming.com/game-sitemap.xml',
     async lister(recuperer) {
