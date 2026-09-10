@@ -26,7 +26,7 @@ export function PiedDePage() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/marque-w2p.webp"
-              alt="where2play"
+              alt="where2spin"
               className="mb-3 h-[86px] w-auto"
             />
             <p className="mt-2 text-[12px] leading-relaxed text-texte-doux">

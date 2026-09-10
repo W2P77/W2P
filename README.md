@@ -1,4 +1,4 @@
-# where2play
+# where2spin
 
 Catalogue de machines à sous. Site **indépendant** de BetsRank : dépôt, Vercel,
 base et Search Console séparés, et **aucun lien entre les deux sites**.

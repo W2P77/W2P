@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
  *
  * ── Pourquoi un préfixe ───────────────────────────────────────────────────
  *
- * where2play et BetsRank partagent le même Redis et le même endpoint de
+ * where2spin et BetsRank partagent le même Redis et le même endpoint de
  * postback, hébergé sur l'ancien déploiement BCE qu'on ne modifie pas. Rien
  * dans ce tuyau ne sait de quel site vient un clic — sauf le clickId lui-même.
  *
@@ -17,10 +17,24 @@ import { v4 as uuidv4 } from 'uuid';
  *
  * ── Pourquoi BetsRank n'est pas préfixé ───────────────────────────────────
  *
- * Ce n'est pas un oubli. Tout ce qui existait avant where2play vient de
+ * Ce n'est pas un oubli. Tout ce qui existait avant where2spin vient de
  * BetsRank, sans exception : l'absence de préfixe est un **fait**, pas une
  * valeur manquante. Ça étiquette l'historique entier correctement, sans
  * migration ni script de rattrapage.
+ *
+ * ── Pourquoi `w2p-` alors que le site s'appelle where2spin ────────────────
+ *
+ * Le site s'est appelé where2play jusqu'au 10/09/2026 ; `where2play.com` et
+ * `.net` étaient pris, ce dernier par un site du même créneau. Le préfixe,
+ * lui, n'a pas suivi, et ce n'est pas un reste oublié : le postback dérive
+ * la clé de la conversion du clickId, donc le préfixe est **dans la clé
+ * primaire de chaque lead déjà enregistré**, à vie. Le changer renverrait
+ * tout l'historique du côté de BetsRank.
+ *
+ * Accepter les deux préfixes aurait été pire : ce fichier tient parce qu'il
+ * énonce **une** règle, et une liste de cas particuliers se contourne par
+ * distraction là où une règle unique ne se contourne pas. `w2p-` n'est donc
+ * plus des initiales, c'est un identifiant — invisible du visiteur.
  */
 export const PREFIXE_W2P = 'w2p-';
 
@@ -33,7 +47,7 @@ export const PREFIXE_W2P = 'w2p-';
  * BetsRank, puisqu'il ne commence pas par le préfixe du site.
  *
  * D'où l'invariant, qui vaut pour tout ce qu'on ajoutera plus tard — import,
- * API, flux partenaire : **un identifiant where2play commence par `w2p-`.**
+ * API, flux partenaire : **un identifiant where2spin commence par `w2p-`.**
  * Une règle unique ne se contourne pas par distraction ; une liste de cas
  * particuliers, si.
  */
@@ -42,7 +56,7 @@ export const PREFIXE_W2P_MANUEL = `${PREFIXE_W2P}manual-`;
 export type Origine = 'W2P' | 'BR';
 
 /**
- * Un clickId neuf pour un clic sortant depuis where2play.
+ * Un clickId neuf pour un clic sortant depuis where2spin.
  *
  * Le corps reste un UUID v4 : les réseaux d'affiliation acceptent déjà ce
  * format à tirets en production, donc le préfixe n'introduit aucun caractère

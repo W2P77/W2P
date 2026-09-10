@@ -1,7 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 /**
- * La charte de where2play, en jetons.
+ * La charte de where2spin, en jetons.
  *
  * ── Ce qui fait l'identité, et qu'on ne peut pas obtenir avec des arrondis ─
  *

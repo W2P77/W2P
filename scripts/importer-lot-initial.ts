@@ -5,7 +5,7 @@
  *
  * Des fiches dont le RTP a été **vérifié auprès des studios**. Ce sont des
  * faits — RTP, volatilité, gain maximum, mécaniques — donc transférables. Les
- * textes, eux, ne le sont pas et ne sont pas repris : where2play écrira les
+ * textes, eux, ne le sont pas et ne sont pas repris : where2spin écrira les
  * siens.
  *
  * ── Le niveau de preuve n'est pas décoratif ───────────────────────────────

@@ -14,7 +14,7 @@ import {
   PREFIXE_W2P,
 } from '../tracking/click-id';
 
-describe('clickId where2play', () => {
+describe('clickId where2spin', () => {
   it('porte le préfixe et un UUID complet', () => {
     const id = nouveauClickId();
     expect(id.startsWith(PREFIXE_W2P)).toBe(true);
@@ -50,7 +50,7 @@ describe('clickId where2play', () => {
 
   it('attribue à BetsRank tout ce qui n’est pas préfixé', () => {
     // Ce n'est pas un défaut par défaut : tout ce qui existait avant
-    // where2play vient de BetsRank. L'historique s'étiquette donc seul.
+    // where2spin vient de BetsRank. L'historique s'étiquette donc seul.
     expect(origineDuClickId('550e8400-e29b-41d4-a716-446655440000')).toBe('BR');
     expect(origineDuClickId('manual-discord-1757000000000-ab12cd')).toBe('BR');
     expect(origineDuClickId('')).toBe('BR');

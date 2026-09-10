@@ -6,7 +6,7 @@ import { Redis } from '@upstash/redis';
  * ── Redis partagé avec BetsRank, volontairement ───────────────────────────
  *
  * Les postbacks arrivent sur un déploiement commun qui lit cette base. Un
- * Redis séparé rendrait les clics de where2play introuvables au moment de la
+ * Redis séparé rendrait les clics de where2spin introuvables au moment de la
  * conversion : le lead serait perdu, pas seulement mal attribué.
  *
  * Le format des clés reprend donc exactement celui de BetsRank — c'est ce que

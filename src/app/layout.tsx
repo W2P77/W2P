@@ -48,7 +48,7 @@ const corps = Barlow({
  * `lang="fr"` restait de l'amorçage : il annonçait du français aux lecteurs
  * d'écran et aux moteurs sur des pages entièrement rédigées en anglais.
  */
-const TITRE = 'where2play — where to play the slots you are looking for';
+const TITRE = 'where2spin — where to spin the slots you are looking for';
 const DESCRIPTION =
   'RTP, volatility, max win and free demos. Every number says where it comes from, and how well it is verified.';
 
@@ -66,15 +66,15 @@ const OG = ['png', 'jpg', 'jpeg', 'webp']
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: TITRE, template: '%s · where2play' },
+  title: { default: TITRE, template: '%s · where2spin' },
   description: DESCRIPTION,
   openGraph: {
     type: 'website',
-    siteName: 'where2play',
+    siteName: 'where2spin',
     title: TITRE,
     description: DESCRIPTION,
     url: SITE_URL,
-    ...(OG ? { images: [{ url: OG, width: 1200, height: 630, alt: 'where2play' }] } : {}),
+    ...(OG ? { images: [{ url: OG, width: 1200, height: 630, alt: 'where2spin' }] } : {}),
   },
   twitter: {
     card: OG ? 'summary_large_image' : 'summary',

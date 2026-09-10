@@ -1,8 +1,8 @@
 {
-  "name": "where2play",
+  "name": "where2spin",
   "version": "0.1.0",
   "private": true,
-  "description": "Catalogue de machines a sous — where2play.info",
+  "description": "Catalogue de machines a sous — where2spin.com",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",

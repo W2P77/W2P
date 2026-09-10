@@ -15,7 +15,7 @@ import { EtoileEnregistrer } from './EtoileEnregistrer';
  * ── Ce qu'on met à la place des étoiles ──────────────────────────────────
  *
  * La maquette pose une rangée d'étoiles sous chaque jeu. On n'a pas de note
- * éditoriale sur where2play, et en inventer une serait exactement ce que le
+ * éditoriale sur where2spin, et en inventer une serait exactement ce que le
  * site reproche aux catalogues qu'il veut remplacer. La bande du bas garde
  * donc sa place et son poids visuel, mais elle porte ce qu'on sait vraiment :
  * le RTP et son niveau de preuve. C'est aussi ce que le visiteur est venu

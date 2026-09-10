@@ -7,7 +7,9 @@
  *
  * ── Pourquoi elle n'est plus écrite en dur ────────────────────────────────
  *
- * Elle valait `https://where2play.info`, un domaine **qui ne résout pas**. Le
+ * Elle valait `https://where2play.info`, un domaine **qui ne résout pas** —
+ * et que le site a d'ailleurs cessé de porter, `where2play.com` et `.net`
+ * étant déjà pris, ce dernier par un site du même créneau. Le
  * site déclarait donc à Google que ses 1 987 URLs vivaient à une adresse
  * morte, et les réseaux sociaux allaient chercher l'image de partage sur un
  * hôte inexistant — d'où l'absence d'aperçu au partage, qui n'était que le
@@ -31,7 +33,7 @@ function racineDuSite(): string {
 
 export const SITE_URL = racineDuSite().replace(/\/$/, '');
 
-export const SITE_NOM = 'where2play.info';
+export const SITE_NOM = 'where2spin.com';
 
 /**
  * La racine publique du stockage des captures.

@@ -62,10 +62,10 @@ export function EnTete() {
           {/*
            * Le logo complet, sans mot-marque HTML à côté.
            *
-           * La version précédente juxtaposait l'emblème découpé et un
-           * « where2play.info » en texte : le nouveau fichier porte déjà son
-           * mot-marque, et le doubler affichait la marque deux fois, dans deux
-           * typographies différentes.
+           * La version précédente juxtaposait l'emblème découpé et le nom du
+           * site en texte : le fichier de marque porte déjà son mot-marque, et
+           * le doubler affichait la marque deux fois, dans deux typographies
+           * différentes.
            *
            * Il déborde volontairement sous le bandeau (`-mb-[38px]`) : le
            * garder entier dans la hauteur de l'en-tête aurait obligé à
@@ -75,7 +75,7 @@ export function EnTete() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/marque-w2p.webp"
-            alt="where2play"
+            alt="where2spin"
             className="-mb-[24px] h-[82px] w-auto shrink-0 sm:-mb-[38px] sm:h-[110px]"
           />
         </Link>

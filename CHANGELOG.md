@@ -1,6 +1,41 @@
-# Carnet de bord — where2play
+# Carnet de bord — where2spin
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
+
+## 2026-09-10 — Le site s'appelle where2spin
+
+`where2play.com` et `.net` sont pris, et le `.net` n'est pas dormant : c'est un
+site vivant intitulé « Where-to-Play », dans le même créneau. Garder le nom
+revenait à se disputer les recherches de marque avec un concurrent déjà
+installé, sans jamais pouvoir récupérer le `.com`. Vérifié registre par
+registre avant de trancher — `where2play.io`, `.gg` et `.co` étaient libres,
+mais une extension technique pour un site grand public ne compense pas ça.
+
+`where2spin` garde la construction « X2Y » : le « 2 » néon en tracé de circuit
+et la machine à sous restent, seul le dernier mot change. Le domaine, le `.net`
+et le `.io` étaient libres.
+
+**Ce qui n'a délibérément pas suivi le nom : le préfixe `w2p-` des clickId.**
+
+Le postback dérive la clé de la conversion du clickId, donc le préfixe est
+inscrit dans la **clé primaire de chaque lead déjà enregistré**, à vie — là où
+les clics, eux, expirent à 90 jours. Le renommer renverrait tout l'historique
+du côté de BetsRank, dont le tableau de bord lit ce préfixe pour étiqueter
+l'origine des leads.
+
+Accepter les deux préfixes aurait été pire : ce fichier tient parce qu'il
+énonce **une** règle, et une liste de cas particuliers se contourne par
+distraction là où une règle unique ne se contourne pas. `w2p-` n'est donc plus
+des initiales, c'est un identifiant — invisible du visiteur. Le raisonnement
+est écrit en tête de `src/lib/tracking/click-id.ts`, pour que personne ne
+« corrige » ça dans six mois.
+
+⚠️ **Trois visuels épellent encore l'ancien nom** et doivent être regénérés :
+`marque-w2p.webp` (le logo complet), `favicon.png` (« W2P » → « W2S ») et
+`og.jpg` (1200×630). Le code, lui, est entièrement renommé.
+
+⚠️ Rien à changer le jour où le domaine sera branché sur Vercel : `site.ts`
+lit le domaine de production du projet et suivra tout seul.
 
 ## 2026-09-10 — La capture ne connaissait qu'un habillage sur deux
 
