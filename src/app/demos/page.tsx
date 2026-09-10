@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+
+import { metadonneesDePage } from '@/lib/metadonnees';
 import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
 import { CarteJeu } from '@/components/CarteJeu';
@@ -7,11 +9,12 @@ import { prisma } from '@/lib/donnees/prisma';
 
 export const revalidate = 600;
 
-export const metadata: Metadata = {
-  title: 'Free slot demos — play without an account',
+export const metadata: Metadata = metadonneesDePage({
+  titre: 'Free slot demos — play without an account',
   description:
     'Play hundreds of slots for free, no sign-up and no deposit. Every demo links straight to the studio, never to another site.',
-};
+  chemin: '/demos',
+});
 
 export default async function Demos({
   searchParams,

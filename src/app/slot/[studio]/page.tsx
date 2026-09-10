@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+
+import { metadonneesDePage } from '@/lib/metadonnees';
 import { notFound } from 'next/navigation';
 import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
@@ -45,10 +47,14 @@ export async function generateMetadata({
   const { studio } = await params;
   const s = await prisma.studio.findUnique({ where: { slug: studio } });
   if (!s) return { title: 'Provider not found' };
-  return {
-    title: `${s.nom} slots — RTP, volatility and demos`,
+  // Cette page n'avait pas non plus de canonique : elle est atteignable
+  // depuis le catalogue et la navigation, chacune pouvant traîner ses
+  // paramètres de pagination.
+  return metadonneesDePage({
+    titre: `${s.nom} slots — RTP, volatility and demos`,
     description: `Every ${s.nom} slot with its RTP, volatility and max win — and where each number comes from.`,
-  };
+    chemin: `/slot/${s.slug}`,
+  });
 }
 
 export default async function PageStudio({

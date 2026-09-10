@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+
+import { metadonneesDePage } from '@/lib/metadonnees';
 import { notFound } from 'next/navigation';
 import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
 import { GUIDES, guideParSlug } from '@/data/guides';
-import { SITE_URL } from '@/lib/site';
 
 export function generateStaticParams() {
   return GUIDES.map((g) => ({ slug: g.slug }));
@@ -18,11 +19,11 @@ export async function generateMetadata({
   const { slug } = await params;
   const g = guideParSlug(slug);
   if (!g) return { title: 'Guide not found' };
-  return {
-    title: g.titre,
+  return metadonneesDePage({
+    titre: g.titre,
     description: g.chapo,
-    alternates: { canonical: `${SITE_URL}/guides/${g.slug}` },
-  };
+    chemin: `/guides/${g.slug}`,
+  });
 }
 
 export default async function Guide({ params }: { params: Promise<{ slug: string }> }) {

@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+
+import { metadonneesDePage } from '@/lib/metadonnees';
 import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
 import { CarteJeu } from '@/components/CarteJeu';
@@ -6,7 +8,6 @@ import { BarreFiltres } from '@/components/BarreFiltres';
 import { GrilleStudios } from '@/components/GrilleStudios';
 import { Tirets } from '@/components/DecorNeon';
 import { chercherJeux, studiosDuCatalogue } from '@/lib/donnees/catalogue';
-import { SITE_URL } from '@/lib/site';
 
 /**
  * Les vues filtrées ne sont pas indexées, et c'est délibéré.
@@ -28,20 +29,27 @@ export async function generateMetadata({
   const sp = await searchParams;
   const filtre = sp.q || sp.studio || sp.volatilite || sp.preuve || sp.rtpMin || sp.page;
 
+  const description =
+    'Every slot with its RTP, volatility and max win — and where each number comes from.';
+
+  // Une vue filtrée n'est pas une page : elle pointe sa canonique et son
+  // partage vers le catalogue entier, et sort de l'index.
   if (filtre) {
     return {
-      title: sp.q ? `Search: ${sp.q}` : 'Filtered catalogue',
+      ...metadonneesDePage({
+        titre: sp.q ? `Search: ${sp.q}` : 'Filtered catalogue',
+        description,
+        chemin: '/catalogue',
+      }),
       robots: { index: false, follow: true },
-      alternates: { canonical: `${SITE_URL}/catalogue` },
     };
   }
 
-  return {
-    title: 'Slot catalogue — RTP, volatility and demos',
-    description:
-      'Every slot with its RTP, volatility and max win — and where each number comes from.',
-    alternates: { canonical: `${SITE_URL}/catalogue` },
-  };
+  return metadonneesDePage({
+    titre: 'Slot catalogue — RTP, volatility and demos',
+    description,
+    chemin: '/catalogue',
+  });
 }
 
 export default async function Catalogue({

@@ -1,14 +1,17 @@
 import type { Metadata } from 'next';
+
+import { metadonneesDePage } from '@/lib/metadonnees';
 import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
 import { Tirets } from '@/components/DecorNeon';
 import { GUIDES } from '@/data/guides';
 
-export const metadata: Metadata = {
-  title: 'Guides — how to read slot data',
+export const metadata: Metadata = metadonneesDePage({
+  titre: 'Guides — how to read slot data',
   description:
     'How RTP tiers, bonus buy returns and volatility labels actually work — written from what we measured building the catalogue.',
-};
+  chemin: '/guides',
+});
 
 export default function Guides() {
   return (

@@ -3,6 +3,7 @@ import { join } from 'node:path';
 
 import type { Metadata } from 'next';
 
+import { BANNIERE_OG } from '@/lib/metadonnees';
 import { SITE_URL } from '@/lib/site';
 import { Barlow, Chakra_Petch, Saira_Condensed } from 'next/font/google';
 import './globals.css';
@@ -60,25 +61,14 @@ const DESCRIPTION =
  * longtemps après que le fichier est arrivé. On vérifie donc la présence au
  * rendu, côté serveur — la même précaution que pour le visuel d'accroche.
  *
- * ── Pourquoi une version dans l'URL ───────────────────────────────────────
- *
- * Le cache des réseaux porte sur l'**URL**, et il dure des semaines. Or le
- * chemin `/images/og.jpg` a servi deux images différentes : celle de
- * where2play jusqu'au 10/09/2026, celle de where2spin depuis. Toute
- * plateforme qui avait mis la première en cache continuait de l'afficher, à
- * URL identique — un lien where2spin illustré par l'ancien nom.
- *
- * La version change l'URL, donc force un nouveau téléchargement. **À
- * incrémenter à chaque fois que le fichier change**, sans quoi le problème
- * revient exactement à l'identique.
+ * La version de l'URL vit dans `@/lib/metadonnees`, avec le repli qu'utilisent
+ * les pages : deux endroits où l'écrire, c'est un endroit de trop.
  */
-const VERSION_OG = 'w2s-1';
+const OG = existsSync(join(process.cwd(), 'public', 'images', 'og.jpg'))
+  ? BANNIERE_OG
+  : undefined;
 
-const OG = ['png', 'jpg', 'jpeg', 'webp']
-  .map((ext) => `/images/og.${ext}`)
-  .find((chemin) => existsSync(join(process.cwd(), 'public', chemin)));
-
-const OG_URL = OG ? `${OG}?v=${VERSION_OG}` : undefined;
+const OG_URL = OG;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

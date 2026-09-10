@@ -1,20 +1,21 @@
 import type { Metadata } from 'next';
+
+import { metadonneesDePage } from '@/lib/metadonnees';
 import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
 import { CarteJeu } from '@/components/CarteJeu';
 import { Tirets } from '@/components/DecorNeon';
 import { prisma } from '@/lib/donnees/prisma';
-import { SITE_URL } from '@/lib/site';
 
 // Une heure : c'est la page dont la fraîcheur est l'argument.
 export const revalidate = 3600;
 
-export const metadata: Metadata = {
-  title: 'New slot releases — the latest games, with their real RTP',
+export const metadata: Metadata = metadonneesDePage({
+  titre: 'New slot releases — the latest games, with their real RTP',
   description:
     'Slots released recently, with the RTP the studio actually publishes — and a clear mark when we have not been able to confirm it yet.',
-  alternates: { canonical: `${SITE_URL}/new-releases` },
-};
+  chemin: '/new-releases',
+});
 
 const CHAMPS = {
   slug: true, nom: true, rtpStudio: true, rtpConfiance: true,

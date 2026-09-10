@@ -44,6 +44,47 @@ capture de base publiée, aucun RTP inventé, plus de repassage.
 ⚠️ Attrapé en relisant : l'adaptateur renvoyait bien le cas, mais le script ne
 le distinguait pas de zéro — la détection était donc restée sans effet.
 
+## 2026-09-10 — Les 1 951 fiches déclaraient toutes l'accueil au partage
+
+Next **fusionne** les métadonnées d'une page avec celles du layout racine. Un
+`title` défini dans la page remplace bien celui du layout — mais un bloc
+`openGraph` absent est hérité **en entier**. Aucune des pages qui déclaraient
+leurs métadonnées n'écrivait ce bloc. Résultat, sur chaque fiche de jeu :
+
+    og:title  →  where2spin — where to spin the slots you are looking for
+    og:url    →  la page d'accueil
+    og:image  →  la bannière générique du site
+
+Le `<title>` et la `description`, eux, étaient bien uniques — c'est ce qui
+rendait le défaut invisible en regardant l'onglet du navigateur.
+
+**`og:url` est le plus grave des trois.** C'est le signal de canonique que
+lisent les plateformes sociales : déclarer la même adresse sur 1 951 pages
+revient à leur dire que ce sont toutes la même. Et tout lien de jeu partagé
+s'affichait avec la vignette du site, quel que soit le jeu.
+
+Un helper `metadonneesDePage` pose désormais titre, description, canonique et
+bloc de partage d'un seul geste, sur les **neuf** pages concernées — fiche de
+jeu, page studio, catalogue, guides et son index, démos, nouveautés, avis.
+L'oubli était trop facile à refaire pour rester réparti dans neuf fichiers.
+
+Deux choses que le passage a révélées au passage :
+
+- **La page studio n'avait aucune canonique**, alors qu'elle est atteignable
+  depuis le catalogue et la navigation avec des paramètres de pagination.
+- **Omettre `images` ne rend pas la bannière du site, il ne rend rien.** Next
+  ne fusionne pas les images dès lors que la page déclare son bloc. Le repli
+  est donc explicite dans le helper, sinon la correction aurait supprimé la
+  vignette des pages de section au lieu de la personnaliser.
+
+Chaque fiche de jeu porte maintenant **son propre artwork** en image de
+partage — 600×337, au-dessus du seuil des grandes cartes sociales (600×315),
+et 1 855 jeux en ont un.
+
+La version de l'URL de la bannière vit désormais à côté du repli, dans
+`metadonnees.ts` : elle était écrite dans `layout.tsx`, et deux endroits pour
+la même constante en font un qui sera oublié.
+
 ## 2026-09-10 — Le site s'appelle where2spin
 
 `where2play.com` et `.net` sont pris, et le `.net` n'est pas dormant : c'est un

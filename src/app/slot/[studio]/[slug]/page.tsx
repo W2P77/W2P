@@ -11,6 +11,7 @@ import { OuJouer } from '@/components/OuJouer';
 import { CapturesJeu } from '@/components/CapturesJeu';
 import { BoutonEnregistrer } from '@/components/BoutonEnregistrer';
 import { baliseJeu } from '@/lib/donnees-structurees';
+import { metadonneesDePage } from '@/lib/metadonnees';
 import { SITE_URL } from '@/lib/site';
 
 export const revalidate = 3600;
@@ -48,15 +49,26 @@ export async function generateMetadata({
   if (!jeu) return { title: 'Slot not found' };
 
   const rtp = jeu.rtpStudio ? `${Number(jeu.rtpStudio).toFixed(2)}% RTP` : 'RTP';
-  return {
-    title: `Where to play ${jeu.nom} — ${rtp}, demo and full specs`,
+
+  /*
+   * L'image de partage est celle du jeu quand on l'a : 600×337, au-dessus du
+   * seuil des grandes cartes sociales (600×315). À défaut seulement, la
+   * bannière du site prend le relais — mieux vaut une vignette générique que
+   * pas de vignette.
+   */
+  return metadonneesDePage({
+    titre: `Where to play ${jeu.nom} — ${rtp}, demo and full specs`,
     description: `${jeu.nom} by ${jeu.studio.nom}: ${rtp}, volatility, max win and free demo. Every number sourced — we tell you when it is not.`,
     // La canonique est posée explicitement : la fiche est atteignable depuis
     // le catalogue, la page du studio et la recherche, chacune pouvant traîner
     // ses paramètres.
-    alternates: { canonical: `${SITE_URL}/slot/${jeu.studio.slug}/${jeu.slug}` },
-  };
+    chemin: `/slot/${jeu.studio.slug}/${jeu.slug}`,
+    image: jeu.visuelUrl
+      ? { url: `${SITE_URL}${jeu.visuelUrl}`, largeur: 600, hauteur: 337, alt: jeu.nom }
+      : null,
+  });
 }
+
 
 function Fiche({ libelle, valeur }: { libelle: string; valeur: React.ReactNode }) {
   if (valeur == null || valeur === '') return null;

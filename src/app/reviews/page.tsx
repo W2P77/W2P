@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+
+import { metadonneesDePage } from '@/lib/metadonnees';
 import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
 import { CarteJeu } from '@/components/CarteJeu';
@@ -7,11 +9,12 @@ import { prisma } from '@/lib/donnees/prisma';
 
 export const revalidate = 600;
 
-export const metadata: Metadata = {
-  title: 'Verified slots — RTP checked against the studio',
+export const metadata: Metadata = metadonneesDePage({
+  titre: 'Verified slots — RTP checked against the studio',
   description:
     'Slots whose RTP we checked against the studio itself, with the source on file. What we could not confirm is listed as unconfirmed.',
-};
+  chemin: '/reviews',
+});
 
 /**
  * « Reviews », version honnête.
