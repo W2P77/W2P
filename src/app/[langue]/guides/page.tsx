@@ -6,7 +6,7 @@ import { metadonneesDePage } from '@/lib/metadonnees';
 import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
 import { Tirets } from '@/components/DecorNeon';
-import { GUIDES } from '@/data/guides';
+import { contenuDuGuide, GUIDES } from '@/data/guides';
 
 export async function generateMetadata({
   params,
@@ -30,7 +30,8 @@ export default async function Guides({
   params: Promise<{ langue: string }>;
 }) {
   const { langue: brutL } = await params;
-  const t = textes(estUneLangue(brutL) ? brutL : LANGUE_DEFAUT);
+  const langue = estUneLangue(brutL) ? brutL : LANGUE_DEFAUT;
+  const t = textes(langue);
   return (
     <div className="min-h-screen bg-fond">
       <EnTete />
@@ -52,8 +53,8 @@ export default async function Guides({
                 href={`/guides/${g.slug}`}
                 className="panneau block p-5 transition hover:border-neon-cyan/60"
               >
-                <p className="font-titre text-[16px] font-bold text-white">{g.titre}</p>
-                <p className="mt-1.5 text-[13px] leading-relaxed text-texte-doux">{g.chapo}</p>
+                <p className="font-titre text-[16px] font-bold text-white">{contenuDuGuide(g, langue).titre}</p>
+                <p className="mt-1.5 text-[13px] leading-relaxed text-texte-doux">{contenuDuGuide(g, langue).chapo}</p>
                 <span className="mt-2.5 inline-block font-mono text-[11px] text-neon-cyan">
                   {g.minutes} min read →
                 </span>

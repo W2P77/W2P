@@ -147,3 +147,33 @@ export async function casinosPourStudio(cleCasino: string | null) {
     },
   });
 }
+
+/**
+ * Les fiches citées par une section de guide, dans l'ordre où elles le sont.
+ *
+ * ── Pourquoi rendre le niveau de preuve avec le chiffre ───────────────────
+ *
+ * Un guide qui affirme « les jeux de table rendent 98 % » doit montrer sur
+ * quoi il s'appuie. Servir le RTP sans son niveau de preuve reviendrait à
+ * présenter une valeur non confirmée avec la même autorité qu'une valeur lue
+ * dans le panneau du jeu — c'est précisément ce que ce site reproche aux
+ * agrégateurs.
+ *
+ * L'ordre d'entrée est conservé : l'auteur du guide a choisi de citer ces
+ * jeux dans cet ordre, et le trier par RTP changerait son propos.
+ */
+export async function jeuxCites(slugs: string[]) {
+  if (!slugs.length) return [];
+  const jeux = await prisma.jeu.findMany({
+    where: { slug: { in: slugs } },
+    select: {
+      slug: true,
+      nom: true,
+      rtpStudio: true,
+      rtpConfiance: true,
+      studio: { select: { nom: true, slug: true } },
+    },
+  });
+  const parSlug = new Map(jeux.map((j) => [j.slug, j]));
+  return slugs.map((s) => parSlug.get(s)).filter((j): j is NonNullable<typeof j> => j != null);
+}

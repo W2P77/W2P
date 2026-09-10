@@ -1,5 +1,8 @@
-import { GUIDES } from '@/data/guides';
+'use client';
+
+import { contenuDuGuide, GUIDES } from '@/data/guides';
 import { Lien } from '@/components/Lien';
+import { useLangue } from '@/i18n/useLangue';
 
 /**
  * La colonne « Latest guides & reviews ».
@@ -36,6 +39,7 @@ function Vignette({ rang }: { rang: number }) {
 }
 
 export function ListeGuides() {
+  const { langue } = useLangue();
   return (
     <ul className="divide-y divide-fond-bordure">
       {GUIDES.map((g, i) => (
@@ -44,7 +48,7 @@ export function ListeGuides() {
             <Vignette rang={i} />
             <span className="min-w-0">
               <span className="block font-corps text-[14px] font-medium leading-snug text-texte transition-colors group-hover:text-white">
-                {g.titre}
+                {contenuDuGuide(g, langue).titre}
               </span>
               <span className="mt-1.5 flex items-center gap-2">
                 <span className="font-ui text-[11px] font-semibold uppercase tracking-[0.08em] text-neon-cyan">

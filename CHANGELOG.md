@@ -63,6 +63,40 @@ seul.
 BetsRank se propage ici en silence au semis suivant. La confrontation
 systématique vaut mieux que la confiance dans la source.
 
+## 2026-09-11 — Un guide qui cite le catalogue, preuve à l'appui
+
+Premier guide sur les jeux de table, dans les trois langues, et surtout un
+mécanisme de maillage qui n'existait pas.
+
+**Chaque section peut citer des fiches du catalogue.** La page va les chercher
+en base et affiche leur nom, leur studio, leur RTP — **et son niveau de
+preuve**. C'est ce qui distingue ce maillage d'un simple lien : l'affirmation
+du paragraphe et la donnée sur laquelle elle repose tiennent dans le même
+écran, et le lecteur vérifie d'un clic.
+
+Servir le RTP sans sa preuve aurait donné la même autorité à une valeur lue
+dans le panneau du jeu et à une valeur reprise ailleurs — précisément ce que
+ce site reproche aux agrégateurs.
+
+⚠️ **Ce que le chantier a révélé, et qui a changé le guide.** Les 45 jeux de
+table du catalogue portent tous un RTP en `AUCUNE` : aucun n'est confirmé à la
+source. Écrire « le blackjack rend 99,5 % » en s'appuyant dessus aurait été
+exactement la faute que le site dénonce.
+
+La prose n'affirme donc rien sur un jeu précis : elle explique le
+**mécanisme** — pourquoi l'avantage d'une table découle de ses règles et non
+d'un réglage, pourquoi les chiffres s'y regroupent alors qu'ils se dispersent
+sur les machines, pourquoi la valeur du blackjack est un plafond et non une
+espérance. De l'arithmétique, pas une donnée. Les chiffres, eux, sont dans la
+liste, avec leur étiquette.
+
+**Les guides deviennent multilingues**, avec l'anglais en repli. Un guide
+traduit à moitié vaut mieux qu'un guide absent dans deux langues sur trois —
+et le repli se voit, ce qui rappelle qu'il reste à traduire.
+
+☑️ Les trois guides existants restent à traduire. ☑️ Les RTP des jeux de table
+restent à confirmer à la source : Evolution et Pragmatic les publient.
+
 ## 2026-09-11 — Passe de traduction complète, et le layout racine réparé
 
 **Le layout racine cassait le site.** Next 15 exige `<html>` et `<body>` dans
