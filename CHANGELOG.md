@@ -44,6 +44,25 @@ capture de base publiée, aucun RTP inventé, plus de repassage.
 ⚠️ Attrapé en relisant : l'adaptateur renvoyait bien le cas, mais le script ne
 le distinguait pas de zéro — la détection était donc restée sans effet.
 
+## 2026-09-10 — Betti servait GB/DE/AU au lieu de la France
+
+Correction en base, héritée de BetsRank. Là-bas, un commit de **rédaction** du
+13/08 (`c7845348`, « 8 fiches éditoriales en 6 langues, rédaction menée par
+7 agents en parallèle ») avait remplacé `['FR']` par `['GB', 'DE', 'AU']` sur
+Betti, noyé dans un diff de 9 396 lignes.
+
+where2spin a été semé depuis BetsRank **après** cet accident : il a donc
+hérité de l'erreur sans que rien ne la signale. Le casino restait `actif`,
+simplement proposé au mauvais public.
+
+Les deux catalogues ont été confrontés entièrement dans la foulée — pays et
+statut masqué/actif, marque par marque. **Aucun autre écart.** Betti était le
+seul.
+
+⚠️ Ce que ça dit du pont entre les deux sites : une erreur de données à
+BetsRank se propage ici en silence au semis suivant. La confrontation
+systématique vaut mieux que la confiance dans la source.
+
 ## 2026-09-10 — Pragmatic inventorié : 697 jeux publiés, 634 chez nous
 
 Cinquième adaptateur d'inventaire, et le plus gros studio du catalogue.
