@@ -59,10 +59,26 @@ const DESCRIPTION =
  * les réseaux sociaux mettent en cache l'échec, et le lien reste sans vignette
  * longtemps après que le fichier est arrivé. On vérifie donc la présence au
  * rendu, côté serveur — la même précaution que pour le visuel d'accroche.
+ *
+ * ── Pourquoi une version dans l'URL ───────────────────────────────────────
+ *
+ * Le cache des réseaux porte sur l'**URL**, et il dure des semaines. Or le
+ * chemin `/images/og.jpg` a servi deux images différentes : celle de
+ * where2play jusqu'au 10/09/2026, celle de where2spin depuis. Toute
+ * plateforme qui avait mis la première en cache continuait de l'afficher, à
+ * URL identique — un lien where2spin illustré par l'ancien nom.
+ *
+ * La version change l'URL, donc force un nouveau téléchargement. **À
+ * incrémenter à chaque fois que le fichier change**, sans quoi le problème
+ * revient exactement à l'identique.
  */
+const VERSION_OG = 'w2s-1';
+
 const OG = ['png', 'jpg', 'jpeg', 'webp']
   .map((ext) => `/images/og.${ext}`)
   .find((chemin) => existsSync(join(process.cwd(), 'public', chemin)));
+
+const OG_URL = OG ? `${OG}?v=${VERSION_OG}` : undefined;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -74,13 +90,13 @@ export const metadata: Metadata = {
     title: TITRE,
     description: DESCRIPTION,
     url: SITE_URL,
-    ...(OG ? { images: [{ url: OG, width: 1200, height: 630, alt: 'where2spin' }] } : {}),
+    ...(OG_URL ? { images: [{ url: OG_URL, width: 1200, height: 630, alt: 'where2spin' }] } : {}),
   },
   twitter: {
     card: OG ? 'summary_large_image' : 'summary',
     title: TITRE,
     description: DESCRIPTION,
-    ...(OG ? { images: [OG] } : {}),
+    ...(OG_URL ? { images: [OG_URL] } : {}),
   },
 };
 
