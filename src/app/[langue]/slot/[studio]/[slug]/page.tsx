@@ -15,6 +15,7 @@ import { estPublieable } from '@/lib/publication';
 import { SITE_URL } from '@/lib/site';
 import { Lien } from '@/components/Lien';
 import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
+import { remplir, textes } from '@/i18n/textes';
 
 export const revalidate = 3600;
 
@@ -50,14 +51,24 @@ export async function generateMetadata({
   const jeu = await jeuParSlug(slug);
   if (!jeu) return { title: 'Slot not found' };
 
-  const rtp = jeu.rtpStudio ? `${Number(jeu.rtpStudio).toFixed(2)}% RTP` : 'RTP';
+  const langue = estUneLangue(brutLangue) ? brutLangue : LANGUE_DEFAUT;
+  const t = textes(langue);
 
   /*
-   * L'image de partage est celle du jeu quand on l'a : 600×337, au-dessus du
-   * seuil des grandes cartes sociales (600×315). À défaut seulement, la
-   * bannière du site prend le relais — mieux vaut une vignette générique que
-   * pas de vignette.
+   * ── Deux gabarits, parce qu'un seul laissait un trou ────────────────────
+   *
+   * La formule unique donnait « Where to play Gemix — RTP, demo and full
+   * specs » sur les 512 fiches sans RTP : une virgule après un mot vide, sur
+   * un cinquième du catalogue. Celle sans RTP nomme le studio à la place —
+   * c'est le fait qu'on a, et il distingue la fiche.
    */
+  const valeurs = {
+    jeu: jeu.nom,
+    studio: jeu.studio.nom,
+    rtp: jeu.rtpStudio ? Number(jeu.rtpStudio).toFixed(2) : '',
+  };
+  const avecRtp = jeu.rtpStudio != null;
+
   /*
    * Une fiche sans RTP vient de l'inventaire des catalogues studio : on sait
    * que le jeu existe, rien de plus. Elle reste consultable — un visiteur qui
@@ -70,9 +81,9 @@ export async function generateMetadata({
   return {
     ...horsIndex,
     ...metadonneesDePage({
-    langue: estUneLangue(brutLangue) ? brutLangue : LANGUE_DEFAUT,
-    titre: `Where to play ${jeu.nom} — ${rtp}, demo and full specs`,
-    description: `${jeu.nom} by ${jeu.studio.nom}: ${rtp}, volatility, max win and free demo. Every number sourced — we tell you when it is not.`,
+    langue,
+    titre: remplir(avecRtp ? t.titreJeuAvecRtp : t.titreJeuSansRtp, valeurs),
+    description: remplir(avecRtp ? t.descriptionJeuAvecRtp : t.descriptionJeuSansRtp, valeurs),
     // La canonique est posée explicitement : la fiche est atteignable depuis
     // le catalogue, la page du studio et la recherche, chacune pouvant traîner
     // ses paramètres.
@@ -99,9 +110,11 @@ function Fiche({ libelle, valeur }: { libelle: string; valeur: React.ReactNode }
 export default async function PageJeu({
   params,
 }: {
-  params: Promise<{ studio: string; slug: string }>;
+  params: Promise<{ studio: string; slug: string; langue: string }>;
 }) {
   const { studio, slug } = await params;
+  const { langue: brutLangue } = await params;
+  const t = textes(estUneLangue(brutLangue) ? brutLangue : LANGUE_DEFAUT);
   const jeu = await jeuParSlug(slug);
   if (!jeu) notFound();
 
@@ -168,7 +181,7 @@ export default async function PageJeu({
         <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
           <div className="min-w-0">
             <h1 className="font-titre text-[30px] font-black uppercase leading-[0.95] tracking-tight text-white sm:text-[40px]">
-              Where to play {jeu.nom}
+              {t.ouJouer} {jeu.nom}
             </h1>
             <div className="mt-2 flex flex-wrap items-center gap-3">
               <p className="text-[14px] text-texte-doux">
@@ -224,7 +237,7 @@ export default async function PageJeu({
                 rel="noopener noreferrer"
                 className="tube tube-cyan mt-5 inline-block"
               >
-                Play the free demo
+                {t.jouerDemo}
               </a>
             )}
           </div>
@@ -261,7 +274,7 @@ export default async function PageJeu({
             )}
 
             <h2 className="mb-4 font-titre text-[15px] font-bold uppercase tracking-wide text-white">
-              Game data
+              {t.donneesJeu}
             </h2>
 
             <div className="mb-4 rounded-lg border border-fond-bordure bg-fond p-3.5">

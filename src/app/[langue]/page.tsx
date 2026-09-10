@@ -9,12 +9,17 @@ import { BoutonFlottant } from '@/components/BoutonFlottant';
 import { jeuxEnAvant, compterCatalogue } from '@/lib/donnees/jeux';
 import { studiosDuCatalogue } from '@/lib/donnees/catalogue';
 import { Lien } from '@/components/Lien';
+import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
+import { textes } from '@/i18n/textes';
 
 // Les chiffres viennent de la base, jamais du texte : un nombre recopié dans
 // une page dérive dès qu'un jeu entre ou sort.
 export const revalidate = 300;
 
-export default async function Home() {
+export default async function Home({ params }: { params: Promise<{ langue: string }> }) {
+  const { langue: brut } = await params;
+  const t = textes(estUneLangue(brut) ? brut : LANGUE_DEFAUT);
+
   const [jeux, compte, studios] = await Promise.all([
     jeuxEnAvant(8),
     compterCatalogue(),
@@ -61,7 +66,7 @@ export default async function Home() {
               className="font-titre text-[34px] font-black uppercase leading-[0.86] tracking-[0.005em] text-white sm:text-[50px] md:text-[60px] lg:text-[72px]"
               style={{ textShadow: '0 0 24px rgba(255,255,255,0.22), 0 0 52px rgba(47,216,245,0.16)' }}
             >
-              Discover your next
+              {t.accroche}
               <br />
               reel adventure
             </h1>
@@ -70,15 +75,15 @@ export default async function Home() {
           {/* Une seule ligne : sur deux, le bloc perd sa densité et les boutons
               descendent hors du premier écran. */}
           <p className="mt-4 max-w-[36rem] font-corps text-[17px] leading-snug text-texte-doux">
-            Unleash thousands of free slots, demos, and expert reviews.
+            {t.accrocheSuite}
           </p>
 
           <div className="mt-5 flex flex-wrap gap-3">
             <Lien href="/demos" className="tube tube-magenta">
-              Play free demos
+              {t.jouerDemos}
             </Lien>
             <Lien href="/catalogue" className="tube tube-cyan">
-              Explore catalogue
+              {t.explorerCatalogue}
             </Lien>
           </div>
         </div>
@@ -109,7 +114,7 @@ export default async function Home() {
       {/* ── Les deux panneaux ────────────────────────────────────────────── */}
       <section className="mx-auto grid max-w-[1440px] gap-6 px-6 py-7 lg:grid-cols-[1.75fr_1fr]">
         <Panneau teinte="mixte" className="p-6">
-          <TitreSection>Top rated slots this week</TitreSection>
+          <TitreSection>{t.mieuxNotes}</TitreSection>
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             {jeux.map((j, i) => (
@@ -129,7 +134,7 @@ export default async function Home() {
 
           <div className="mt-5 border-t border-fond-bordure pt-5">
             <h3 className="mb-3 font-ui text-[11px] font-bold uppercase tracking-[0.18em] text-texte-faible">
-              Browse by provider
+              {t.parStudio}
             </h3>
             <ul className="grid grid-cols-2 gap-2.5">
               {studios.slice(0, 6).map((s) => (

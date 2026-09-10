@@ -1,5 +1,8 @@
+'use client';
+
 import { GalerieCaptures } from './GalerieCaptures';
 import type { Capture } from '@/data/captures';
+import { useLangue } from '@/i18n/useLangue';
 
 /**
  * Les captures faites dans la démo officielle du studio.
@@ -25,6 +28,7 @@ export function CapturesJeu({
   captures: unknown;
   faitesLe: Date | null;
 }) {
+  const { t } = useLangue();
   /*
    * Le champ vient d'une colonne JSON : rien ne garantit sa forme à la
    * lecture. On la vérifie ici plutôt que de laisser une fiche tomber en 500
@@ -45,7 +49,7 @@ export function CapturesJeu({
   return (
     <section className="biseau mt-6 border border-fond-bordure bg-fond-panneau p-5">
       <h2 className="font-titre text-[19px] font-extrabold uppercase tracking-wide text-white">
-        Inside the game
+        {t.dansLeJeu}
       </h2>
       <p className="mt-2 max-w-3xl font-corps text-[13px] leading-relaxed text-texte-doux">
         Captured in the studio&apos;s own free demo{date ? ` on ${date}` : ''}. Nothing below is

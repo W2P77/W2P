@@ -63,6 +63,40 @@ seul.
 BetsRank se propage ici en silence au semis suivant. La confrontation
 systématique vaut mieux que la confiance dans la source.
 
+## 2026-09-10 — L'interface traduite, et le titre troué réparé
+
+Trente-huit chaînes d'interface dans les trois langues : navigation, pied de
+page, accroche, fiche de jeu. Un objet typé plutôt qu'une bibliothèque — à
+cette échelle, le typage suffit et fait mieux : une clé oubliée dans une
+langue casse la compilation.
+
+**Le titre des fiches avait un trou, et il touchait un cinquième du
+catalogue.** La formule unique donnait, sur les 512 fiches sans RTP :
+
+    Where to play Gemix — RTP, demo and full specs
+
+Une virgule après un mot vide. Deux gabarits valent mieux qu'un trou : celui
+sans RTP nomme **le studio** à la place — c'est le fait dont on dispose, et il
+distingue la fiche.
+
+    Where to play Gemix by Play'n GO — free demo and specs
+    Où jouer à Gemix de Play'n GO — démo gratuite et fiche
+    Wo Gemix von Play'n GO spielen — Gratis-Demo und Daten
+
+**Les liens de navigation portent une clé, pas un libellé.** Écrire « HOME »
+dans le tableau des liens l'aurait figé en anglais dans les trois langues.
+
+Le pied de page devient un composant client alors qu'il ne porte aucun état :
+il ne contient que des liens et des intitulés, mais les deux doivent suivre la
+langue. Le faire descendre en propriété depuis les huit pages qui l'affichent
+coûterait plus cher que le kilo-octet de script que ça ajoute.
+
+☑️ Reste hors de ce dictionnaire, et volontairement : les **données des jeux**.
+Elles sont stockées en un seul exemplaire dans la fiche, et la table
+`Traduction` existe pour porter leurs versions par langue. Les mélanger ferait
+d'un dictionnaire d'interface un dictionnaire de contenu, qui grossirait sans
+fin.
+
 ## 2026-09-10 — Le site passe en trois langues
 
 Anglais, français, allemand. Le choix suit les marchés réellement couverts par

@@ -1,5 +1,16 @@
+'use client';
+
+/*
+ * Composant client, alors qu'il ne porte aucun état.
+ *
+ * Il ne contient que des liens et des intitulés — mais les deux doivent
+ * suivre la langue, et celle-ci se lit dans l'URL. Le faire descendre en
+ * propriété depuis les huit pages qui l'affichent coûterait plus cher que
+ * le kilo-octet de script que cette directive ajoute.
+ */
 import { Liseré } from './DecorNeon';
 import { Lien } from '@/components/Lien';
+import { useLangue } from '@/i18n/useLangue';
 
 /**
  * Le pied de page.
@@ -10,6 +21,8 @@ import { Lien } from '@/components/Lien';
  * des réseaux d'affiliation.
  */
 export function PiedDePage() {
+  const { t } = useLangue();
+
   return (
     <footer className="mt-12">
       <Liseré inverse />
@@ -37,18 +50,18 @@ export function PiedDePage() {
 
           <nav className="flex gap-10 text-[12px]">
             <div>
-              <p className="mb-2 font-semibold uppercase tracking-wide text-texte-faible">Browse</p>
+              <p className="mb-2 font-semibold uppercase tracking-wide text-texte-faible">{t.piedParcourir}</p>
               <ul className="space-y-1.5">
-                <li><Lien href="/catalogue" className="text-texte-doux hover:text-neon-cyan">Catalogue</Lien></li>
-                <li><Lien href="/demos" className="text-texte-doux hover:text-neon-cyan">Free demos</Lien></li>
-                <li><Lien href="/reviews" className="text-texte-doux hover:text-neon-cyan">Verified slots</Lien></li>
+                <li><Lien href="/catalogue" className="text-texte-doux hover:text-neon-cyan">{t.piedCatalogue}</Lien></li>
+                <li><Lien href="/demos" className="text-texte-doux hover:text-neon-cyan">{t.piedDemos}</Lien></li>
+                <li><Lien href="/reviews" className="text-texte-doux hover:text-neon-cyan">{t.piedAvis}</Lien></li>
               </ul>
             </div>
             <div>
-              <p className="mb-2 font-semibold uppercase tracking-wide text-texte-faible">Learn</p>
+              <p className="mb-2 font-semibold uppercase tracking-wide text-texte-faible">{t.piedApprendre}</p>
               <ul className="space-y-1.5">
-                <li><Lien href="/guides" className="text-texte-doux hover:text-neon-cyan">Guides</Lien></li>
-                <li><Lien href="/favorites" className="text-texte-doux hover:text-neon-cyan">Favorites</Lien></li>
+                <li><Lien href="/guides" className="text-texte-doux hover:text-neon-cyan">{t.piedGuides}</Lien></li>
+                <li><Lien href="/favorites" className="text-texte-doux hover:text-neon-cyan">{t.piedFavoris}</Lien></li>
               </ul>
             </div>
           </nav>

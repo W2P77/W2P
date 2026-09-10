@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Tirets } from './DecorNeon';
 import { filtrerCasinosParPays, nomDuPays } from '@/lib/geo/filtrer-casinos';
+import { useLangue } from '@/i18n/useLangue';
 
 /**
  * « Où jouer à ce jeu » — le bloc qui transforme une visite en lead.
@@ -69,6 +70,7 @@ export function OuJouer({
   studio: string;
   casinos: CasinoCta[];
 }) {
+  const { t } = useLangue();
   const [pays, setPays] = useState<string | null>(null);
   const [tout, setTout] = useState(false);
   useEffect(() => setPays(lirePaysDuCookie()), []);
@@ -81,7 +83,7 @@ export function OuJouer({
     <section className="biseau mt-6 border border-fond-bordure bg-fond-panneau p-5">
       <div className="mb-1 flex items-center gap-3">
         <h2 className="font-titre text-[19px] font-extrabold uppercase tracking-wide text-white">
-          Where to play {jeu}
+          {t.ouJouer} {jeu}
         </h2>
         <Tirets />
       </div>

@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { ConduiteEnTete } from './DecorNeon';
 import { Lien } from '@/components/Lien';
 import { SelecteurLangue } from '@/components/SelecteurLangue';
+import type { CleTexte } from '@/i18n/textes';
+import { useLangue } from '@/i18n/useLangue';
 
 /**
  * L'en-tête, et son menu mobile.
@@ -22,14 +24,20 @@ import { SelecteurLangue } from '@/components/SelecteurLangue';
  * affirmer qu'il ne puisse tenir. Chaque entrée ci-dessous mène à une page
  * réelle.
  */
-const LIENS = [
-  { label: 'HOME', href: '/' },
-  { label: 'SLOT CATALOGUE', href: '/catalogue', chevron: true },
-  { label: 'NEW', href: '/new-releases' },
-  { label: 'REVIEWS', href: '/reviews' },
-  { label: 'DEMOS', href: '/demos' },
-  { label: 'GUIDES', href: '/guides' },
-  { label: 'FAVORITES', href: '/favorites' },
+/*
+ * Les liens portent une **clé** de texte, pas un libellé.
+ *
+ * Écrire « HOME » ici le figerait en anglais dans les trois langues. La clé
+ * est résolue au rendu, avec la langue lue dans l'URL.
+ */
+const LIENS: Array<{ cle: CleTexte; href: string; chevron?: boolean }> = [
+  { cle: 'navAccueil', href: '/' },
+  { cle: 'navCatalogue', href: '/catalogue', chevron: true },
+  { cle: 'navNouveautes', href: '/new-releases' },
+  { cle: 'navAvis', href: '/reviews' },
+  { cle: 'navDemos', href: '/demos' },
+  { cle: 'navGuides', href: '/guides' },
+  { cle: 'navFavoris', href: '/favorites' },
 ];
 
 /**
@@ -45,6 +53,7 @@ const DEPART_CONDUITE = 196;
 export function EnTete() {
   const chemin = usePathname();
   const [ouvert, setOuvert] = useState(false);
+  const { t } = useLangue();
   const actif = (href: string) => (href === '/' ? chemin === '/' : chemin.startsWith(href));
 
   return (
@@ -93,7 +102,7 @@ export function EnTete() {
                 actif(l.href) ? 'text-neon-magenta' : 'text-white/85 hover:text-neon-cyan'
               }`}
             >
-              {l.label}
+              {t[l.cle]}
               {l.chevron && <span className="ml-1 text-neon-cyan">›</span>}
               {/* La barre d'état actif, sous le mot : sur la maquette c'est
                   elle qui dit où l'on est, pas seulement la couleur — une
@@ -134,7 +143,7 @@ export function EnTete() {
                 actif(l.href) ? 'text-neon-magenta' : 'text-texte-doux'
               }`}
             >
-              {l.label}
+              {t[l.cle]}
             </Lien>
           ))}
         </nav>
