@@ -2,6 +2,27 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — Campagne Pragmatic : 275 jeux, et un écart tranché à l'œil
+
+La file Pragmatic a tourné en entier, sans tête, 15 secondes entre deux jeux :
+**275 jeux traités, 198 RTP lus au panneau, 18 sans panneau, 0 bannissement**.
+La politesse paie : la campagne BGaming s'était arrêtée sur un 1015 après
+~230 démos rapprochées ; ici, rien.
+
+**155 jeux affichent un RTP différent de celui que portait la base.** Sur 75
+d'entre eux, `resoudre-ecarts` a relu la capture en plein cadre, à double
+résolution : **75 confirmés, 0 infirmé**. Ils sont alignés sur leur panneau.
+
+**Triple Tigers a été tranché en regardant l'image.** Base 96,52, panneau
+97,52 : un point d'écart, et pile le genre de saut qu'une erreur de chiffre
+produit (6 lu 7). La double lecture ne prouve rien ici — elle dit que l'OCR
+est stable, pas qu'il a lu la bonne ligne. J'ai donc téléchargé la capture
+depuis Supabase Storage et lu le panneau : « The theoretical RTP of this game
+is 97.52 % », sur les deux pages de règles capturées. Le chiffre est bon.
+
+441 preuves écrites (43 rtpStudio, 200 volatilités, 198 gains max), toutes
+adossées à une capture qui montre la valeur. 971 fiches portent un RTP sans
+source : elles restent sans preuve, volontairement.
 ## 2026-09-11 — Ce que le contrôle d'identité écarte encore, et pourquoi c'est juste
 
 Cinq studios aux pages souvent écartées ont été simulés en entier, pages
