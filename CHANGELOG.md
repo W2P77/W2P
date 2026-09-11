@@ -2,6 +2,26 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — Une page écartée dit pourquoi, et Starburst XXXtreme reste en doute
+
+Chaque page que le contrôle d'identité écarte est désormais **nommée dans le
+rapport** avec le titre qu'elle porte (`og:title` d'abord, puis `<title>`, puis
+`h1`). C'est ce qui sépare une vraie fausse page — « Game Not Found » chez
+Amusnet et Peter & Sons, statut 200, sans redirection — d'une page juste dont le
+titre est formulé autrement que notre nom.
+
+**Starburst XXXtreme, 96,45 %, porte une note de doute.** La page produit de
+NetEnt affiche 96,45 % sans rien préciser. Mais la fiche de BetsRank écrit :
+« NetEnt publie un RTP de 96,26 % en jeu standard, qui passe à 96,45 % lorsque
+les XXXtreme Spins sont activés ». Si c'est exact, 96,45 % est le taux **avec
+fonction**, et il ne peut pas être le RTP du jeu. BetsRank a été remis à
+96,26 % ; la confrontation continuera de signaler cet écart, volontairement,
+jusqu'à ce qu'une source du studio tranche.
+
+Côté BetsRank, l'outil d'arbitrage de la base a été doté de gardes de phrase
+après avoir abîmé 39 phrases nuancées dans la journée — restaurées depuis les
+sauvegardes. Voir son carnet.
+
 ## 2026-09-11 — 3 350 RTP lus sur les pages produit de trente studios
 
 Le lecteur générique appliqué à trente studios : **3 350 fiches reçoivent un
