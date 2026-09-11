@@ -119,12 +119,21 @@ export function titreFiable(titre: string): boolean {
   return vocabulaireTenu(titre);
 }
 
+/*
+ * L'ordre compte : « very high » doit être essayé avant « high », sinon la
+ * seconde règle l'attrape et rend HAUTE. Et la forme inversée
+ * « Volatility: High » de Hacksaw ne ressemble à aucune des précédentes.
+ */
 const VOLATILITES: Array<[RegExp, FaitsLus['volatilite']]> = [
   [/very\s+high\s+volatility/i, 'TRES_HAUTE'],
-  [/high\s+volatility/i, 'HAUTE'],
+  [/volatility\s*:?\s*very\s+high/i, 'TRES_HAUTE'],
   [/medium\s*-?\s*high\s+volatility/i, 'HAUTE'],
+  [/high\s+volatility/i, 'HAUTE'],
+  [/volatility\s*:?\s*high/i, 'HAUTE'],
   [/medium\s+volatility/i, 'MOYENNE'],
+  [/volatility\s*:?\s*medium/i, 'MOYENNE'],
   [/low\s+volatility/i, 'BASSE'],
+  [/volatility\s*:?\s*low/i, 'BASSE'],
 ];
 
 /** Un nombre écrit par un moteur d'OCR : virgules, espaces, points parasites. */
@@ -257,6 +266,19 @@ export async function lireLesRegles(cheminsPng: string[]): Promise<FaitsLus> {
     await ouvrier.terminate();
   }
 
+  return extraireLesFaits(texte, pages);
+}
+
+/**
+ * Les faits, à partir du texte brut — sans OCR ni fichier.
+ *
+ * Séparer la lecture de l'interprétation est ce qui rend l'interprétation
+ * testable. Tant qu'elle vivait à l'intérieur de `lireLesRegles`, vérifier
+ * qu'on sait lire « Theoretical payout (RTP): 96.43% » demandait de fabriquer
+ * une image PNG et de faire tourner Tesseract : personne ne le faisait, et les
+ * formulations d'un nouveau studio n'étaient découvertes qu'en production.
+ */
+export function extraireLesFaits(texte: string, pages: FaitsLus['pages'] = []): FaitsLus {
   const t = texte.replace(/\s+/g, ' ');
 
   /*
@@ -287,8 +309,15 @@ export async function lireLesRegles(cheminsPng: string[]): Promise<FaitsLus> {
    */
   const CHIFFRE = '(\\d{2}\\s?[.,]\\s?\\d{1,2})';
   const jusquAuNombre = '(?:(?!BUY|using|USING)[^0-9]){0,40}';
+  /*
+   * Chaque studio a sa formule, et le mot « RTP » n'y est pas toujours nu.
+   * Pragmatic écrit « The theoretical RTP of this game is 96.00% », Hacksaw
+   * « Theoretical payout (RTP): 96.43% ». Exiger `RTP` juste après le mot-clé
+   * rendait donc **null** sur un panneau Hacksaw parfaitement lisible.
+   */
+  const APRES_LE_MOT = '\\s+(?:payout\\s*)?\\(?\\s*RTP\\s*\\)?';
   const lire = (mot: string) =>
-    new RegExp(`${mot}\\s+RTP${jusquAuNombre}${CHIFFRE}`, 'i').exec(t)?.[1] ?? null;
+    new RegExp(`${mot}${APRES_LE_MOT}${jusquAuNombre}${CHIFFRE}`, 'i').exec(t)?.[1] ?? null;
 
   const brutHaut = lire('theoretical') ?? lire('maximum');
   const brutBas = lire('minimum');
@@ -297,11 +326,13 @@ export async function lireLesRegles(cheminsPng: string[]): Promise<FaitsLus> {
 
   const minLu = /MINIMUM\s+BET[^0-9]{0,12}([\d.,]+)/i.exec(t);
   const maxLu = /MAXIMUM\s+BET[^0-9]{0,12}([\d.,]+)/i.exec(t);
-  // Deux formulations, là encore : « maximum theoretical win is 5,000x » et
-  // « the maximum win amount is limited to 5,000x bet ».
+  // Trois formulations : « maximum theoretical win is 5,000x » et « the
+  // maximum win amount is limited to 5,000x bet » chez Pragmatic, « Maximum
+  // achievable win: 10,000x » chez Hacksaw.
   const gainLu =
     /maximum\s+theoretical\s+win[^0-9]{0,40}([\d.,]+)\s*x/i.exec(t) ??
-    /maximum\s+win\s+amount\s+is\s+limited\s+to\s+([\d.,]+)\s*x/i.exec(t);
+    /maximum\s+win\s+amount\s+is\s+limited\s+to\s+([\d.,]+)\s*x/i.exec(t) ??
+    /maximum\s+achievable\s+win[^0-9]{0,40}([\d.,]+)\s*x/i.exec(t);
   const freqLu = /chance\s+to\s+hit\s+of\s+1\s+in\s+([\d.,]+)/i.exec(t);
 
   const volatilite = VOLATILITES.find(([r]) => r.test(t))?.[1] ?? null;

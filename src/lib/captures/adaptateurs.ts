@@ -33,6 +33,28 @@ export interface Adaptateur {
   studio: string;
   /** Le temps de chargement du jeu, mesuré et non deviné. */
   chargementMs: number;
+
+  /**
+   * À quoi reconnaît-on une `demoUrl` exploitable chez ce studio.
+   *
+   * Pragmatic publie un lanceur (`openGame.do?gameSymbol=…`) ; Hacksaw met en
+   * base l'adresse de sa **page produit**, depuis laquelle l'adaptateur va
+   * chercher la démo. Le runner filtrait en dur sur `openGame.do` : tout autre
+   * studio ressortait avec zéro jeu à capturer, sans erreur — un lot vide et
+   * un lot impossible se ressemblent trop.
+   */
+  demoExploitable?(url: string): boolean;
+
+  /**
+   * Ce studio exige-t-il un navigateur avec tête ?
+   *
+   * Le RGS de démo de Hacksaw est derrière Cloudflare, qui refuse un Chromium
+   * sans tête : `play/authenticate` part en `net::ERR_FAILED` et le jeu
+   * affiche « Connection lost to wallet ». Avec tête, le même code passe. Ce
+   * n'est pas réparable dans l'adaptateur, qui ne reçoit qu'une `Page` déjà
+   * née.
+   */
+  avecTete?: boolean;
   /** Ferme l'écran d'accueil, s'il y en a un. */
   ouvrirLeJeu(page: Page): Promise<void>;
   /**
@@ -65,6 +87,9 @@ export interface Adaptateur {
 export const PRAGMATIC: Adaptateur = {
   studio: 'pragmatic-play',
   chargementMs: 30_000,
+
+  /** Leur lanceur de démo, le seul qui ouvre un jeu jouable. */
+  demoExploitable: (url) => url.includes('openGame.do'),
 
   /**
    * Ferme l'écran d'accueil : **la touche Espace**.
@@ -231,6 +256,9 @@ export const PRAGMATIC: Adaptateur = {
   },
 };
 
+import { HACKSAW } from './adaptateur-hacksaw';
+
 export const ADAPTATEURS: Record<string, Adaptateur> = {
   'pragmatic-play': PRAGMATIC,
+  'hacksaw-gaming': HACKSAW,
 };

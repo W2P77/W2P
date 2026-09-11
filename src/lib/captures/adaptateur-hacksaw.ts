@@ -74,6 +74,12 @@ async function visible(page: Page, id: string): Promise<boolean> {
 export const HACKSAW: Adaptateur = {
   studio: 'hacksaw-gaming',
 
+  /** Leur `demoUrl` est la page produit : c'est de là qu'on part. */
+  demoExploitable: (url) => /hacksawgaming\.com\/games\//.test(url),
+
+  /** Cloudflare refuse un Chromium sans tête devant leur RGS de démo. */
+  avecTete: true,
+
   /**
    * Trois secondes, et non trente comme chez Pragmatic — parce que ce délai
    * ne porte pas sur le jeu.

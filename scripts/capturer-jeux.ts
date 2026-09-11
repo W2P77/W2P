@@ -48,7 +48,18 @@ const ATELIER = resolve(process.cwd(), 'public/images/captures');
 const CHROME = process.env.CHROME_BIN ?? '';
 const PARALLELE = 2;
 
+/*
+ * Les deux écritures, parce que les deux existent dans le dépôt.
+ *
+ * Ce script lisait `--studio hacksaw-gaming` quand les autres lisent
+ * `--studio=hacksaw-gaming`. La forme avec signe égal ne rendait rien, le
+ * défaut s'appliquait, et la campagne partait **sur Pragmatic** en l'annonçant
+ * dans son journal — que personne ne relit ligne à ligne. Une option ignorée
+ * doit rester impossible.
+ */
 function arg(nom: string): string | undefined {
+  const colle = process.argv.find((a) => a.startsWith(`--${nom}=`));
+  if (colle) return colle.slice(nom.length + 3);
   const i = process.argv.indexOf(`--${nom}`);
   return i >= 0 ? process.argv[i + 1] : undefined;
 }
@@ -283,21 +294,37 @@ async function main() {
     adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
   });
 
-  const jeux = await prisma.jeu.findMany({
-    where: {
-      studio: { slug: studio },
-      demoUrl: { contains: 'openGame.do' },
-      capturesLe: null,
-    },
+  /*
+   * Le filtre de `demoUrl` appartient à l'adaptateur, pas au runner.
+   *
+   * Il était écrit en dur sur `openGame.do`, le lanceur de Pragmatic : tout
+   * autre studio ressortait avec « 0 jeux à capturer » sans la moindre erreur.
+   * Un lot vide et un lot impossible se ressemblent trop pour qu'on laisse la
+   * question au runner.
+   */
+  const candidats = await prisma.jeu.findMany({
+    where: { studio: { slug: studio }, demoUrl: { not: null }, capturesLe: null },
     select: { id: true, slug: true, nom: true, demoUrl: true, rtpStudio: true },
     orderBy: { nom: 'asc' },
-    take: limite,
   });
-  console.log(`${jeux.length} jeux à capturer (studio ${studio}).\n`);
+  const exploitable = adaptateur.demoExploitable ?? (() => true);
+  const jeux = candidats.filter((j) => exploitable(j.demoUrl!)).slice(0, limite);
+
+  const ecartes = candidats.length - candidats.filter((j) => exploitable(j.demoUrl!)).length;
+  console.log(
+    `${jeux.length} jeux à capturer (studio ${studio})` +
+      (ecartes ? ` — ${ecartes} écartés, leur demoUrl n'est pas exploitable par cet adaptateur.` : '') +
+      '\n',
+  );
+  if (!jeux.length && candidats.length) {
+    console.log('Aucune demoUrl exploitable : vérifier `demoExploitable` de l\'adaptateur.');
+  }
 
   mkdirSync(ATELIER, { recursive: true });
   const nav = await chromium.launch({
     executablePath: CHROME || undefined,
+    // Cloudflare refuse un Chromium sans tête devant certains RGS de démo.
+    headless: !adaptateur.avecTete,
     args: ['--autoplay-policy=no-user-gesture-required'],
   });
 

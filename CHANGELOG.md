@@ -2,6 +2,51 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — Hacksaw capture enfin, et une option qui lançait le mauvais studio
+
+Le catalogue compte 10 430 fiches et **245 sont prêtes**. Ajouter des noms ne
+sert plus à rien : ce qui manque, ce sont les faits. Or la chaîne de capture ne
+tournait que sur Pragmatic, alors que trois adaptateurs étaient écrits.
+
+L'adaptateur Hacksaw était complet depuis des semaines et ne pouvait
+matériellement pas aboutir, pour deux raisons qui ne lui appartenaient pas :
+
+- **Le filtre de `demoUrl` était écrit en dur dans le runner**, sur
+  `openGame.do` — le lanceur de Pragmatic. Hacksaw met en base l'adresse de sa
+  page produit : le lot sortait vide, sans erreur. Le filtre appartient
+  désormais à l'adaptateur (`demoExploitable`), et le runner dit combien de
+  jeux il écarte et pourquoi.
+- **Cloudflare refuse un Chromium sans tête** devant leur RGS de démo :
+  `play/authenticate` part en `net::ERR_FAILED` et le jeu affiche « Connection
+  lost to wallet ». L'adaptateur déclare maintenant `avecTete`, et le runner
+  ouvre le navigateur en conséquence.
+
+Premier jeu capturé de bout en bout : `2-wild-2-die`, RTP 96,25 lu dans le
+panneau, dix captures.
+
+### L'option qui lançait le mauvais studio
+
+`--studio=hacksaw-gaming` ne rendait rien : ce script lisait la forme séparée
+par une espace quand tous les autres lisent la forme collée. Le défaut
+s'appliquait donc, et la campagne partait **sur Pragmatic** en l'annonçant dans
+son journal — que personne ne relit ligne à ligne. Les deux écritures sont
+acceptées. Une option ignorée doit rester impossible.
+
+### L'interprétation sortie de l'OCR
+
+Chaque studio a sa formule : Pragmatic écrit « The theoretical RTP of this game
+is 96.07% », Hacksaw « Theoretical payout (RTP): 96.43% ». Exiger `RTP` juste
+après le mot-clé rendait **null** sur un panneau parfaitement lisible. Idem
+pour « Maximum achievable win » et pour « Volatility: High », dont l'ordre des
+mots est inversé.
+
+Vérifier ces formulations demandait jusqu'ici de fabriquer une image PNG et de
+faire tourner Tesseract — donc personne ne le faisait, et une formule inconnue
+ne se découvrait qu'en production, sous la forme d'un champ resté vide.
+`extraireLesFaits(texte)` est maintenant une fonction pure, et treize tests
+couvrent les formules des deux studios, le refus du RTP d'achat de bonus, les
+bornes de vraisemblance et l'ordre « very high » avant « high ».
+
 ## 2026-09-11 — La bonne mesure n'est pas le nombre de fiches
 
 Décision prise avec le propriétaire : **on ne court pas après les 52 513 jeux
