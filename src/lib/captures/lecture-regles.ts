@@ -334,8 +334,30 @@ export function extraireLesFaits(texte: string, pages: FaitsLus['pages'] = []): 
   const lire = (mot: string) =>
     new RegExp(`${mot}${APRES_LE_MOT}${jusquAuNombre}${CHIFFRE}`, 'i').exec(t)?.[1] ?? null;
 
-  const brutHaut = lire('theoretical') ?? lire('maximum');
-  const brutBas = lire('minimum');
+  let brutHaut = lire('theoretical') ?? lire('maximum');
+  let brutBas = lire('minimum');
+
+  /*
+   * Une plage dans la même phrase.
+   *
+   * BGaming écrit, pour ses jeux à stratégie : « The overall theoretical Return
+   * to Player (RTP) is 89,41 - 94,00% depending on the player's strategy »
+   * (Four Lucky Clover). `lire` s'arrête au premier nombre, qui est le **bas**
+   * de la plage : la fiche annonçait 89,41 % pour un jeu qui rend 94 % joué
+   * correctement. La double lecture ne l'a pas vu — ses deux lectures passent
+   * par cette même interprétation. Le haut est le défaut, le bas un palier :
+   * la convention de « maximum RTP / minimum RTP ».
+   */
+  const plage = new RegExp(
+    `theoretical${APRES_LE_MOT}${jusquAuNombre}${CHIFFRE}\\s*[-–—]\\s*${CHIFFRE}\\s?%`,
+    'i',
+  ).exec(t);
+  if (plage) {
+    const [a, b] = [plage[1], plage[2]];
+    const hautEnPremier = (nombre(a) ?? 0) >= (nombre(b) ?? 0);
+    brutHaut = hautEnPremier ? a : b;
+    brutBas = hautEnPremier ? b : a;
+  }
   const rtp = nombre(brutHaut ?? '');
   const rtpMin = brutBas ? nombre(brutBas) : null;
 

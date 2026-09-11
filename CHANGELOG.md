@@ -2,6 +2,29 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — La double lecture ne voit pas une mauvaise phrase
+
+Avant d'écrire dans BetsRank les 33 RTP BGaming qui le contredisaient, les sept
+plus gros écarts ont été relus **dans leur phrase**. Deux étaient faux chez
+nous, et la double lecture les avait confirmés.
+
+BGaming écrit, pour ses jeux à stratégie : « The overall theoretical Return to
+Player (RTP) is **89,41 - 94,00%** depending on the player's strategy ».
+L'extraction s'arrêtait au premier nombre — le **bas** de la plage. Four Lucky
+Clover passait à 89,41 % au lieu de 94 %, Four Lucky Diamonds à 92,84 % au lieu
+de 94,03 %. Et BetsRank, qu'on s'apprêtait à « corriger », avait raison pour le
+second.
+
+**Pourquoi la double lecture n'a rien vu** : ses deux lectures passent par la
+même interprétation. Elle prouve que l'OCR est stable, pas qu'on a lu la bonne
+phrase. Le vrai contrôle, pour un écart important, reste de relire la phrase.
+
+L'extraction lit désormais une plage « A - B % » par son haut, le bas devenant
+un palier (la convention de « maximum RTP / minimum RTP »). Un test recopié du
+texte OCR. Les 116 fiches BGaming sourcées ont été relues à la recherche d'une
+plage : **ces deux-là seulement**, corrigées en base avec leur palier, leur
+légende et une note sur la preuve.
+
 ## 2026-09-11 — Le runner s'arrête sur un ban, et le post-traitement BGaming
 
 ### S'arrêter au lieu de s'enfoncer

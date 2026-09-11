@@ -46,6 +46,18 @@ describe('le RTP, selon la formule du studio', () => {
     expect(extraireLesFaits('The theoretical RTP of this game uses 20 lines').rtp).toBeNull();
   });
 
+  /*
+   * Recopié de l'OCR de Four Lucky Clover. Le premier nombre est le bas : le
+   * prendre pour le taux publiait 89,41 % au lieu de 94 %.
+   */
+  it('lit une plage « A - B % » dans la même phrase par son haut', () => {
+    const f = extraireLesFaits(
+      "Return to Player The overall theoretical Return to Player (RTP) is 89,41 - 94,00% depending on the player's strategy.",
+    );
+    expect(f.rtp).toBe(94);
+    expect(f.rtpMin).toBe(89.41);
+  });
+
   it('lit une plage comme un défaut et un palier', () => {
     const f = extraireLesFaits(
       'The maximum RTP of this game is 96.03% The minimum RTP of this game is 94.02%',
