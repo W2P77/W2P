@@ -2,6 +2,39 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — 73 RTP corrigés, et deux lectures valent mieux qu'une
+
+Quand le panneau d'un jeu contredit la base, `capturer-jeux` n'écrase pas — un
+OCR peut prendre un 6 pour un 7. Mais il publie les captures quand même, et la
+fiche montre alors le jeu annonçant 97,1 % à côté d'un chiffre qui dit 96,1 %.
+L'écart, lui, n'était consigné nulle part : une ligne de console. La campagne
+Hacksaw a tourné en mode réel, son journal a disparu avec `/tmp`.
+
+Il n'était pas perdu. La capture qui porte le RTP garde sa légende (« Stated by
+the game itself: RTP 97.1% »). En comparant ce chiffre à la base :
+**429 fiches capturées, 308 en accord, 73 en écart** — 63 Pragmatic, 10 Hacksaw.
+
+### La règle : une seconde lecture indépendante
+
+`scripts/resoudre-ecarts.ts` retélécharge chaque capture porteuse et la relit
+**autrement** : plein cadre, sans le recadrage de la première lecture, à double
+résolution. Le panneau ne remplace la base que si les deux lectures tombent sur
+le même chiffre.
+
+**73 confirmés, 0 infirmé, 0 illisible.** Le motif dit d'où venait l'erreur :
+la plupart partaient de `96,5` — le chiffre rond de l'import, remplacé par la
+vraie valeur (`96,03`, `96,07`, `96,52`…). Les plus gros : `lady-godiva-slot`
+94,05 → 96,54, `dwarf-dragon` 95,54 → 96,59, `beware-the-deep-megaways`
+97,47 → 96,54. Chaque correction laisse une preuve signée `double-lecture` qui
+nomme la valeur remplacée.
+
+### Le runner, corrigé en conséquence
+
+Sur un écart, la volatilité et le gain maximum étaient écrits quand même, alors
+qu'ils sortent de la lecture qu'on venait de juger douteuse. Ils suivent
+désormais le sort du RTP. Et le runner annonce en fin de campagne le nombre
+d'écarts et le script qui les tranche.
+
 ## 2026-09-11 — BGaming capture, et lit mieux que notre base
 
 L'adaptateur BGaming était écrit depuis des semaines et n'avait jamais tourné.

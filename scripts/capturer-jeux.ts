@@ -362,8 +362,16 @@ async function main() {
               confiance: 'STUDIO' as const,
             }
           : {}),
-        ...(r.volatilite ? { volatilite: r.volatilite as never } : {}),
-        ...(r.gainMax != null ? { gainMaxMultiple: Math.round(r.gainMax) } : {}),
+        /*
+         * La volatilité et le gain maximum suivent le sort du RTP.
+         *
+         * Ils sortent de la même lecture : quand elle contredit la base sur le
+         * RTP, rien ne dit qu'elle a lu juste le reste. Les écrire quand même
+         * mettait en base, sous l'apparence d'un fait lu, deux valeurs issues
+         * d'une lecture qu'on venait de juger douteuse.
+         */
+        ...(r.volatilite && !r.ecart ? { volatilite: r.volatilite as never } : {}),
+        ...(r.gainMax != null && !r.ecart ? { gainMaxMultiple: Math.round(r.gainMax) } : {}),
       },
     });
     // Le dossier de travail ne garde rien : les images vivent chez Supabase.
@@ -400,6 +408,18 @@ async function main() {
 
   const verifies = await prisma.jeu.count({ where: { rtpConfiance: 'STUDIO' } });
   console.log(`\n${resultats.length} jeux publiés. ${verifies} fiches en source studio.`);
+  /*
+   * Un écart ne s'affichait qu'une fois, dans la console. La campagne Hacksaw
+   * du 11/09/2026 a tourné en mode réel et son journal a disparu avec /tmp :
+   * ses désaccords ne se retrouvaient plus qu'en relisant les légendes.
+   */
+  const nbEcarts = resultats.filter((r) => r.ecart).length;
+  if (nbEcarts) {
+    console.log(
+      `${nbEcarts} fiches où le panneau contredit la base : leurs captures sont publiées, ` +
+        'leur RTP non. Trancher avec `scripts/resoudre-ecarts.ts`.',
+    );
+  }
   await fermerLeLecteur();
   await prisma.$disconnect();
 }
