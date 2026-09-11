@@ -1,0 +1,213 @@
+/*
+ * Transformer un rapport de prospection en studios et en fiches WIP.
+ *
+ * ── Pourquoi c'est un second script ───────────────────────────────────────
+ *
+ * `prospecter-studios.ts` devine. Ce script écrit. Les séparer donne le point
+ * d'arrêt où quelqu'un relit avant que la base bouge : un domaine mal deviné
+ * remplirait le catalogue de jeux qui n'existent pas, et c'est précisément ce
+ * qu'on s'interdit.
+ *
+ * Il ne fait pas confiance au rapport sur parole : il relit le sitemap qui y
+ * est consigné et refiltre avec le motif retenu. Le rapport dit où regarder,
+ * pas ce qu'il faut croire.
+ *
+ *   npx tsx --env-file=.env.local scripts/adopter-prospection.ts --rapport=/tmp/prospection-220.json
+ *   … --appliquer          écrit vraiment
+ *   … --avec-racine        inclut les catalogues servis sans préfixe d'URL
+ *   … --min=25             relève le plancher (défaut 15)
+ */
+
+import { readFileSync } from 'node:fs';
+
+import { prisma } from '@/lib/donnees/prisma';
+import { locsDuTexte, slugDepuisUrl } from '@/lib/inventaire/sources';
+
+const arg = (nom: string) =>
+  process.argv.find((a) => a.startsWith(`--${nom}=`))?.split('=').slice(1).join('=');
+const APPLIQUER = process.argv.includes('--appliquer');
+const AVEC_RACINE = process.argv.includes('--avec-racine');
+const MIN = Number(arg('min') ?? 15);
+
+const UA =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36';
+
+interface Piste {
+  studio: string;
+  domaine: string | null;
+  sitemap: string | null;
+  motif: string | null;
+  jeux: number;
+  confiance?: 'prefixe' | 'racine';
+}
+
+function nomDepuisSlug(slug: string): string {
+  return slug
+    .split('-')
+    .map((mot) => (mot.length <= 2 ? mot : mot[0].toUpperCase() + mot.slice(1)))
+    .join(' ');
+}
+
+async function recuperer(url: string): Promise<string> {
+  const r = await fetch(url, {
+    headers: { 'user-agent': UA },
+    signal: AbortSignal.timeout(30000),
+    redirect: 'follow',
+  });
+  if (!r.ok) throw new Error(`${r.status} sur ${url}`);
+  return r.text();
+}
+
+/** Les URL de jeux d'une piste, relues à la source. */
+async function jeuxDeLaPiste(piste: Piste): Promise<string[]> {
+  if (!piste.sitemap || !piste.motif || !piste.domaine) return [];
+  const prefixe = piste.motif.replace(/\/<slug>$/, '');
+  const texte = await recuperer(piste.sitemap);
+
+  let urls = locsDuTexte(texte);
+  if (/<sitemapindex/i.test(texte)) {
+    const sous = urls.filter((u) => /game|slot|product|portfolio/i.test(u)).slice(0, 4);
+    const tout: string[] = [];
+    for (const s of sous.length ? sous : urls.slice(0, 3)) {
+      try {
+        tout.push(...locsDuTexte(await recuperer(s)));
+      } catch {
+        /* un sous-sitemap injoignable ne fait pas échouer la piste */
+      }
+    }
+    urls = tout;
+  }
+
+  const hote = new URL(piste.domaine).hostname.replace(/^www\./, '');
+  return [...new Set(urls)].filter((u) => {
+    try {
+      const p = new URL(u);
+      if (p.hostname.replace(/^www\./, '') !== hote) return false;
+      const chemin = p.pathname.replace(/\/+$/, '');
+      const segments = chemin.split('/').filter(Boolean);
+      if (!segments.length) return false;
+      const parent = '/' + segments.slice(0, -1).join('/');
+      return parent === (prefixe || '/');
+    } catch {
+      return false;
+    }
+  });
+}
+
+async function main() {
+  const chemin = arg('rapport') ?? '/tmp/prospection.json';
+  const pistes: Piste[] = JSON.parse(readFileSync(chemin, 'utf8'));
+
+  const retenues = pistes.filter(
+    (p) => p.jeux >= MIN && p.sitemap && p.motif && (AVEC_RACINE || p.confiance !== 'racine'),
+  );
+  const ecartees = pistes.filter((p) => p.jeux > 0 && !retenues.includes(p));
+
+  console.log(`${pistes.length} pistes lues · ${retenues.length} retenues · ${ecartees.length} écartées\n`);
+  if (ecartees.length) {
+    console.log('Écartées :');
+    for (const e of ecartees) {
+      const pourquoi = e.confiance === 'racine' ? 'servie à la racine (--avec-racine pour l\'inclure)' : `moins de ${MIN} jeux`;
+      console.log(`  ${e.studio.padEnd(16)} ${String(e.jeux).padStart(4)} jeux — ${pourquoi}`);
+    }
+    console.log();
+  }
+
+  console.log('studio             trouvés  créés  déjà là  collisions  jumeaux');
+  console.log('─'.repeat(70));
+
+  let totalCrees = 0;
+  const incidents: string[] = [];
+
+  for (const piste of retenues) {
+    let urls: string[];
+    try {
+      urls = await jeuxDeLaPiste(piste);
+    } catch (e) {
+      console.log(`${piste.studio.padEnd(18)}  ${e instanceof Error ? e.message : 'échec'}`);
+      continue;
+    }
+
+    const slugs = [...new Set(urls.map(slugDepuisUrl))].filter(Boolean);
+    if (slugs.length < MIN) {
+      console.log(`${piste.studio.padEnd(18)}  ${slugs.length} seulement à la relecture — piste abandonnée`);
+      continue;
+    }
+
+    let studio = await prisma.studio.findUnique({ where: { slug: piste.studio } });
+    if (!studio && APPLIQUER) {
+      studio = await prisma.studio.create({
+        data: {
+          slug: piste.studio,
+          nom: nomDepuisSlug(piste.studio),
+          siteUrl: piste.domaine,
+          ouSourcer: `${piste.sitemap} — familles ${piste.motif}`,
+        },
+      });
+    }
+
+    const nos = studio
+      ? await prisma.jeu.findMany({ where: { studioId: studio.id }, select: { slug: true } })
+      : [];
+    const chezNous = new Set(nos.map((j) => j.slug));
+    const manquants = slugs.filter((s) => !chezNous.has(s));
+
+    let crees = 0;
+    let collisions = 0;
+    let jumeaux = 0;
+
+    if (APPLIQUER && studio) {
+      // `Jeu.slug` est unique globalement : un slug pris ailleurs n'est pas
+      // forcément le même jeu, et on ne tranche pas à la place de quelqu'un.
+      const pris = new Set(
+        (await prisma.jeu.findMany({ where: { slug: { in: manquants } }, select: { slug: true } })).map(
+          (j) => j.slug,
+        ),
+      );
+      // Le même jeu sous deux orthographes — cf. `inventorier-studios.ts`.
+      const colle = (v: string) => v.replace(/[^a-z0-9]/g, '');
+      const nosCollees = new Set(nos.map((j) => colle(j.slug)));
+
+      for (const slug of manquants) {
+        if (pris.has(slug)) {
+          collisions += 1;
+          incidents.push(`${piste.studio}/${slug} — slug déjà pris`);
+          continue;
+        }
+        if (nosCollees.has(colle(slug))) {
+          jumeaux += 1;
+          continue;
+        }
+        await prisma.jeu.create({ data: { slug, nom: nomDepuisSlug(slug), studioId: studio.id } });
+        crees += 1;
+      }
+    } else {
+      crees = manquants.length;
+    }
+
+    totalCrees += crees;
+    console.log(
+      piste.studio.padEnd(18) +
+        String(slugs.length).padStart(7) +
+        String(crees).padStart(7) +
+        String(chezNous.size).padStart(9) +
+        String(collisions).padStart(12) +
+        String(jumeaux).padStart(9),
+    );
+  }
+
+  console.log('─'.repeat(70));
+  console.log(
+    APPLIQUER
+      ? `\n${totalCrees} fiches créées, sans aucune donnée inventée.`
+      : `\nSIMULATION — ${totalCrees} fiches seraient créées. Ajouter --appliquer.`,
+  );
+  if (incidents.length) {
+    console.log(`\n${incidents.length} slugs déjà pris ailleurs, non créés :`);
+    for (const i of incidents.slice(0, 15)) console.log(`  ${i}`);
+    if (incidents.length > 15) console.log(`  … et ${incidents.length - 15} autres.`);
+  }
+  console.log('Elles restent hors index et hors sitemap tant qu\'elles n\'ont pas de RTP.\n');
+}
+
+main().finally(() => prisma.$disconnect());

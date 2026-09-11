@@ -2,6 +2,51 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — Un prospecteur, parce qu'on ne peut pas écrire mille adaptateurs
+
+Objectif fixé : porter le catalogue au niveau de SlotCatalog, qui annonce
+**52 513 jeux de 1 280 fournisseurs** sur sa propre page « About Us ». On ne
+copie pas leur base — leur sitemap est derrière un challenge Cloudflare, et
+leur catalogue leur appartient. Les jeux, on les reconstruit depuis les sites
+des studios.
+
+À mille studios, écrire un adaptateur à la main coûte un mois. D'où
+`scripts/prospecter-studios.ts` : on lui donne un nom de studio, il cherche son
+domaine, lit son robots.txt, descend dans son sitemap et devine la famille
+d'URL qui porte les jeux. Il rend un rapport et **n'écrit rien**.
+
+`scripts/adopter-prospection.ts` fait l'autre moitié : il relit le sitemap
+consigné dans le rapport, refiltre avec le motif retenu, crée le studio s'il
+manque et les fiches WIP. Deux scripts plutôt qu'un, pour garder le point
+d'arrêt où quelqu'un relit avant que la base bouge.
+
+### Trois garde-fous, tous payés d'avance
+
+**Le domaine parqué.** Un nom de studio est souvent un mot courant — `mascot`,
+`platipus`, `tada`. Le .com correspondant appartient fréquemment à quelqu'un
+d'autre. Le prospecteur exige donc qu'un mot du métier (slot, RTP, volatility,
+jackpot…) figure sur la page d'accueil avant d'aller plus loin. Sans ça, on
+aurait inventorié le catalogue d'une boutique de déguisements.
+
+**Le plancher à quinze.** Premier jet : Playtech rendait « 10 jeux » sous
+`/products/` et Amatic « 9 » — des pages d'offre commerciale B2B qui portent
+par hasard un mot du métier. Un studio qui publie vraiment son catalogue en
+aligne des dizaines. Sous quinze, on ne conclut pas.
+
+**La racine.** Mascot sert ses jeux sans préfixe (`mascot.games/<slug>`, 211
+pages) : exiger un dossier les rendait invisibles. On accepte la racine, mais
+seulement au-delà de cinquante pages, et le rapport la marque `⚠ racine` —
+`/about` et `/contact` y vivent aussi, une relecture s'impose avant d'en faire
+des fiches.
+
+### Ce qu'un échec raconte
+
+Un studio manqué rend désormais les trois familles d'URL les plus peuplées de
+son sitemap. `platipus → //… ×5` dit tout de suite que le catalogue est en
+JavaScript et qu'aucun sitemap ne le portera ; `amatic → /products/… ×9` dit
+que c'est une vitrine. Chaque échec devient une ligne d'adaptateur à écrire au
+lieu d'une enquête à refaire.
+
 ## 2026-09-11 — Les 27 studios sont enfin tous rangés quelque part
 
 Après les sept premiers, il restait douze studios ni inventoriés ni expliqués —
