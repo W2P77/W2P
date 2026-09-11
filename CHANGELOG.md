@@ -2,6 +2,38 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — 508 RTP lus sur les pages produit, et 16 écarts Pragmatic tranchés
+
+Les lecteurs de fiches produit ont été appliqués aux trois studios dont la page
+publie le RTP en HTML. Aucune donnée inventée : un champ n'est rempli que si la
+page l'énonce sans ambiguïté, et le panneau du jeu garde toujours le dernier mot.
+
+| studio | pages | RTP ajoutés | confirmés | remplacés | désaccords (panneau gardé) | sans chiffre |
+|---|---|---|---|---|---|---|
+| NetEnt | 236 | 210 | 20 | 2 | 0 | 3 |
+| Endorphina | 234 | 218 | 4 | 0 | 0 | 10 |
+| BGaming | 343 | 80 | 172 | 13 | 8 | 69 |
+
+Chez BGaming, **172 pages confirment le chiffre déjà en base**, dont la centaine
+lue au panneau : c'est la validation croisée qui manquait au lecteur. Les 8
+désaccords restants sont sains — le jeu dit clairement 96,1 %, la page arrondit
+autrement — et le panneau l'emporte. Les remplacements de plus d'un demi-point
+ont été relus dans leur phrase avant écriture : Mice & Magic Wonder Spin
+(96,93 → 94,96 %, écrit deux fois sur la page, sans plage ni variante),
+Treasure Explorer (96 → 97,07 %), Fiesta Clusters (97,5 → 97 %).
+
+Chez Endorphina, les 10 pages « sans chiffre » incluent Satoshi's Secret, dont
+le lecteur a refusé le bas de plage (« ranges from 89.83% ») au lieu de le
+publier comme taux.
+
+**La campagne Pragmatic** sur la file des jeux déjà échoués a produit 16 écarts
+avec la base, tous partis du 96,5 % rond de l'import : 16 confirmés par double
+lecture, aucun infirmé, le plus gros d'un demi-point.
+
+Les faits vérifiés exportés vers BetsRank passent de 516 à **1 150**. Confrontés
+au catalogue de BetsRank : 642 identiques après arbitrage, 508 portent sur des
+jeux que BetsRank ne catalogue pas.
+
 ## 2026-09-11 — Jackpot, plage et « Medium-Low » : trois lectures fausses arrêtées
 
 La page produit a validé le panneau sur 168 fiches BGaming — et en a
