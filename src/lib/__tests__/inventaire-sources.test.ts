@@ -39,6 +39,23 @@ describe('slug déduit de l’URL', () => {
   });
 
   /*
+   * Dragon Gaming met la langue en paramètre : `/games/x/?lang=zh-hans`. Sans
+   * couper la requête, le dernier segment est `?lang=zh-hans` et tous ses jeux
+   * traduits tombent sur le slug « lang-zh-hans ».
+   */
+  it('coupe la requête et l’ancre avant de lire le slug', () => {
+    expect(slugDepuisUrl('https://x.test/games/mythical-creatures/?lang=zh-hans')).toBe(
+      'mythical-creatures',
+    );
+    expect(slugDepuisUrl('https://x.test/games/a-b#regles')).toBe('a-b');
+  });
+
+  /* Merkur et Push Gaming servent des `.html`. */
+  it('coupe une extension de fichier', () => {
+    expect(slugDepuisUrl('https://merkur.com/en/games/articles/jokers-cap.html')).toBe('jokers-cap');
+  });
+
+  /*
    * Habanero nomme ses pages avec un identifiant interne. Sans son crochet,
    * `SGKoiGate` devient `sgkoigate` : aucun slug de la base ne lui ressemble,
    * et son catalogue entier serait compté deux fois — 226 manquants d'un côté,

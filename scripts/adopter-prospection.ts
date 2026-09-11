@@ -41,6 +41,17 @@ interface Piste {
   confiance?: 'prefixe' | 'racine';
 }
 
+/**
+ * Les pistes qu'on refuse malgré un catalogue énumérable.
+ *
+ * Le prospecteur trouve des URL ; il ne sait pas ce qu'elles décrivent. Deux
+ * cas rencontrés valent d'être nommés plutôt que redécouverts.
+ */
+const ECARTES: Record<string, string> = {
+  egt:
+    "Euro Games Technology est le parent industriel d'Amusnet : son catalogue est fait de bornes et de variantes par juridiction (`rise-of-ra-gold-vlt-spain`, `panorama-roulette-double-zero-automatic-virtual-live`). On ne peut y jouer depuis aucune page web, comme les `land-based` d'Amusnet déjà exclus.",
+};
+
 function nomDepuisSlug(slug: string): string {
   return slug
     .split('-')
@@ -98,16 +109,47 @@ async function main() {
   const chemin = arg('rapport') ?? '/tmp/prospection.json';
   const pistes: Piste[] = JSON.parse(readFileSync(chemin, 'utf8'));
 
-  const retenues = pistes.filter(
-    (p) => p.jeux >= MIN && p.sitemap && p.motif && (AVEC_RACINE || p.confiance !== 'racine'),
+  const eligibles = pistes.filter(
+    (p) =>
+      p.jeux >= MIN &&
+      p.sitemap &&
+      p.motif &&
+      (AVEC_RACINE || p.confiance !== 'racine') &&
+      !ECARTES[p.studio],
   );
+
+  /*
+   * Un domaine, un studio.
+   *
+   * Nos casinos citent `felix` et `felixgaming` comme deux fournisseurs : les
+   * deux pistes tombent sur felixgaming.com. Sans ce regroupement, la même
+   * société entrerait deux fois en base avec 106 fiches chacune — dont la
+   * moitié en collision de slug, l'autre moitié en doublons publiés.
+   */
+  const parDomaine = new Map<string, Piste>();
+  const doublons: string[] = [];
+  for (const p of eligibles) {
+    const hote = new URL(p.domaine!).hostname.replace(/^www\./, '');
+    const deja = parDomaine.get(hote);
+    if (deja) {
+      doublons.push(`${p.studio} — même site que « ${deja.studio} » (${hote})`);
+      continue;
+    }
+    parDomaine.set(hote, p);
+  }
+  const retenues = [...parDomaine.values()];
   const ecartees = pistes.filter((p) => p.jeux > 0 && !retenues.includes(p));
 
   console.log(`${pistes.length} pistes lues · ${retenues.length} retenues · ${ecartees.length} écartées\n`);
   if (ecartees.length) {
     console.log('Écartées :');
     for (const e of ecartees) {
-      const pourquoi = e.confiance === 'racine' ? 'servie à la racine (--avec-racine pour l\'inclure)' : `moins de ${MIN} jeux`;
+      const pourquoi =
+        ECARTES[e.studio] ??
+        (e.confiance === 'racine'
+          ? "servie à la racine (--avec-racine pour l'inclure)"
+          : doublons.find((d) => d.startsWith(`${e.studio} `))?.split('—')[1]?.trim() ??
+            `moins de ${MIN} jeux`);
       console.log(`  ${e.studio.padEnd(16)} ${String(e.jeux).padStart(4)} jeux — ${pourquoi}`);
     }
     console.log();

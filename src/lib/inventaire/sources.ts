@@ -342,7 +342,18 @@ export const SANS_SOURCE_AUTOMATISABLE: Record<string, string> = {
  * sont pas.
  */
 export function slugDepuisUrl(url: string): string {
-  const dernier = decodeURIComponent(url.split('/').filter(Boolean).pop() ?? '');
+  /*
+   * La requête et l'ancre d'abord.
+   *
+   * Dragon Gaming publie `/games/mythical-creatures/?lang=zh-hans` : le dernier
+   * segment est alors `?lang=zh-hans`, et tous ses jeux traduits seraient
+   * tombés sur le même slug « lang-zh-hans ».
+   */
+  const sansRequete = url.split('#')[0].split('?')[0];
+  const dernier = decodeURIComponent(sansRequete.split('/').filter(Boolean).pop() ?? '')
+    // Merkur et Push Gaming servent des `.html`. Sans couper l'extension,
+    // « jokers-cap.html » devient le slug « jokers-cap-html ».
+    .replace(/\.(html?|php|aspx?)$/i, '');
   return dernier
     .toLowerCase()
     .normalize('NFD')

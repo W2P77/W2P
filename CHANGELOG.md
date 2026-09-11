@@ -2,6 +2,63 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — 3 908 fiches de plus, et quatre pièges au passage
+
+La prospection des 220 fournisseurs cités par nos casinos partenaires rend
+**48 catalogues énumérables**. Après relecture, 39 sont adoptés : le catalogue
+passe de 5 220 à **9 128 fiches**. Les 245 fiches prêtes le sont toujours.
+
+### Ce que la relecture a arrêté
+
+C'est pour ça que prospecter et adopter sont deux scripts. Aucun de ces cas
+n'aurait échoué tout seul.
+
+**EGT, 1 698 « jeux ».** Euro Games Technology est le parent industriel
+d'Amusnet, et son catalogue est fait de bornes et de variantes par juridiction :
+`rise-of-ra-gold-vlt-spain`, `panorama-roulette-double-zero-automatic-virtual-live`.
+On ne peut y jouer depuis aucune page web — même motif que les `land-based`
+d'Amusnet écartés le matin même.
+
+**La locale prise pour un catalogue.** EGT sert `/ru/game/…` ×1702,
+`/es/game/…` ×1027 et `/game/…` ×470 : le même catalogue six fois, et le russe
+l'emportait au nombre. Le détecteur regroupe désormais les variantes qui ne
+diffèrent que par un préfixe de langue et garde celle qui n'en a pas.
+
+**`felix` et `felixgaming`** sont cités comme deux fournisseurs par nos
+casinos. Les deux pistes tombent sur felixgaming.com. Sans regroupement par
+domaine, la même société entrait deux fois avec 106 fiches chacune.
+
+**La langue en paramètre d'URL.** Dragon Gaming publie
+`/games/mythical-creatures/?lang=zh-hans`. Notre `slugDepuisUrl` prenait le
+dernier segment — donc `?lang=zh-hans` — et **tous ses jeux traduits seraient
+tombés sur un unique slug « lang-zh-hans »**. La requête et l'ancre sont
+maintenant coupées avant lecture, et deux tests le verrouillent. Même correctif
+pour les `.html` de Merkur et Push Gaming.
+
+### Les collisions disent quelque chose
+
+111 slugs étaient déjà pris. Une bonne part vient d'AvatarUX — `popnoir`,
+`heliopopolis`, `zombie-apopalypse` — que Yggdrasil distribue et que nous
+avions donc déjà sous Yggdrasil. Le garde-fou a eu raison de refuser : c'est un
+seul jeu, il ne mérite qu'une page. Reste à trancher un jour qui, du créateur
+ou du distributeur, doit porter la fiche.
+
+### La piste MGA, et pourquoi on l'abandonne
+
+Le registre des licenciés de la Malta Gaming Authority aurait donné une liste
+officielle de studios avec leur numéro de licence — une donnée vérifiable que
+les concurrents n'affichent pas. Mais le registre est une application dont le
+bundle est **volontairement obscurci**, chaînes encodées en hexadécimal, et
+tous les chemins d'API conventionnels rendent la coquille de l'application. En
+tirer les données demanderait de désobscurcir leur code : on ne contourne pas.
+
+La piste des agrégateurs, elle, est propre. SoftSwiss publie ses 146 studios
+distribués dans un `gamevendor-sitemap.xml` dédié. Croisé avec nos 248, cela
+donne **45 studios inconnus** — dont Games Global (l'ex-Microgaming) et
+Greentube (le bras en ligne de Novomatic). Le croisement exige de couper les
+suffixes de raison sociale : `blueprint-gaming` et `blueprint` sont le même
+studio, et sans ça on comptait 66 nouveaux au lieu de 45.
+
 ## 2026-09-11 — Un prospecteur, parce qu'on ne peut pas écrire mille adaptateurs
 
 Objectif fixé : porter le catalogue au niveau de SlotCatalog, qui annonce

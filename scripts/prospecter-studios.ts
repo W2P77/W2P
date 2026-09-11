@@ -139,7 +139,27 @@ function meilleureFamille(
     familles.set(parent, membres);
   }
 
-  const classees = [...familles.entries()]
+  /*
+   * Une locale n'est pas un catalogue de plus.
+   *
+   * EGT sert `/ru/game/…` ×1702, `/es/game/…` ×1027 et `/game/…` ×470 : le
+   * même catalogue six fois, et le russe l'emporte au nombre. Retenir la
+   * famille la plus peuplée aurait compté leur catalogue au triple. On
+   * regroupe donc les variantes qui ne diffèrent que par un préfixe de langue
+   * et on garde celle qui n'en a pas — à défaut, la plus fournie du groupe.
+   */
+  const sansLangue = (chemin: string) => chemin.replace(/^\/[a-z]{2}(-[a-z]{2,4})?(?=\/|$)/i, '') || '/';
+  const groupes = new Map<string, Array<[string, Set<string>]>>();
+  for (const entree of familles.entries()) {
+    const cle = sansLangue(entree[0]);
+    groupes.set(cle, [...(groupes.get(cle) ?? []), entree]);
+  }
+  const representants = [...groupes.entries()].map(([cle, variantes]) => {
+    const nue = variantes.find(([chemin]) => chemin === cle);
+    return nue ?? variantes.sort((a, b) => b[1].size - a[1].size)[0];
+  });
+
+  const classees = representants
     .filter(([parent, membres]) => parent !== '/' || membres.size >= 50)
     .sort((a, b) => b[1].size - a[1].size);
   const meilleure = classees[0];
