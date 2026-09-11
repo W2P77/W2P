@@ -2,6 +2,32 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — Ce que le contrôle d'identité écarte encore, et pourquoi c'est juste
+
+Cinq studios aux pages souvent écartées ont été simulés en entier, pages
+écartées nommées. Ce qu'ils disent :
+
+- **Fugaso sert parfois une page vide.** Ouverte seule, la fiche de Mega
+  Thunder porte son `og:title` ; lue dans une série de pages, elle arrive sans
+  titre, sans `h1`, sans `og:title` — la coquille d'un site en rendu serveur,
+  que le JavaScript devait remplir. Le contrôle ne peut rien confirmer et
+  n'écrit rien : c'est le bon côté pour se tromper.
+- **Caleta et King Midas nomment leurs jeux autrement que leurs adresses** :
+  `pao-com-manteiga` pour « Hi-Loaf », `fortune-wolf` pour « Lobinho Fortuna »,
+  `coin-dozer` pour « COIN PUSHER ». Sans doute les mêmes jeux, sous un nom
+  localisé — mais rien ne permet de l'affirmer. Écartés.
+- **Fantasma** garde des pages de travail dans son catalogue (`…-slider-test`).
+  Écartées.
+- **Un défaut du contrôle lui-même** : « Hold & Hit **3×3** » chez Spinomenal.
+  Le signe de multiplication devenait une espace, et le « 3x3 » de notre nom ne
+  s'y retrouvait plus. Corrigé : **23 RTP récupérés** sur 26 pages. Les trois
+  restantes sont de vraies divergences (« 4horsemen2 » pour « 4 Horsemen II »).
+
+**Pragmatic** : trois lots d'écarts de plus confirmés par double lecture (13,
+puis 30), dont Ratinho Sortudo relu dans son panneau avant écriture — « The
+theoretical RTP of this game is 97.57% », une phrase unique, sans RTP d'achat
+à côté.
+
 ## 2026-09-11 — Une page écartée dit pourquoi, et Starburst XXXtreme reste en doute
 
 Chaque page que le contrôle d'identité écarte est désormais **nommée dans le

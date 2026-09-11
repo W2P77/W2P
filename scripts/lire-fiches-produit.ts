@@ -94,7 +94,8 @@ function titreDePage(html: string): string {
 
 function parleDuJeu(html: string, nom: string): boolean {
   const norme = (x: string) =>
-    x.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/&[a-z#0-9]+;/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
+    // « Hold & Hit 3×3 » : le signe de multiplication devient une espace, et « 3x3 » ne s'y retrouve plus.
+    x.replace(/×|&#215;|&times;/g, 'x').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/&[a-z#0-9]+;/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
   /*
    * `og:title` et `twitter:title` en plus du titre et du `h1`.
    *
