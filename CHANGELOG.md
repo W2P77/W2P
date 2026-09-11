@@ -2,6 +2,62 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — Une bande jetée en silence, un RTP rond, et un ban
+
+### La bande que le runner jetait
+
+Le runner passait aux adaptateurs une fonction `regarder = async () =>
+lireLEcran(sonde)` **sans paramètre**. Un adaptateur qui demandait
+`lireLEcran('bas')` recevait la bande par défaut — le haut de l'écran — et
+TypeScript l'acceptait, une fonction sans paramètre valant pour une fonction à
+paramètre optionnel. Conséquence : **la détection des jeux Pragmatic sans
+panneau de règles n'a jamais marché en production**. Elle cherche « COIN
+VALUE / TOTAL BET » en bas ; elle regardait en haut. Ces jeux sortaient en
+« icône introuvable », restaient en file et étaient rechargés à chaque
+campagne. Corrigé : `888-gold-slot` est désormais reconnu sans panneau.
+
+### Le RTP rond
+
+BGaming écrit « The overall theoretical Return to Player (RTP) is 96%. » — un
+entier. Exiger une décimale laissait des fiches photographiées, publiées, et
+sans chiffre. L'entier est accepté **seulement suivi de « % »**, pour qu'un
+« 20 lines » ne passe pas pour un taux. Deux tests.
+
+`scripts/relire-captures.ts` relit les captures déjà publiées avec les
+formules du jour, sans recapturer : le panneau est déjà photographié. Il
+n'écrit un RTP que s'il ne contredit pas la base ; sinon il pose la légende et
+laisse `resoudre-ecarts.ts` trancher par double lecture.
+
+`--slugs` vise des jeux précis, **y compris déjà capturés** : c'est le seul
+moyen de faire passer un jeu connu pour marcher dans le vrai runner.
+
+### La campagne BGaming, et pourquoi 45 % échouent
+
+227 jeux, 120 publiés. Diagnostiqués sur de vrais écrans, les échecs n'ont pas
+une cause mais plusieurs :
+
+- le moteur **« hyperhive »** : 22 échecs sur 99, **0 réussite sur 118** — une
+  cause isolée, le prochain chantier ;
+- des **écrans de choix** avant la partie : personnage puis pays sur
+  Soccermania, nombre de lignes sur All Lucky Clovers ;
+- le **portail 18+** de bgaming.com, resté fermé sur Sweet Rush Megaways ;
+- **12 jeux sans démo** sur leur page, **6 dont la démo est hébergée par un
+  casino** : jamais capturables chez BGaming.
+
+### Le ban, et la conclusion fausse qu'il m'a fait tirer
+
+Vers 18h, `demo.bgaming-network.com` a répondu **« Error 1015 — You are being
+rate limited »** (HTTP 429, Cloudflare) : 227 lancements en ~2h40, plus mes
+relances de diagnostic. Pendant le ban, chaque jeu échoue en « icône
+introuvable ». Deux tests de non-régression ont ainsi « échoué » sur des jeux
+qui marchaient, et j'en ai d'abord conclu que mon correctif du clic de départ
+les cassait. **C'était faux** : le vrai runner échouait aussi, sans ce
+correctif. Tous les tests postérieurs à 18h sont nuls. Le correctif est retiré
+quand même — il n'avait récupéré aucun des quatre jeux essayés.
+
+On ne contourne pas un ban. Aucune donnée n'est perdue : les jeux ratés restent
+en file.
+
 ## 2026-09-11 — 73 RTP corrigés, et deux lectures valent mieux qu'une
 
 Quand le panneau d'un jeu contredit la base, `capturer-jeux` n'écrase pas — un

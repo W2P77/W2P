@@ -142,9 +142,20 @@ async function capturerUnJeu(
      * donc pas déclarée dans `fichiers`, sinon elle partirait sur la fiche.
      */
     const sonde = join(dossier, 'sonde.png');
-    const regarder = async () => {
+    /*
+     * La bande demandée doit arriver jusqu'à l'OCR.
+     *
+     * Cette fonction ne prenait aucun argument. Les adaptateurs appellent
+     * `lireLEcran('bas')` pour lire la barre du jeu de base, et TypeScript
+     * accepte qu'une fonction sans paramètre en remplace une à paramètre
+     * optionnel : la bande était jetée en silence, et c'est la bande par
+     * défaut qui était lue. Le contrôle « le jeu a-t-il démarré ? » de BGaming
+     * ne voyait donc jamais la barre qu'il cherchait, et la détection des jeux
+     * sans panneau de Pragmatic regardait le haut de l'écran.
+     */
+    const regarder = async (bande?: 'haut' | 'bas') => {
       await page.screenshot({ path: sonde });
-      return lireLEcran(sonde);
+      return lireLEcran(sonde, bande);
     };
 
     const pages = await adaptateur.capturerLesRegles(page, cliche, regarder);
@@ -303,7 +314,22 @@ async function main() {
    * question au runner.
    */
   const candidats = await prisma.jeu.findMany({
-    where: { studio: { slug: studio }, demoUrl: { not: null }, capturesLe: null },
+    where: {
+      studio: { slug: studio },
+      demoUrl: { not: null },
+      /*
+       * Viser des jeux précis, **y compris déjà capturés**.
+       *
+       * Sans `--slugs`, seuls les jeux jamais capturés sont repris : c'est le
+       * marque-page qui rend une campagne interruptible. Mais pour vérifier
+       * qu'un correctif ne casse pas un jeu qui marchait, il faut justement
+       * relancer un jeu déjà capturé — et un banc de test écrit à côté du
+       * runner s'est révélé ne pas reproduire le runner : il échouait sur des
+       * jeux que la campagne réussissait. Nommer un jeu, c'est vouloir le
+       * reprendre ; avec `--appliquer`, ses captures sont remplacées.
+       */
+      ...(arg('slugs') ? { slug: { in: arg('slugs')!.split(',') } } : { capturesLe: null }),
+    },
     select: { id: true, slug: true, nom: true, demoUrl: true, rtpStudio: true },
     orderBy: { nom: 'asc' },
   });

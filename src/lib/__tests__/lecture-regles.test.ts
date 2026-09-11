@@ -32,6 +32,20 @@ describe('le RTP, selon la formule du studio', () => {
     expect(f.rtp).toBe(97.04);
   });
 
+  /*
+   * Recopié de l'OCR de Snoop Dogg Dollars : un RTP rond, sans décimale, et
+   * pas d'espace après le point. La fiche était capturée sans chiffre.
+   */
+  it('lit un RTP entier quand il est suivi de « % »', () => {
+    expect(
+      extraireLesFaits('The overall theoretical Return to Player (RTP) is 96%.RTP in the Buy Bonus feature').rtp,
+    ).toBe(96);
+  });
+
+  it('ne prend pas un nombre entier sans « % » pour un RTP', () => {
+    expect(extraireLesFaits('The theoretical RTP of this game uses 20 lines').rtp).toBeNull();
+  });
+
   it('lit une plage comme un défaut et un palier', () => {
     const f = extraireLesFaits(
       'The maximum RTP of this game is 96.03% The minimum RTP of this game is 94.02%',

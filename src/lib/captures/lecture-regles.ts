@@ -307,7 +307,15 @@ export function extraireLesFaits(texte: string, pages: FaitsLus['pages'] = []): 
    * **using** ». Le refus se fait caractère par caractère entre le mot-clé et
    * le nombre.
    */
-  const CHIFFRE = '(\\d{2}\\s?[.,]\\s?\\d{1,2})';
+  /*
+   * Un RTP rond s'écrit sans décimale. BGaming annonce « The overall
+   * theoretical Return to Player (RTP) is 96%. » sur Snoop Dogg Dollars : exiger
+   * une virgule laissait la fiche capturée, publiée, et sans chiffre — sur 28
+   * jeux d'une même campagne. L'entier n'est accepté que **suivi de « % »** :
+   * sans ce signe, « 20 lines » ou « 25 free spins » passeraient pour un taux,
+   * et les bornes 80-99,9 n'arrêteraient ni 96 lignes ni 90 tours.
+   */
+  const CHIFFRE = '(\\d{2}\\s?[.,]\\s?\\d{1,2}|\\d{2}(?=\\s?%))';
   const jusquAuNombre = '(?:(?!BUY|using|USING)[^0-9]){0,40}';
   /*
    * Chaque studio a sa formule, et le mot « RTP » n'y est pas toujours nu.
