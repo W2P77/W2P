@@ -2,6 +2,62 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — Les 27 studios sont enfin tous rangés quelque part
+
+Après les sept premiers, il restait douze studios ni inventoriés ni expliqués —
+le pire des deux états, puisqu'un silence se lit « pas encore fait ». Cinq de
+plus sont désormais automatisés (NetEnt 236, Red Tiger 355, Yggdrasil 571,
+ELK 159, Big Time Gaming 90) et **1 275 fiches** rejoignent le catalogue, qui
+passe de 3 945 à **5 220**. Les 245 fiches prêtes le sont toujours : aucune
+nouvelle n'entre à l'index.
+
+Le tableau couvre maintenant les 27 studios : **17 automatisés, 10 expliqués**,
+zéro sans réponse.
+
+### Deux adaptateurs écrits puis retirés
+
+Ils marchaient. C'est le résultat qui ne valait rien.
+
+- **Push Gaming** raccourcit ses URL en supprimant les petits mots :
+  `mystery-mission-moon` pour « Mystery Mission To The Moon »,
+  `land-zenith` pour « Land of Zenith », `grand-show` pour « The Grand Show ».
+  La transformation n'est pas réversible. L'inventaire annonçait 11 manquants
+  et 49 « chez nous seulement » sur 85 fiches : les créer aurait donné deux
+  pages indexables pour un seul jeu, onze fois.
+- **Relax Gaming** colle ses slugs sans séparateur
+  (`/products/casino/moneytrain5`). On ne déduit pas « Money Train 5 » de ça.
+  Leur titre est sur la page : une passe par fiche reste possible, l'inventaire
+  en masse non.
+
+Les deux rejoignent `SANS_SOURCE_AUTOMATISABLE` avec leur raison. Un adaptateur
+qui produit un mauvais rapprochement est pire que pas d'adaptateur : il crée du
+faux là où l'absence n'aurait rien créé.
+
+### Le garde-fou des jumeaux
+
+Big Time Gaming écrit `starquest`, notre fiche dit `star-quest`. Les deux slugs
+sont libres, la création serait passée sans rien signaler — et le catalogue
+aurait porté deux pages pour un seul jeu, enrichies à moitié chacune plus tard.
+`inventorier-studios.ts` compare désormais les slugs **débarrassés de leurs
+séparateurs** avant de créer, et signale au lieu d'écrire. Dès sa première
+exécution il a attrapé deux cas : `star-quest`/`starquest` et
+`hyperburst`/`hyper-burst` chez Yggdrasil.
+
+### Ce qu'on ne sait pas faire, et pourquoi
+
+| studio | obstacle |
+|---|---|
+| Blueprint | `Disallow: /` sur tout le site |
+| Betsoft | aucun sitemap publié |
+| Booming | domaine mort (ENOTFOUND) |
+| Evolution | aucune page par jeu, seulement 9 marques |
+| PG Soft | jeux identifiés par un numéro (`/games/201/`) |
+| Playson | 403 sur robots.txt comme sur le sitemap |
+| Spribe | sitemap vide |
+| Push Gaming | URL raccourcies, non réversibles |
+| Relax Gaming | slugs collés, nom non déductible |
+| InOut Games | aucun `siteUrl` en base |
+
 ## 2026-09-11 — Sept studios inventoriés, trois qu'on ne peut pas inventorier
 
 Dix studios stagnaient à exactement 6 fiches — 5 pour Booming, 4 pour Wazdan.

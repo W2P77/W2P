@@ -69,6 +69,7 @@ async function main() {
 
   let creees = 0;
   const collisions: string[] = [];
+  const jumeaux: string[] = [];
   for (const source of sources) {
     const studio = await prisma.studio.findUnique({ where: { slug: source.studio } });
     if (!studio) {
@@ -116,9 +117,26 @@ async function main() {
       });
       const dejaPris = new Map(pris.map((j) => [j.slug, j.studio.slug]));
 
+      /*
+       * Le même jeu sous deux orthographes.
+       *
+       * Big Time Gaming écrit `starquest` là où notre fiche dit `star-quest`.
+       * Les deux slugs sont libres, la création passerait — et le catalogue
+       * porterait deux pages indexables pour un seul jeu, qu'on enrichirait
+       * ensuite à moitié chacune. On ne tranche pas à la place de quelqu'un :
+       * on signale et on laisse la fiche existante seule.
+       */
+      const colle = (v: string) => v.replace(/[^a-z0-9]/g, '');
+      const nosCollees = new Map(nos.map((j) => [colle(j.slug), j.slug]));
+
       for (const slug of manquants) {
         if (dejaPris.has(slug)) {
           collisions.push(`${source.studio}/${slug} — slug déjà pris par ${dejaPris.get(slug)}`);
+          continue;
+        }
+        const jumeau = nosCollees.get(colle(slug));
+        if (jumeau) {
+          jumeaux.push(`${source.studio}/${slug} — déjà chez nous sous « ${jumeau} »`);
           continue;
         }
         await prisma.jeu.create({
@@ -136,6 +154,11 @@ async function main() {
       console.log(`\n${collisions.length} slugs déjà pris par un autre studio, non créés :`);
       for (const c of collisions.slice(0, 20)) console.log(`  ${c}`);
       if (collisions.length > 20) console.log(`  … et ${collisions.length - 20} autres.`);
+    }
+    if (jumeaux.length) {
+      console.log(`\n${jumeaux.length} jeux déjà présents sous une autre orthographe, non créés :`);
+      for (const j of jumeaux.slice(0, 20)) console.log(`  ${j}`);
+      if (jumeaux.length > 20) console.log(`  … et ${jumeaux.length - 20} autres.`);
     }
     console.log('Elles restent hors index et hors sitemap tant qu\'elles n\'ont pas de RTP.');
   } else {

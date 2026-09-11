@@ -251,6 +251,54 @@ export const SOURCES: SourceStudio[] = [
       return filtrer(locsDuTexte(await recuperer(jeux)), /^https:\/\/evoplay\.games\/game\/[^/]+\/?$/);
     },
   },
+  {
+    studio: 'netent',
+    origine: 'https://netent.com/sitemap.xml',
+    async lister(recuperer) {
+      return filtrer(await locs(await recuperer(this.origine), recuperer), /^https:\/\/netent\.com\/games\/[^/]+$/);
+    },
+  },
+  {
+    studio: 'red-tiger',
+    origine: 'https://redtiger.com/sitemap.xml',
+    async lister(recuperer) {
+      return filtrer(await locs(await recuperer(this.origine), recuperer), /^https:\/\/redtiger\.com\/games\/[^/]+$/);
+    },
+  },
+  {
+    studio: 'yggdrasil',
+    origine: 'https://www.yggdrasilgaming.com/games-sitemap.xml',
+    async lister(recuperer) {
+      // 571 jeux : le catalogue maison **et** celui des studios partenaires
+      // qu'ils distribuent sous leur plateforme. Les deux sont publiés sous la
+      // marque, on ne cherche pas à les démêler ici.
+      return filtrer(await locs(await recuperer(this.origine), recuperer), /^https:\/\/yggdrasilgaming\.com\/games\/[^/]+$/);
+    },
+  },
+  {
+    studio: 'elk-studios',
+    origine: 'https://www.elk-studios.com/game-sitemap.xml',
+    async lister(recuperer) {
+      const urls = filtrer(await locs(await recuperer(this.origine), recuperer), /\/games\/[^/]+\/?$/);
+      // Trois pages de travail traînent dans leur sitemap — `hiddenprogress`,
+      // `hidden`, `test-page-iframes`. Créer une fiche pour chacune mettrait
+      // trois jeux inexistants au dénominateur du catalogue.
+      return urls.filter((u) => !/\/(hidden|hiddenprogress|test-page-iframes)\/?$/.test(u));
+    },
+  },
+  {
+    studio: 'big-time-gaming',
+    origine: 'https://www.bigtimegaming.com/sitemap.xml',
+    async lister(recuperer) {
+      // 207 URL sous `/games/`, dont 90 seulement sont des jeux : le reste est
+      // rangé plus profond (catégories, déclinaisons). Exiger un seul segment
+      // écarte tout ça.
+      return filtrer(
+        await locs(await recuperer(this.origine), recuperer),
+        /^https:\/\/www\.bigtimegaming\.com\/games\/[^/]+\/?$/,
+      );
+    },
+  },
 ];
 
 /**
@@ -268,6 +316,20 @@ export const SANS_SOURCE_AUTOMATISABLE: Record<string, string> = {
     "betsoftgaming.com ne publie aucun sitemap : `/sitemap.xml` rend la page d'accueil en HTML, et robots.txt n'en déclare pas.",
   booming:
     "le domaine `boominggames.com` enregistré chez nous ne résout plus (ENOTFOUND). Retrouver leur site avant tout inventaire.",
+  evolution:
+    "evolution.com ne publie aucune page par jeu : son sitemap ne porte que des actualités, des pages investisseurs et neuf marques. Leur catalogue ne s'inventorie pas depuis leur site.",
+  pgsoft:
+    "pgsoft.com identifie ses jeux par un numéro (`/games/201/`), pas par un slug. On peut en compter, pas les rapprocher des nôtres — un inventaire y créerait des fiches nommées « 201 ».",
+  playson:
+    'playson.com rend 403 sur robots.txt comme sur le sitemap : le site refuse la requête automatisée.',
+  spribe:
+    'spribe.co publie un sitemap vide (aucun `<loc>`). Rien à énumérer.',
+  'push-gaming':
+    "pushgaming.com raccourcit ses URL en supprimant les petits mots — `mystery-mission-moon` pour « Mystery Mission To The Moon », `land-zenith` pour « Land of Zenith ». La transformation n'est pas réversible : 11 jeux qu'on a déjà seraient recréés sous un second slug, soit deux pages indexables pour un seul jeu.",
+  'relax-gaming':
+    "relax-gaming.com colle ses slugs sans séparateur (`/products/casino/moneytrain5`). On ne peut pas en déduire « Money Train 5 » : les fiches créées porteraient un nom illisible. Leur titre est sur la page, une passe par fiche reste possible.",
+  'inout-games':
+    "aucun `siteUrl` en base pour ce studio : on ne sait même pas où regarder. Retrouver leur site avant tout inventaire.",
 };
 
 /**
