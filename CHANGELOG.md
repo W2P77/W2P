@@ -2,6 +2,42 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — 723 preuves, et 1 702 fiches volontairement laissées sans
+
+La table `Preuve` existait depuis ce matin et était vide.
+`scripts/adopter-preuves.ts` l'alimente à partir de ce que les campagnes de
+capture ont déjà établi : **723 lignes sur 250 fiches** — le RTP, plus la
+volatilité et le gain maximum là où une capture les montre.
+
+### Ce qu'on n'a pas écrit, et pourquoi ça compte plus
+
+**1 702 fiches portent un RTP sans aucune source.** Elles viennent d'un import,
+personne n'est allé les vérifier. Leur fabriquer une ligne de preuve sans URL
+transformerait « on ne sait pas d'où ça vient » en « c'est sourcé » — l'inverse
+exact du but de cette table. Elles restent sans preuve, et c'est l'information
+juste.
+
+Même règle à l'intérieur d'une fiche : la volatilité et le gain maximum ne sont
+prouvés que si la capture les montre. `capturer-jeux.ts` ne pose une légende
+chiffrée que sur la page qui porte le RTP ; ailleurs, ces champs viennent de
+l'import, et les rattacher à l'URL du panneau affirmerait qu'on les y a lus.
+
+### Une fausse alerte, notée pour ne pas la relever deux fois
+
+L'écart entre 1 950 pages publiables et 251 sourcées ressemblait à une faute :
+des pages indexées avec un RTP que personne n'a vérifié. Vérification faite,
+la fiche **affiche son niveau de preuve à l'écran** (`BadgePreuve`), donc elle
+ne prétend rien. `estPublieable` reste ce qu'il est : c'est l'absence de donnée
+qui disqualifie une page, pas la faiblesse de sa source. Le travail n'est pas
+de désindexer, il est de sourcer.
+
+### La campagne Hacksaw
+
+Lancée sur ses 145 jeux capturables. Les échecs observés sont de vrais 404 —
+`alpha-eagle`, `aztec-twist` ne figurent plus sur leur site : ce sont les
+orphelins que l'inventaire avait signalés le matin même (193 fiches chez nous
+contre 144 chez eux). La campagne les saute, comme prévu.
+
 ## 2026-09-11 — Hacksaw capture enfin, et une option qui lançait le mauvais studio
 
 Le catalogue compte 10 430 fiches et **245 sont prêtes**. Ajouter des noms ne
