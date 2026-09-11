@@ -2,6 +2,27 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — Un gros écart ne s'écrit plus sans relecture
+
+Toute la soirée, la même règle a évité les erreurs : **un gros écart se relit
+dans sa phrase avant d'être écrit**. Elle ne tenait qu'à la vigilance de celui
+qui lance le script. Or une simulation ne couvre qu'un échantillon — douze
+pages par studio — et l'application parcourt des milliers de pages.
+
+`lire-fiches-produit.ts` met désormais de côté tout remplacement de plus d'un
+demi-point (`--seuil=` le règle) : il le liste sous « à relire », il ne l'écrit
+pas. Les fiches sans chiffre en base reçoivent leur RTP normalement — il n'y a
+rien à contredire.
+
+**Le contrôle d'identité a déjà servi.** Chez Peter & Sons, dix pages sur douze
+répondent 200 avec le titre « Game Not Found » : de fausses pages trouvées,
+sans redirection. Le contrôle les a arrêtées et a laissé passer la vraie page de
+3 Piggy Brothers.
+
+**SpinOro écarté de l'application** : erreurs 500 et délais dépassés sur dix
+pages sur douze. Insister sur un site qui répond mal, c'est ce qui a valu à
+where2spin le ban du serveur de démo BGaming.
+
 ## 2026-09-11 — Le lecteur générique lit les entiers, et n'exclut plus trop large
 
 Deux studios rendaient zéro RTP sur douze pages alors que leurs pages en

@@ -31,6 +31,15 @@ const arg = (nom: string) =>
 const APPLIQUER = process.argv.includes('--appliquer');
 const LIMITE = Number(arg('limite') ?? Infinity);
 const PAUSE = Number(arg('pause') ?? 1500);
+/*
+ * Au-delà de cet écart, un remplacement est mis de côté au lieu d'être écrit.
+ *
+ * La règle de la soirée : un gros écart se relit dans sa phrase avant d'être
+ * écrit. Une simulation ne couvre qu'un échantillon ; sur des milliers de pages,
+ * le script peut croiser un écart que personne n'a relu. Il le liste, il ne
+ * l'écrit pas.
+ */
+const SEUIL = Number(arg('seuil') ?? 0.5);
 const AUTEUR = 'fiche-produit';
 
 const UA =
@@ -85,7 +94,7 @@ function parleDuJeu(html: string, nom: string): boolean {
 
 type Verdict =
   | 'nouveau' | 'confirme' | 'remplace' | 'desaccord-panneau' | 'sans-chiffre' | 'hors-base' | 'illisible' | 'redirige'
-  | 'autre-page';
+  | 'autre-page' | 'a-relire';
 
 async function main() {
   const studios = arg('studio') ? [arg('studio')!] : Object.keys(LECTEURS);
@@ -129,7 +138,7 @@ async function main() {
     const urls = paires.map((p) => p.url);
     const bilan: Record<Verdict, number> = {
       nouveau: 0, confirme: 0, remplace: 0, 'desaccord-panneau': 0, 'sans-chiffre': 0, 'hors-base': 0, illisible: 0,
-      redirige: 0, 'autre-page': 0,
+      redirige: 0, 'autre-page': 0, 'a-relire': 0,
     };
     const aMontrer: string[] = [];
 
@@ -157,12 +166,14 @@ async function main() {
         : base == null ? 'nouveau'
         : identique ? 'confirme'
         : 'remplace';
-      bilan[verdict] += 1;
-      if (verdict === 'remplace' || verdict === 'desaccord-panneau') {
-        aMontrer.push(`  ${verdict.padEnd(18)} ${jeu.slug.padEnd(32)} base ${String(base).padEnd(6)} fiche ${f.rtp}`);
+      const ecartFort = verdict === 'remplace' && base != null && Math.abs(base - f.rtp) > SEUIL;
+      const retenu: Verdict = ecartFort ? 'a-relire' : verdict;
+      bilan[retenu] += 1;
+      if (retenu === 'remplace' || retenu === 'desaccord-panneau' || retenu === 'a-relire') {
+        aMontrer.push(`  ${retenu.padEnd(18)} ${jeu.slug.padEnd(32)} base ${String(base).padEnd(6)} fiche ${f.rtp}`);
       }
 
-      if (!APPLIQUER || auPanneau) continue;
+      if (!APPLIQUER || auPanneau || retenu === 'a-relire') continue;
 
       await prisma.jeu.update({
         where: { id: jeu.id },
@@ -208,9 +219,9 @@ async function main() {
       `  nouveaux ${bilan.nouveau} · confirmés ${bilan.confirme} · remplacés ${bilan.remplace} · ` +
         `désaccords avec le panneau ${bilan['desaccord-panneau']} · sans chiffre ${bilan['sans-chiffre']} · ` +
         `hors base ${bilan['hors-base']} · illisibles ${bilan.illisible} · redirigées ${bilan.redirige} · ` +
-        `pages d'un autre jeu ${bilan['autre-page']}`,
+        `pages d'un autre jeu ${bilan['autre-page']} · à relire ${bilan['a-relire']}`,
     );
-    for (const l of aMontrer.slice(0, 12)) console.log(l);
+    for (const l of aMontrer.slice(0, 40)) console.log(l);
   }
   console.log(APPLIQUER ? '\nÉcrit.\n' : '\nSIMULATION — ajouter --appliquer.\n');
 }
