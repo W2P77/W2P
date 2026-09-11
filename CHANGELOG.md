@@ -2,6 +2,41 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — La page produit, une source qui passe à l'échelle
+
+Capturer un panneau de règles coûte un navigateur, un OCR et un rechargement
+complet du jeu — et le serveur de démo de BGaming nous a mis au ban ce soir.
+Or le champ `ouSourcer` le disait déjà : chez **BGaming, NetEnt et
+Endorphina**, la page produit publie le RTP en HTML ordinaire. Une requête
+suffit, sans écran, sans OCR, sans toucher au serveur de démo.
+
+Sondés sur deux pages chacun :
+
+| studio | forme | lu |
+|---|---|---|
+| BGaming | bloc « Game Details » : `RTP 96.00 %`, `Volatility Very-high`, `Max.multiplier x 10000` | RTP, volatilité, gain max |
+| NetEnt | JSON dans la page `"rtp":95.62`, « 1 700 x bet Max payout » | RTP, gain max |
+| Endorphina | `RTP: 94.76%`, `Volatility: High` | RTP, volatilité |
+| Habanero | rien dans le HTML servi — page construite en JavaScript | écarté |
+
+`src/lib/fiches-produit/lecteurs.ts`, fonctions pures, sept tests recopiés des
+pages réelles. Trois pièges verrouillés :
+
+- BGaming écrit `x 10.490` : le point **sépare les milliers**. Lu comme une
+  décimale, le gain maximum de Lucky Lager tombait à 10,49 fois la mise.
+- « Max Win € 250,000 » est **en euros** : jamais pris, seul un multiple de la
+  mise se compare d'un jeu à l'autre.
+- La volatilité de NetEnt est une note chiffrée (`5.1`) sur une échelle qu'on
+  ne sait pas convertir : **laissée vide** plutôt qu'inventée.
+
+`scripts/lire-fiches-produit.ts` les applique, une page à la fois avec une
+pause. **Le panneau du jeu l'emporte** sur la page produit : une fiche déjà
+lue au panneau n'est jamais écrasée, un désaccord est seulement signalé.
+Ailleurs, la page produit remplace la valeur d'import et la preuve garde la
+trace de ce qu'elle remplace. Sur un échantillon de 45 pages : 39 fiches
+recevraient un RTP qu'elles n'ont pas, et les quatre déjà lues au panneau
+donnent **le même chiffre** sur leur page produit.
+
 ## 2026-09-11 — La double lecture ne voit pas une mauvaise phrase
 
 Avant d'écrire dans BetsRank les 33 RTP BGaming qui le contredisaient, les sept
