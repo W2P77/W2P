@@ -2,6 +2,37 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — Le runner s'arrête sur un ban, et le post-traitement BGaming
+
+### S'arrêter au lieu de s'enfoncer
+
+Pendant le ban Cloudflare de BGaming, chaque jeu échouait en « icône des règles
+introuvable » et la campagne continuait d'en lancer — ce qui prolonge un ban et
+remplit le journal de faux défauts d'adaptateur. Le runner reconnaît désormais
+le ban à deux signes : un **HTTP 429** sur une navigation de la page principale,
+ou la page Cloudflare portant **à la fois** « Error 1015 » et « rate limited ».
+Les deux ensemble, parce qu'un jeu peut embarquer « Too Many Requests » dans son
+code et qu'un gain maximum peut valoir « x1015 ». Dès le premier signe, la
+campagne s'arrête et dit où elle en est ; les jeux non traités restent en file.
+
+La détection vit dans `src/lib/captures/limite-de-debit.ts`, fonction pure, trois
+tests — dont les deux faux positifs qu'elle doit refuser.
+
+Un adaptateur peut aussi déclarer `pauseEntreJeuxMs`, remplaçable par
+`--pause=`. BGaming est à 30 s : **une précaution, pas un seuil mesuré** — on ne
+connaît pas celui de Cloudflare. Le garde-fou, c'est l'arrêt.
+
+### Le post-traitement de la campagne
+
+- `relire-captures` : 12 fiches photographiées sans chiffre relues, **6 ont leur
+  RTP**, 2 écarts passés à la double lecture, 4 sans RTP sur les pages prises.
+- `resoudre-ecarts` : **32 écarts, 32 confirmés** par la seconde lecture,
+  0 infirmé.
+- `adopter-preuves` : **388 preuves** écrites.
+
+Confrontés à BetsRank, les faits vérifiés sont 490 : 457 identiques, **33
+différents, tous BGaming**, tous à corriger dans son fichier statique.
+
 ## 2026-09-11 — Une bande jetée en silence, un RTP rond, et un ban
 
 ### La bande que le runner jetait

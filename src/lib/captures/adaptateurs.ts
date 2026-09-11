@@ -55,6 +55,17 @@ export interface Adaptateur {
    * née.
    */
   avecTete?: boolean;
+
+  /**
+   * Combien attendre entre deux lots de jeux, en millisecondes.
+   *
+   * Le serveur de démo de BGaming a mis notre IP au ban (Cloudflare 1015)
+   * après 227 lancements en 2h40 sans pause. Le seuil n'est pas publié et on
+   * ne l'a pas mesuré : la valeur retenue par un adaptateur est une précaution.
+   * Le vrai garde-fou est l'arrêt de la campagne sur la première page de ban.
+   * `--pause=` la remplace.
+   */
+  pauseEntreJeuxMs?: number;
   /** Ferme l'écran d'accueil, s'il y en a un. */
   ouvrirLeJeu(page: Page): Promise<void>;
   /**

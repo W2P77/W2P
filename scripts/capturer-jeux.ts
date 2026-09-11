@@ -41,6 +41,7 @@ import {
   lireLesRegles,
 } from '../src/lib/captures/lecture-regles';
 import { televerser } from '../src/lib/visuels/stockage';
+import { LimiteDeDebit, estUneLimiteDeDebit } from '../src/lib/captures/limite-de-debit';
 
 loadEnv({ path: resolve(process.cwd(), '.env.local'), quiet: true });
 
@@ -117,6 +118,18 @@ async function capturerUnJeu(
   adaptateur: (typeof ADAPTATEURS)[string],
 ): Promise<Resultat | null> {
   const page = await nav.newPage({ viewport: { width: 1280, height: 800 } });
+
+  /*
+   * Le ban d'un serveur de démo se voit à un 429 sur une navigation de la page
+   * principale. On le retient au passage : la navigation vers la démo se fait
+   * souvent dans l'adaptateur, dont on ne reçoit pas la réponse.
+   */
+  const ban = { hote: null as string | null };
+  page.on('response', (r) => {
+    if (r.status() === 429 && r.request().isNavigationRequest() && r.frame() === page.mainFrame()) {
+      ban.hote ??= new URL(r.url()).hostname;
+    }
+  });
   const dossier = join(ATELIER, jeu.slug);
   mkdirSync(dossier, { recursive: true });
   const pngRegles: string[] = [];
@@ -134,6 +147,9 @@ async function capturerUnJeu(
     await page.goto(jeu.demoUrl, { waitUntil: 'load', timeout: 120_000 });
     await page.waitForTimeout(adaptateur.chargementMs);
     await adaptateur.ouvrirLeJeu(page);
+    if (ban.hote || estUneLimiteDeDebit(await page.content())) {
+      throw new LimiteDeDebit(ban.hote ?? new URL(page.url()).hostname);
+    }
     await cliche('base');
 
     /*
@@ -176,8 +192,10 @@ async function capturerUnJeu(
     await adaptateur.capturerLAchat(page, cliche, regarder);
     rmSync(sonde, { force: true });
   } catch (e) {
-    console.log(`  ! ${jeu.slug} — ${e instanceof Error ? e.message.slice(0, 60) : 'erreur'}`);
     await page.close();
+    // Un ban vaut pour tous les jeux suivants : il arrête la campagne, pas ce seul jeu.
+    if (e instanceof LimiteDeDebit) throw e;
+    console.log(`  ! ${jeu.slug} — ${e instanceof Error ? e.message.slice(0, 60) : 'erreur'}`);
     return null;
   }
   await page.close();
@@ -405,12 +423,29 @@ async function main() {
   };
 
   const resultats: Resultat[] = [];
+  const pause = Number(arg('pause') ?? adaptateur.pauseEntreJeuxMs ?? 0);
   for (let i = 0; i < jeux.length; i += PARALLELE) {
-    const lot = await Promise.all(
-      jeux.slice(i, i + PARALLELE).map((j) =>
-        capturerUnJeu(nav, { ...j, demoUrl: j.demoUrl! }, adaptateur),
-      ),
-    );
+    if (i > 0 && pause) await new Promise((fin) => setTimeout(fin, pause));
+    let lot: Array<Awaited<ReturnType<typeof capturerUnJeu>>>;
+    try {
+      lot = await Promise.all(
+        jeux.slice(i, i + PARALLELE).map((j) =>
+          capturerUnJeu(nav, { ...j, demoUrl: j.demoUrl! }, adaptateur),
+        ),
+      );
+    } catch (e) {
+      if (!(e instanceof LimiteDeDebit)) throw e;
+      /*
+       * Continuer dans un ban ne rapporte rien et le prolonge : chaque jeu y
+       * échouerait en « icône introuvable », et resterait en file de toute
+       * façon. On s'arrête, et on ne contourne pas.
+       */
+      console.log(
+        `\n  ⛔ ${e.message}. Campagne arrêtée au jeu ${i + 1}/${jeux.length}.` +
+          '\n     Rien n’est perdu : les jeux non traités restent en file. Relancer plus tard, `--pause=` plus long.',
+      );
+      break;
+    }
     for (const r of lot) {
       if (!r) continue;
       resultats.push(r);

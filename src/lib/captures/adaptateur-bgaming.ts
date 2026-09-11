@@ -200,6 +200,9 @@ export const BGAMING: Adaptateur = {
   /** Leur `demoUrl` est la fiche marketing : c'est de là qu'on part. */
   demoExploitable: (url) => /bgaming\.com\/games\//.test(url),
 
+  /** Une précaution après le ban du 11/09/2026 — pas un seuil mesuré. */
+  pauseEntreJeuxMs: 30_000,
+
   /*
    * Pas de `avecTete` : vérifié sur trois jeux, la démo BGaming se charge et
    * se joue en Chromium **sans tête**, contrairement au RGS de Hacksaw que
