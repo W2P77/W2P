@@ -53,13 +53,28 @@ async function recuperer(url: string, ms = 20000): Promise<{ statut: number; tex
  */
 function domainesCandidats(cle: string): string[] {
   const nu = cle.replace(/[^a-z0-9]/g, '');
+  /*
+   * Premier jet : six formes, toutes en `.com` ou presque. Elles ont manqué
+   * 111 studios sur 265 — dont Booongo, porté par treize de nos casinos.
+   * Le motif n'était pas « studio mort » mais « suffixe non testé » :
+   * Fantasma est `fantasmagames.com`, Peter & Sons n'est pas en `.com`.
+   *
+   * L'ordre compte : un domaine parqué répond aussi vite qu'un vrai, et c'est
+   * le premier qui passe le contrôle du métier qui est retenu.
+   */
   return [
     `https://www.${nu}.com`,
     `https://${nu}.com`,
+    `https://${nu}games.com`,
+    `https://www.${nu}games.com`,
     `https://${nu}.games`,
     `https://www.${nu}gaming.com`,
     `https://${nu}gaming.com`,
+    `https://${nu}studios.com`,
+    `https://${nu}.io`,
+    `https://${nu}.net`,
     `https://${nu}.co`,
+    `https://${nu}.gg`,
   ];
 }
 

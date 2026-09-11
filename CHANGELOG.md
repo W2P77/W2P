@@ -2,6 +2,48 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — La bonne mesure n'est pas le nombre de fiches
+
+Décision prise avec le propriétaire : **on ne court pas après les 52 513 jeux
+de SlotCatalog.** Leurs 1 280 fournisseurs à 41 jeux de moyenne sont une longue
+traîne de catalogues éteints ; publier des pages sur des studios disparus
+n'apporte rien. Un studio mérite une place s'il est **vivant** — au moins un de
+nos casinos partenaires le porte encore, et son site répond.
+
+D'où `scripts/couverture-partenaires.ts`, qui répond à la seule question qui
+décide du revenu : **un joueur qui ouvre un casino qu'on recommande y
+trouve-t-il des jeux qu'on documente ?**
+
+```
+40 casinos actifs citent 245 fournisseurs (1 031 mentions)
+80 studios en base, 10 430 fiches
+  connus en base     80 fournisseurs    58 % des mentions
+  absents           165 fournisseurs    42 % des mentions
+```
+
+Ce matin : 28 fournisseurs, 41 %. La mesure pondère par le nombre de casinos
+qui portent chaque studio — un fournisseur présent chez trente partenaires pèse
+trente fois celui qu'un seul distribue. **155 fournisseurs sous le seuil ne
+pèsent que 31 % des mentions** : c'est la traîne, à traiter en dernier.
+
+### Le devineur de domaines était le vrai goulot
+
+111 studios sortaient en « aucun domaine plausible ne répond », ce qui se
+lisait « studio mort ». C'était faux : six formes de domaine testées, presque
+toutes en `.com`. Fantasma est `fantasmagames.com`, Peter & Sons
+`peterandsonsgames.com`, Turbo Games `turbogames.io`. Douze formes plus tard,
+onze catalogues rentrent — 476 fiches, dont Fantasma (159), King Midas (154) et
+Peter & Sons (86).
+
+### Encore deux racines refusées
+
+Kalamba servait 537 pages à la racine : **des communiqués de presse**, comme BF
+Games et High 5 avant lui — `partnership-agreed-with-wildz-casino`,
+`news-round-up-04`. Et Jiliasia nomme ses pages en camelCase collé
+(`papaiNoeldaFortuna.html`), d'où sortiraient des slugs illisibles : même motif
+de refus que Relax Gaming. Sur dix racines rencontrées aujourd'hui, **sept
+n'étaient pas des catalogues**.
+
 ## 2026-09-11 — Cinq catalogues sur huit étaient des communiqués de presse
 
 Le prospecteur signale les studios qui servent leurs jeux sans préfixe d'URL —
