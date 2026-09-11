@@ -40,6 +40,8 @@ const PAUSE = Number(arg('pause') ?? 1500);
  * l'écrit pas.
  */
 const SEUIL = Number(arg('seuil') ?? 0.5);
+/** Viser des jeux précis : pour écrire, après relecture, des écarts mis de côté. */
+const SLUGS = arg('slugs')?.split(',');
 const AUTEUR = 'fiche-produit';
 
 const UA =
@@ -80,10 +82,37 @@ async function recupererPage(url: string): Promise<{ html: string; urlFinale: st
 const MOTS_VIDES = new Set([
   'slot', 'slots', 'game', 'games', 'the', 'and', 'of', 'online', 'free', 'play', 'demo', 'casino',
 ]);
+/** Ce que la page dit d'elle-même, pour nommer une page écartée dans le rapport. */
+function titreDePage(html: string): string {
+  const brut =
+    /<meta[^>]+(?:property|name)=["']og:title["'][^>]*content=["']([^"']*)/i.exec(html)?.[1] ||
+    /<title[^>]*>([\s\S]*?)<\/title>/i.exec(html)?.[1] ||
+    /<h1[^>]*>([\s\S]*?)<\/h1>/i.exec(html)?.[1] ||
+    '';
+  return brut.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 70) || '(page sans titre)';
+}
+
 function parleDuJeu(html: string, nom: string): boolean {
   const norme = (x: string) =>
     x.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/&[a-z#0-9]+;/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
-  const entete = [/<title[^>]*>([\s\S]*?)<\/title>/i.exec(html)?.[1] ?? '', /<h1[^>]*>([\s\S]*?)<\/h1>/i.exec(html)?.[1] ?? '']
+  /*
+   * `og:title` et `twitter:title` en plus du titre et du `h1`.
+   *
+   * Les fiches de Fugaso n'ont ni `<title>` ni `<h1>` dans le HTML servi : le
+   * nom du jeu n'y est porté que par `og:title` (« MEGA THUNDER »). Sans lui, le
+   * contrôle ne pouvait rien confirmer et écartait 32 pages pourtant justes,
+   * RTP compris.
+   */
+  const meta = (cle: string) =>
+    new RegExp(`<meta[^>]+(?:property|name)=["']${cle}["'][^>]*content=["']([^"']*)`, 'i').exec(html)?.[1] ??
+    new RegExp(`<meta[^>]+content=["']([^"']*)["'][^>]*(?:property|name)=["']${cle}["']`, 'i').exec(html)?.[1] ??
+    '';
+  const entete = [
+    /<title[^>]*>([\s\S]*?)<\/title>/i.exec(html)?.[1] ?? '',
+    /<h1[^>]*>([\s\S]*?)<\/h1>/i.exec(html)?.[1] ?? '',
+    meta('og:title'),
+    meta('twitter:title'),
+  ]
     .join(' ')
     .replace(/<[^>]+>/g, ' ');
   const colle = norme(entete).replace(/ /g, '');
@@ -134,6 +163,7 @@ async function main() {
       const racine = fiche.siteUrl.replace(/\/$/, '');
       paires = jeux.map((jeu) => ({ url: `${racine}${prefixe}/${jeu.slug}`, jeu }));
     }
+    if (SLUGS) paires = paires.filter((p) => p.jeu && SLUGS.includes(p.jeu.slug));
     paires = paires.slice(0, LIMITE);
     const urls = paires.map((p) => p.url);
     const bilan: Record<Verdict, number> = {
@@ -153,7 +183,13 @@ async function main() {
         const { html, urlFinale } = await recupererPage(url);
         // La page lue doit être celle du jeu demandé, pas celle où l'on a été renvoyé.
         if (slugDepuisUrl(urlFinale) !== slugDepuisUrl(url)) { bilan.redirige += 1; continue; }
-        if (!parleDuJeu(html, jeu.nom)) { bilan['autre-page'] += 1; continue; }
+        if (!parleDuJeu(html, jeu.nom)) {
+          bilan['autre-page'] += 1;
+          // Nommer la page écartée : c'est ce qui distingue une vraie page
+          // « introuvable » d'un titre simplement formulé autrement que notre nom.
+          aMontrer.push(`  autre-page         ${jeu.slug.padEnd(32)} ← « ${titreDePage(html)} »`);
+          continue;
+        }
         f = lire(html);
       } catch { bilan.illisible += 1; continue; }
       if (f.rtp == null) { bilan['sans-chiffre'] += 1; continue; }

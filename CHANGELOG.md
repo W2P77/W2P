@@ -2,6 +2,34 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — 3 350 RTP lus sur les pages produit de trente studios
+
+Le lecteur générique appliqué à trente studios : **3 350 fiches reçoivent un
+RTP** que le studio publie lui-même. Les plus gros apports : Spinomenal 541,
+Red Tiger 328, Amusnet 258, Wazdan 256, 1spin4win 227, Stakelogic 206, Evoplay
+201, Fantasma 151, Caleta 148. **Aucun désaccord avec un panneau de jeu.**
+
+Le seuil de relecture a mis de côté **huit** remplacements, tous relus dans leur
+page avant d'être écrits avec `--slugs` : six Nolimit City où l'import avait
+retenu la version basse d'un jeu qui en publie plusieurs (Folsom Prison
+94,01 → 96,07 %), et deux Red Tiger (Mystery Reels Megaways 96,18 → 98,06 %,
+Cash Volt 94,78 → 95,71 %) — chaque fois, la page donne le même chiffre dans son
+titre, ses détails et son JSON, et la valeur d'import n'y apparaît nulle part.
+
+### Le contrôle d'identité, affiné
+
+- **Amusnet et Peter & Sons** servent de fausses pages trouvées — « Game Not
+  Found », statut 200, sans redirection — y compris à des adresses tirées de
+  leur **propre** sitemap. Le contrôle les écarte, à raison.
+- **Fugaso** n'a ni `<title>` ni `<h1>` dans le HTML servi : le nom du jeu
+  n'est porté que par `og:title` (« MEGA THUNDER »). Le contrôle l'accepte
+  désormais, avec `twitter:title`.
+- Chaque page écartée est **nommée dans le rapport** avec le titre qu'elle
+  porte : c'est ce qui distingue une vraie page introuvable d'un titre formulé
+  autrement que notre nom.
+
+Les faits vérifiés exportés vers BetsRank passent à **4 709**.
+
 ## 2026-09-11 — Un gros écart ne s'écrit plus sans relecture
 
 Toute la soirée, la même règle a évité les erreurs : **un gros écart se relit
