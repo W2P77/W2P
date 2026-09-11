@@ -52,6 +52,33 @@ const ECARTES: Record<string, string> = {
     "Euro Games Technology est le parent industriel d'Amusnet : son catalogue est fait de bornes et de variantes par juridiction (`rise-of-ra-gold-vlt-spain`, `panorama-roulette-double-zero-automatic-virtual-live`). On ne peut y jouer depuis aucune page web, comme les `land-based` d'Amusnet déjà exclus.",
 };
 
+/**
+ * Les studios dont la racine est vraiment le catalogue, vérifiés un par un.
+ *
+ * Le prospecteur signale une famille servie sans préfixe d'URL ; il ne sait pas
+ * ce qu'elle contient. Sur les huit rencontrées, **cinq étaient des communiqués
+ * de presse** : BF Games, Vivo, Fire Kirin, Bluberi et High 5 auraient versé au
+ * catalogue sept cents fiches nommées
+ * « bf-games-enters-switzerland-with-gamanza-partnership ».
+ *
+ * D'où une liste nominative plutôt qu'un drapeau global : chaque entrée a été
+ * ouverte et lue.
+ */
+const RACINE_VALIDEE: Record<string, string> = {
+  mascot: '210 pages à la racine, toutes des jeux',
+  backseat: '58 pages à la racine, toutes des jeux',
+  gamebeat: 'des jeux, précédés de six pages de navigation que le filtre écarte',
+};
+
+/**
+ * Ce qui vit à la racine d'un site sans être un jeu.
+ *
+ * Gamebeat sert `about`, `careers`, `blog`, `partners`, `brandbook` et
+ * `games-catalog` au même niveau que ses machines.
+ */
+const PAGES_DE_SITE =
+  /^(about|about-us|contact|contact-us|careers|jobs|blog|news|press|partners|partnership|brandbook|media|legal|privacy|privacy-policy|terms|terms-of-use|cookies|imprint|faq|support|home|games?|games?-catalog|catalog|catalogue|portfolio|team|company|responsible-gaming|sitemap|search|login|demo|releases|case-study)$/i;
+
 function nomDepuisSlug(slug: string): string {
   return slug
     .split('-')
@@ -114,7 +141,7 @@ async function main() {
       p.jeux >= MIN &&
       p.sitemap &&
       p.motif &&
-      (AVEC_RACINE || p.confiance !== 'racine') &&
+      (AVEC_RACINE || p.confiance !== 'racine' || RACINE_VALIDEE[p.studio]) &&
       !ECARTES[p.studio],
   );
 
@@ -147,7 +174,7 @@ async function main() {
       const pourquoi =
         ECARTES[e.studio] ??
         (e.confiance === 'racine'
-          ? "servie à la racine (--avec-racine pour l'inclure)"
+          ? "servie à la racine, non vérifiée (voir RACINE_VALIDEE)"
           : doublons.find((d) => d.startsWith(`${e.studio} `))?.split('—')[1]?.trim() ??
             `moins de ${MIN} jeux`);
       console.log(`  ${e.studio.padEnd(16)} ${String(e.jeux).padStart(4)} jeux — ${pourquoi}`);
@@ -170,13 +197,32 @@ async function main() {
       continue;
     }
 
-    const slugs = [...new Set(urls.map(slugDepuisUrl))].filter(Boolean);
+    const slugs = [...new Set(urls.map(slugDepuisUrl))].filter((s) => s && !PAGES_DE_SITE.test(s));
     if (slugs.length < MIN) {
       console.log(`${piste.studio.padEnd(18)}  ${slugs.length} seulement à la relecture — piste abandonnée`);
       continue;
     }
 
-    let studio = await prisma.studio.findUnique({ where: { slug: piste.studio } });
+    /*
+     * Le même studio sous deux noms, d'un rapport à l'autre.
+     *
+     * Nos casinos l'appellent `amigogaming`, SoftSwiss `amigo-gaming` : deux
+     * slugs, un seul site. Le regroupement par domaine ne vaut qu'à
+     * l'intérieur d'un rapport — ici on confronte à ce que la base porte déjà,
+     * sinon la seconde prospection recrée chaque studio de la première.
+     */
+    const hote = new URL(piste.domaine!).hostname.replace(/^www\./, '');
+    let studio =
+      (await prisma.studio.findUnique({ where: { slug: piste.studio } })) ??
+      (await prisma.studio.findFirst({
+        where: { OR: [{ siteUrl: `https://www.${hote}` }, { siteUrl: `https://${hote}` }] },
+      }));
+
+    if (studio && studio.slug !== piste.studio) {
+      console.log(`${piste.studio.padEnd(18)}  déjà en base sous « ${studio.slug} » (${hote})`);
+      continue;
+    }
+
     if (!studio && APPLIQUER) {
       studio = await prisma.studio.create({
         data: {

@@ -2,6 +2,48 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — Cinq catalogues sur huit étaient des communiqués de presse
+
+Le prospecteur signale les studios qui servent leurs jeux sans préfixe d'URL —
+`mascot.games/<slug>` plutôt que `/games/<slug>`. Huit cas, environ mille jeux
+en attente derrière le drapeau `⚠ racine`. Ouverts un par un :
+
+| studio | ce qu'il y avait vraiment |
+|---|---|
+| Mascot | 210 jeux ✓ |
+| Backseat | 58 jeux ✓ |
+| Gamebeat | des jeux, précédés de six pages de navigation |
+| BF Games | **communiqués de presse** |
+| Vivo | **communiqués de presse** |
+| Fire Kirin | **blog et marketing** |
+| Bluberi | **communiqués de presse** |
+| High 5 Games | **communiqués de presse** |
+
+Sans cette lecture, le catalogue aurait accueilli sept cents fiches nommées
+`bf-games-enters-switzerland-with-gamanza-partnership`. D'où une **liste
+nominative** (`RACINE_VALIDEE`) plutôt qu'un drapeau global : chaque entrée a
+été ouverte. Et un filtre `PAGES_DE_SITE` écarte `about`, `careers`, `blog`,
+`brandbook` — ce que Gamebeat sert au même niveau que ses machines.
+
+### Le même studio sous deux noms, d'un rapport à l'autre
+
+Nos casinos l'appellent `amigogaming`, SoftSwiss `amigo-gaming` : deux slugs,
+un seul site. Le regroupement par domaine ne valait qu'à l'intérieur d'un
+rapport ; la seconde prospection allait donc recréer trois studios de la
+première. L'adoption confronte maintenant le domaine à ce que la base porte
+déjà — `amigo-gaming`, `gaming-corps` et `revolver-gaming` ont été reconnus et
+sautés.
+
+Avec les 45 studios de SoftSwiss (Eyecon, Octoplay, Synot, CreedRoomz) et les
+trois racines validées, le catalogue passe de 9 128 à **9 954 fiches**. Les 245
+prêtes le sont toujours.
+
+### Les agrégateurs, suite
+
+SoftSwiss reste l'exception. Bragg, Pariplay, Relax, Oryx, GameArt, Hub88,
+BetConstruct et Groove ne publient pas de liste de studios énumérable — au
+mieux une poignée de partenaires mis en avant. Inutile d'y repasser.
+
 ## 2026-09-11 — 3 908 fiches de plus, et quatre pièges au passage
 
 La prospection des 220 fournisseurs cités par nos casinos partenaires rend
