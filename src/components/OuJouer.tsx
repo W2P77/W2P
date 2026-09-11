@@ -70,7 +70,7 @@ export function OuJouer({
   studio: string;
   casinos: CasinoCta[];
 }) {
-  const { t } = useLangue();
+  const { t, langue } = useLangue();
   const [pays, setPays] = useState<string | null>(null);
   const [tout, setTout] = useState(false);
   useEffect(() => setPays(lirePaysDuCookie()), []);
@@ -113,7 +113,7 @@ export function OuJouer({
             {liste.map((c) => (
               <li key={c.slug} className="min-w-0">
                 <a
-                  href={`/go/${c.slug}?slot=${encodeURIComponent(jeu)}`}
+                  href={`/go/${c.slug}?slot=${encodeURIComponent(jeu)}&l=${langue}`}
                   target="_blank"
                   rel="nofollow sponsored noopener"
                   className="biseau-petit group flex items-center gap-3 border border-fond-bordure bg-fond p-2.5 transition-all hover:border-neon-magenta"

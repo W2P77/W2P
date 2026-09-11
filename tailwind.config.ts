@@ -67,6 +67,15 @@ const config: Config = {
           'linear-gradient(rgba(139,92,246,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.07) 1px, transparent 1px)',
       },
       backgroundSize: { grille: '44px 44px' },
+      keyframes: {
+        /* La respiration du logo sur l'écran de sortie : une seconde et demie
+           d'attente sans rien qui bouge donne l'impression d'une page figée. */
+        respiration: {
+          '0%, 100%': { transform: 'scale(1)', opacity: '1' },
+          '50%': { transform: 'scale(1.05)', opacity: '0.9' },
+        },
+      },
+      animation: { respiration: 'respiration 2s ease-in-out infinite' },
     },
   },
   plugins: [],

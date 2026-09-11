@@ -22,6 +22,10 @@ import type { Langue } from './langues';
  * exactement le garde-fou qu'on attend.
  */
 const EN = {
+  sortieVers: 'Heading to {casino}',
+  sortieDans: 'Automatic redirect in {n}s…',
+  sortieSecours: 'Click here if nothing happens →',
+  sortieResponsable: '18+ · Play responsibly',
   navAccueil: 'HOME',
   navCatalogue: 'SLOT CATALOGUE',
   navNouveautes: 'NEW',
@@ -124,6 +128,10 @@ const EN = {
 export type CleTexte = keyof typeof EN;
 
 const FR: Record<CleTexte, string> = {
+  sortieVers: 'Direction {casino}',
+  sortieDans: 'Redirection automatique dans {n} s…',
+  sortieSecours: 'Clique ici si rien ne se passe →',
+  sortieResponsable: '18+ · Joue de manière responsable',
   navAccueil: 'ACCUEIL',
   navCatalogue: 'CATALOGUE',
   navNouveautes: 'NOUVEAUTÉS',
@@ -213,6 +221,10 @@ const FR: Record<CleTexte, string> = {
 };
 
 const DE: Record<CleTexte, string> = {
+  sortieVers: 'Weiter zu {casino}',
+  sortieDans: 'Automatische Weiterleitung in {n} s…',
+  sortieSecours: 'Hier klicken, wenn nichts passiert →',
+  sortieResponsable: '18+ · Spiele verantwortungsbewusst',
   navAccueil: 'START',
   navCatalogue: 'KATALOG',
   navNouveautes: 'NEU',

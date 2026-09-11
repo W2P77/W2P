@@ -2,6 +2,36 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Trois secondes sous notre marque avant de partir
+
+La sortie vers un partenaire était une 302 immédiate : le visiteur quittait
+where2spin sans transition. Elle devient un **écran d'attente de trois
+secondes** — le logo qui respire, le nom du casino, son bonus rappelé, un lien
+de secours —, comme le fait déjà BetsRank. Trois secondes suffisent à lire le
+bonus ; au-delà, on ferait attendre pour rien.
+
+**Ce qui n'a pas changé, et ne devait pas.** Le clic est enregistré **côté
+serveur, avant l'affichage** : pas de `fetch` depuis le navigateur, donc un
+bloqueur de scripts ne peut pas effacer un lead. Le clickId garde son préfixe
+`w2p-`. Sans JavaScript, un `<noscript>` en rafraîchissement et le lien de
+secours emmènent quand même le visiteur.
+
+`/go` vit hors du segment de langue : le lien sortant porte donc `&l=` et
+l'écran parle la langue de la page d'où l'on vient, avec repli sur l'anglais.
+
+**Le bot Discord de BetsRank reçoit aussi nos clics.** Même salon
+`#staff-flux-clicks` — deux salons obligeraient à surveiller deux endroits pour
+un flux unique. Ce qui distingue les deux sites est dans le message : un champ
+**Site** (🔷 where2spin / 🟡 BetsRank), la couleur de l'embed, et surtout le
+préfixe `w2p-` du clickId, seule marque à survivre jusqu'à la conversion.
+
+La notification ne retient jamais le visiteur : jeton absent, salon
+introuvable, Discord en panne, réseau coupé — elle renonce, elle ne lève pas.
+Quatre tests fixent ce contrat.
+
+**À brancher côté Vercel where2spin** : `DISCORD_BOT_TOKEN` et
+`DISCORD_GUILD_ID` (et, pour éviter un appel, `DISCORD_SALON_FLUX_CLICS`).
+Sans elles, l'écran de sortie fonctionne et les notifications se taisent.
 ## 2026-09-11 — Campagne Pragmatic : 275 jeux, et un écart tranché à l'œil
 
 La file Pragmatic a tourné en entier, sans tête, 15 secondes entre deux jeux :
