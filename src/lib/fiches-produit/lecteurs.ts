@@ -77,6 +77,14 @@ const MOTS_DE_VOLATILITE: Record<string, Volatilite> = {
   low: 'BASSE',
 };
 
+/*
+ * Un libellé ne vaut que s'il n'est suivi ni d'un tiret ni d'une lettre.
+ *
+ * Endorphina écrit « Volatility: Medium-Low » sur Satoshi's Secret. Sans ce
+ * garde, l'expression s'arrêtait à « Medium » — le tiret compte comme une fin
+ * de mot — et la fiche aurait annoncé une volatilité moyenne là où le studio
+ * dit moyenne-basse. Un libellé absent de la table ci-dessus rend null.
+ */
 function volatilite(brut: string | undefined): Volatilite | null {
   return brut ? MOTS_DE_VOLATILITE[brut.trim().toLowerCase()] ?? null : null;
 }
@@ -92,7 +100,7 @@ function lireBGaming(html: string): FaitsFiche {
   const t = texteDuHtml(html);
   return {
     rtp: taux(/\bRTP\s+(\d{2}[.,]\d{1,2})\s?%/.exec(t)?.[1]),
-    volatilite: volatilite(/\bVolatility\s+(very-high|very high|medium-high|medium high|high|medium|low)\b/i.exec(t)?.[1]),
+    volatilite: volatilite(/\bVolatility\s+(very-high|very high|medium-high|medium high|high|medium|low)(?![-\w])/i.exec(t)?.[1]),
     gainMax: multiple(/Max\.?\s*multiplier\s+x\s*([\d][\d.,\s]{0,12}\d|\d)/i.exec(t)?.[1]),
   };
 }
@@ -116,9 +124,17 @@ function lireNetEnt(html: string): FaitsFiche {
 /** Endorphina : « RTP: 94.76% · Volatility: High », en clair. */
 function lireEndorphina(html: string): FaitsFiche {
   const t = texteDuHtml(html);
+  /*
+   * « The RTP of Satoshi's Secret ranges from 89.83% » : le bloc de détails ne
+   * donne alors que le **bas** d'une plage, et « RTP: 89.83% » s'y lit comme un
+   * taux. Le prendre aurait remplacé 96,07 par le minimum — l'erreur déjà
+   * commise sur Four Lucky Clover côté panneau. Sans le haut de la plage, on
+   * ne publie aucun taux.
+   */
+  const plageSansHaut = /\bRTP\b.{0,80}?ranges\s+from/i.test(t);
   return {
-    rtp: taux(/\bRTP:\s*(\d{2}[.,]\d{1,2})\s?%/i.exec(t)?.[1]),
-    volatilite: volatilite(/\bVolatility:\s*(very-high|very high|medium-high|medium high|high|medium|low)\b/i.exec(t)?.[1]),
+    rtp: plageSansHaut ? null : taux(/\bRTP:\s*(\d{2}[.,]\d{1,2})\s?%/i.exec(t)?.[1]),
+    volatilite: volatilite(/\bVolatility:\s*(very-high|very high|medium-high|medium high|high|medium|low)(?![-\w])/i.exec(t)?.[1]),
     gainMax: null,
   };
 }

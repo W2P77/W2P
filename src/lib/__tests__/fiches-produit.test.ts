@@ -6,6 +6,10 @@ import { LECTEURS } from '../fiches-produit/lecteurs';
 describe('BGaming', () => {
   const lire = LECTEURS.bgaming;
 
+  it('ne lit pas « Medium-Low » comme « Medium »', () => {
+    expect(lire('<p>Volatility Medium-Low RTP 96.00 %</p>').volatilite).toBeNull();
+  });
+
   it('lit le bloc « Game Details » et ignore le titre', () => {
     const f = lire(
       '<title>Snoop Dogg Dollars Demo | Free Spins, 96% RTP</title>' +
@@ -52,6 +56,20 @@ describe('Endorphina', () => {
     expect(
       lire('<p>Game Details RTP: 94.76% Volatility: High Lines: 21 Reels and Rows: 5x3 Bet Range: 0.2</p>'),
     ).toEqual({ rtp: 94.76, volatilite: 'HAUTE', gainMax: null });
+  });
+
+  /* Recopié de la page de Satoshi's Secret : seul le bas de la plage est donné. */
+  it('ne prend pas le bas d’une plage pour le taux', () => {
+    const f = lire(
+      '<p>Game Details RTP: 89.83% Volatility: Medium-Low Lines: 20 Reels and Rows: 6x3</p>' +
+        '<p>What is the RTP of Satoshi’s Secret? The RTP of Satoshi’s Secret ranges from 89.83%.</p>',
+    );
+    expect(f.rtp).toBeNull();
+    expect(f.volatilite).toBeNull();
+  });
+
+  it('ne lit pas « Medium-Low » comme « Medium »', () => {
+    expect(lire('<p>Game Details RTP: 95.10% Volatility: Medium-Low Lines: 20</p>').volatilite).toBeNull();
   });
 
   it('rend null sur une page sans chiffre', () => {

@@ -2,6 +2,43 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — Jackpot, plage et « Medium-Low » : trois lectures fausses arrêtées
+
+La page produit a validé le panneau sur 168 fiches BGaming — et en a
+contredit 12. Relus un par un, ces désaccords ont révélé trois défauts, dont
+aucun ne se serait signalé tout seul.
+
+**Le jackpot entre parenthèses.** Quatre jeux BGaming (Grand Buffalo Hold and
+Win, Stars & Stripes Hold and Win, Olympus Trueways, Wild West Trueways)
+écrivent : « The overall theoretical RTP is **96.23% (without Jackpot) - 96.7%
+(with Jackpot)** ». La règle de plage n'y voyait rien — une parenthèse sépare
+le premier nombre du tiret — et l'extraction gardait 96,23 : le taux hors
+jackpot, publié sans le dire, alors que le studio met en avant 96,70 sur sa
+page produit. Pire, ce chiffre était déjà parti sur BetsRank dans l'après-midi,
+remplaçant un 96,7 % qui était le bon. Le haut devient le défaut, le bas un
+palier ; la légende garde « with / without jackpot ». Les 116 fiches BGaming
+sourcées relues : ces quatre-là seulement.
+
+Les autres désaccords sont sains : sur `always-up-x10000` ou `wild-cash-dice`,
+le jeu dit clairement 96,1 % et la page produit arrondit autrement. Le panneau
+l'emporte, comme prévu, et rien n'est écrit.
+
+**Le bas d'une plage déguisé en taux.** Endorphina écrit, sur Satoshi's
+Secret, « RTP: 89.83% » dans ses détails et « The RTP ranges from 89.83% »
+dans sa FAQ : seul le bas de la plage est donné. Le lecteur l'aurait pris pour
+le taux et remplacé 96,07 — l'erreur de Four Lucky Clover, côté page produit.
+Face à « ranges from », le lecteur ne publie plus rien.
+
+**« Medium-Low » lu comme « Medium ».** Le tiret compte comme une fin de mot :
+l'expression s'arrêtait au premier libellé trouvé. Un libellé suivi d'un tiret
+ou d'une lettre ne vaut plus rien. Deux tests, un par studio.
+
+**NetEnt appliqué** : 236 pages produit, **210 fiches reçoivent un RTP**, 20
+confirmations, 2 valeurs d'import remplacées après lecture de la page
+(Starburst XXXtreme : la page dit 96,45 % dans son titre, son JSON et ses
+détails ; Dead or Alive 2 : 96,8 %, le JSON portant aussi ses composantes de
+base et de bonus, que le lecteur ignore).
+
 ## 2026-09-11 — La page produit, une source qui passe à l'échelle
 
 Capturer un panneau de règles coûte un navigateur, un OCR et un rechargement

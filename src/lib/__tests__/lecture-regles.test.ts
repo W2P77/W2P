@@ -58,6 +58,19 @@ describe('le RTP, selon la formule du studio', () => {
     expect(f.rtpMin).toBe(89.41);
   });
 
+  /*
+   * Recopié de l'OCR de Grand Buffalo Hold and Win. Le taux hors jackpot était
+   * publié seul, alors que le studio met en avant celui avec jackpot.
+   */
+  it('lit « X % (without Jackpot) - Y % (with Jackpot) » par son haut', () => {
+    const f = extraireLesFaits(
+      'Return to Player The overall theoretical Return to Player (RTP) is 96.23% (without Jackpot) - 96.7% (with Jackpot). ' +
+        'RTP in Buy Bonus with Free Spins is 96.7%. RTP in Buy Bonus with Fireball Respin is 92.66% (without Jackpot) - 96.7% (with Jackpot).',
+    );
+    expect(f.rtp).toBe(96.7);
+    expect(f.rtpMin).toBe(96.23);
+  });
+
   it('lit une plage comme un défaut et un palier', () => {
     const f = extraireLesFaits(
       'The maximum RTP of this game is 96.03% The minimum RTP of this game is 94.02%',

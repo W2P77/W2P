@@ -358,6 +358,30 @@ export function extraireLesFaits(texte: string, pages: FaitsLus['pages'] = []): 
     brutHaut = hautEnPremier ? a : b;
     brutBas = hautEnPremier ? b : a;
   }
+
+  /*
+   * Le jackpot, entre parenthèses.
+   *
+   * BGaming écrit, sur ses jeux à jackpot : « The overall theoretical Return to
+   * Player (RTP) is 96.23% (without Jackpot) - 96.7% (with Jackpot) » (Grand
+   * Buffalo Hold and Win, Olympus Trueways…). La règle de plage ci-dessus ne
+   * l'attrape pas — une parenthèse sépare le premier nombre du tiret — et
+   * `lire` rendait 96,23 : le taux **hors** jackpot, publié sans le dire, alors
+   * que la page produit du studio met en avant 96,70. Même convention que les
+   * autres plages : le haut est le défaut, le bas un palier. La distinction
+   * « avec / hors jackpot » ne tient pas dans ces deux champs ; la légende de
+   * la capture la conserve.
+   */
+  const jackpot = new RegExp(
+    `theoretical${APRES_LE_MOT}${jusquAuNombre}${CHIFFRE}\\s?%\\s*\\(\\s*without\\s+jackpot\\s*\\)\\s*[-–—]\\s*${CHIFFRE}\\s?%\\s*\\(\\s*with\\s+jackpot\\s*\\)`,
+    'i',
+  ).exec(t);
+  if (!plage && jackpot) {
+    const [a, b] = [jackpot[1], jackpot[2]];
+    const hautEnPremier = (nombre(a) ?? 0) >= (nombre(b) ?? 0);
+    brutHaut = hautEnPremier ? a : b;
+    brutBas = hautEnPremier ? b : a;
+  }
   const rtp = nombre(brutHaut ?? '');
   const rtpMin = brutBas ? nombre(brutBas) : null;
 
