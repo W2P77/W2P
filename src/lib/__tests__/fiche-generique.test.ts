@@ -52,6 +52,22 @@ describe('le lecteur générique de fiche produit', () => {
     expect(f).toEqual({ rtp: 95.97, volatilite: null, gainMax: null });
   });
 
+  it('lit des entiers séparés par des points-virgules (AvatarUX)', () => {
+    const f = lire('<p>Win Potential 10,000x Variance Medium RTP 96%; 94%; 90.5% Release Date December 11, 2024</p>');
+    expect(f.rtp).toBe(96);
+    expect(f.paliers).toEqual([94, 90.5]);
+  });
+
+  it('n’écarte pas une rubrique qui suit une liste de fonctions (Koala)', () => {
+    const f = lire('<p>Spin Till You Win Buy Feature Stats RTP 96.25%, 94.31%, 92.36%, 90.34% Volatility Medium/High</p>');
+    expect(f.rtp).toBe(96.25);
+    expect(f.paliers).toEqual([94.31, 92.36, 90.34]);
+  });
+
+  it('ne coupe pas un nombre à trois chiffres', () => {
+    expect(lire('<p>Win up to 196% RTP boost</p>').rtp).toBeNull();
+  });
+
   it('ne prend pas un nombre sans le sigle', () => {
     expect(lire('<p>Hit Frequency 26.10% Max Payout x5000</p>').rtp).toBeNull();
   });

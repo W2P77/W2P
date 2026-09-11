@@ -2,6 +2,26 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — Le lecteur générique lit les entiers, et n'exclut plus trop large
+
+Deux studios rendaient zéro RTP sur douze pages alors que leurs pages en
+publiaient un. Relus au texte près :
+
+- **AvatarUX** écrit « RTP **96%; 94%; 90.5%** » : des entiers, et un
+  point-virgule comme séparateur. Le lecteur exigeait une décimale — le défaut
+  déjà payé côté panneau de règles. L'entier est accepté, seulement suivi de
+  « % », et un nombre ne peut plus être la fin d'un autre (« 196% »).
+- **Koala** écrit « … Spin Till You Win **Buy Feature Stats** RTP 96.25%, … ».
+  Le lecteur excluait toute valeur précédée de « Buy Feature » dans les 40
+  caractères — or c'est la fin d'une liste de fonctions, suivie d'une nouvelle
+  rubrique. La fenêtre dépend désormais de la forme : **12 caractères** quand le
+  sigle précède le nombre (une rubrique : seuls les mots collés devant
+  comptent, « Bonus Buy RTP » reste exclu), **25** quand le nombre le précède
+  (de la prose : « Grand Jackpot Set at 94.36% RTP » reste exclu).
+
+Résultat sur douze pages : AvatarUX 0 → 12, Koala 0 → 11, Revolver 2 → 9.
+Trois tests de plus, recopiés de ces pages.
+
 ## 2026-09-11 — Lire une page, mais seulement la bonne
 
 Les 29 studios du lecteur générique n'ont **aucun chiffre en base** à

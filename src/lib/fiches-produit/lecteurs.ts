@@ -164,8 +164,13 @@ function lireEndorphina(html: string): FaitsFiche {
  *   RTP 96.09% », « 95.68% RTP ». Un nombre isolé ailleurs dans la page ne vaut
  *   rien.
  */
-const POURCENT = String.raw`\d{2}[.,]\d{1,2}\s?%`;
-const SUITE = String.raw`(?:\s*(?:\||/|,|or|and|–|-)?\s*${POURCENT})*`;
+/*
+ * Un pourcentage, entier compris : AvatarUX écrit « RTP 96%; 94%; 90.5% ».
+ * Le signe « % » est exigé, et le nombre ne doit pas être la fin d'un autre
+ * (« 196% »). Le point-virgule rejoint les séparateurs de liste.
+ */
+const POURCENT = String.raw`(?<![\d.,])\d{2}(?:[.,]\d{1,2})?\s?%`;
+const SUITE = String.raw`(?:\s*(?:\||/|,|;|or|and|–|-)?\s*${POURCENT})*`;
 const APRES_SIGLE = new RegExp(
   String.raw`\b(?:Default\s+|Fixed\s+|Theoretical\s+)?RTP\b\s*[:\-]?\s*(${POURCENT}${SUITE})`,
   'gi',
@@ -180,10 +185,20 @@ export function lireFicheGenerique(html: string): FaitsFiche {
   );
   for (const m of candidats) {
     const debut = m.index ?? 0;
-    const contexte = t.slice(Math.max(0, debut - 40), debut + m[0].length);
+    /*
+     * Une fenêtre d'exclusion selon la forme.
+     *
+     * Sigle d'abord (« RTP 96.25% ») : c'est une rubrique, seuls les mots
+     * collés devant comptent — « Bonus Buy RTP » est exclu, mais « Buy Feature
+     * Stats RTP » (Koala, fin d'une liste de fonctions puis nouvelle rubrique)
+     * ne l'est pas. Nombre d'abord (« Grand Jackpot Set at 94.36% RTP ») : c'est
+     * de la prose, la phrase entière compte.
+     */
+    const sigleDabord = /^\s*(?:Default\s+|Fixed\s+|Theoretical\s+)?RTP/i.test(m[0]);
+    const contexte = t.slice(Math.max(0, debut - (sigleDabord ? 12 : 25)), debut + m[0].length);
     if (CONTEXTE_EXCLU.test(contexte)) continue;
-    const valeurs = [...m[1].matchAll(/(\d{2})[.,](\d{1,2})\s?%/g)]
-      .map((v) => Number(`${v[1]}.${v[2]}`))
+    const valeurs = [...m[1].matchAll(/(\d{2})(?:[.,](\d{1,2}))?\s?%/g)]
+      .map((v) => Number(`${v[1]}.${v[2] ?? '0'}`))
       .filter((v) => v >= 80 && v <= 99.9);
     if (!valeurs.length) continue;
     const tri = [...new Set(valeurs)].sort((a, b) => b - a);
