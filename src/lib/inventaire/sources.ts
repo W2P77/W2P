@@ -30,6 +30,15 @@ export interface SourceStudio {
   origine: string;
   /** Rend les URL de fiches produit du studio. */
   lister(recuperer: (url: string) => Promise<string>): Promise<string[]>;
+  /**
+   * Comment lire le slug dans l'URL, quand le défaut ne suffit pas.
+   *
+   * Habanero nomme ses pages `SGBattleTheBeast` : la normalisation commune en
+   * fait `sgbattlethebeast`, qui ne ressemble à aucun slug de notre base. Sans
+   * ce crochet, son inventaire annoncerait 226 jeux manquants et 6 jeux
+   * « chez nous seulement » — le catalogue entier compté deux fois.
+   */
+  slug?(url: string): string;
 }
 
 /**
@@ -41,18 +50,33 @@ export interface SourceStudio {
  * alors qu'il en liste 143. Un seul niveau suffit — aucun des sites rencontrés
  * n'imbrique plus loin.
  */
+/**
+ * Un `<loc>`, que son contenu soit nu ou enveloppé de CDATA.
+ *
+ * Evoplay publie `<loc><![CDATA[https://…]]></loc>` — la forme que génère All
+ * in One SEO. Le motif `[^<]+` bute sur le `<` de `<![CDATA[` et rend zéro
+ * résultat : le studio passait pour n'avoir aucun jeu alors qu'il en liste 447.
+ * Un sitemap vide et un sitemap illisible se ressemblent trop pour qu'on se
+ * fie au compte.
+ */
+const LOC = /<loc>\s*(?:<!\[CDATA\[)?([^<\]]+)/g;
+
+export function locsDuTexte(xml: string): string[] {
+  return [...xml.matchAll(LOC)].map((m) => m[1].trim());
+}
+
 async function locs(
   xml: string,
   recuperer: (url: string) => Promise<string>,
 ): Promise<string[]> {
-  const directes = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].trim());
+  const directes = locsDuTexte(xml);
   if (!/<sitemapindex/i.test(xml)) return directes;
 
   const tout: string[] = [];
   for (const sous of directes) {
     try {
       const contenu = await recuperer(sous);
-      tout.push(...[...contenu.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].trim()));
+      tout.push(...locsDuTexte(contenu));
     } catch {
       // Un sous-sitemap injoignable ne doit pas faire échouer l'inventaire
       // entier : on perd sa part, le reste du studio reste comptabilisé.
@@ -77,14 +101,12 @@ export const SOURCES: SourceStudio[] = [
      */
     async lister(recuperer) {
       const index = await recuperer(this.origine);
-      const sous = [...index.matchAll(/<loc>([^<]+)<\/loc>/g)]
-        .map((m) => m[1].trim())
-        .filter((u) => /games-sitemap\d*\.xml$/.test(u));
+      const sous = locsDuTexte(index).filter((u) => /games-sitemap\d*\.xml$/.test(u));
       const tout: string[] = [];
       for (const s of sous) {
         try {
           const contenu = await recuperer(s);
-          tout.push(...[...contenu.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].trim()));
+          tout.push(...locsDuTexte(contenu));
         } catch {
           // Un sous-sitemap injoignable ne doit pas faire echouer l'inventaire.
         }
@@ -128,7 +150,125 @@ export const SOURCES: SourceStudio[] = [
       return filtrer(liens, /\/games\/[^/]+$/).filter((u) => !u.endsWith('/scratchcards'));
     },
   },
+  {
+    studio: 'wazdan',
+    origine: 'https://wazdan.com/games-sitemap.xml',
+    async lister(recuperer) {
+      return filtrer(await locs(await recuperer(this.origine), recuperer), /\/games\/[^/]+$/);
+    },
+  },
+  {
+    studio: 'thunderkick',
+    origine: 'https://www.thunderkick.com/games-sitemap.xml',
+    async lister(recuperer) {
+      return filtrer(await locs(await recuperer(this.origine), recuperer), /\/games\/[^/]+\/?$/);
+    },
+  },
+  {
+    studio: 'quickspin',
+    origine: 'https://quickspin.com/games-sitemap.xml',
+    async lister(recuperer) {
+      // Chez eux c'est `/slots/`, et la page de listing `/slots/` elle-même
+      // figure dans le sitemap : exiger un segment après la barre l'écarte.
+      return filtrer(await locs(await recuperer(this.origine), recuperer), /\/slots\/[^/]+\/?$/);
+    },
+  },
+  {
+    studio: 'endorphina',
+    origine: 'https://endorphina.com/sitemap.xml',
+    async lister(recuperer) {
+      // Les traductions vivent dans des sitemaps séparés (`sitemap_es.xml`,
+      // `sitemap_pt-br.xml`, `sitemap_it.xml`) : le principal est déjà en
+      // anglais seul, rien à dédoublonner.
+      return filtrer(await locs(await recuperer(this.origine), recuperer), /\/games\/[^/]+$/);
+    },
+  },
+  {
+    studio: 'amusnet',
+    origine: 'https://amusnet.com/sitemap.xml',
+    /*
+     * Amusnet range son catalogue en trois familles, et deux ne sont pas de
+     * notre ressort :
+     *
+     * · `/games/online-casino/` — 331 jeux, ce qu'on catalogue.
+     * · `/games/land-based/` — 58 bornes physiques de casino terrestre. Un
+     *   visiteur ne peut pas y jouer depuis une page web : les lister
+     *   gonflerait le dénominateur d'un tiers avec des machines qu'on ne
+     *   pourra jamais ni capturer ni sourcer.
+     * · `/games/live-casino/` — 35 tables filmées. Leur modèle de faits est
+     *   autre : pas de panneau de règles à lire, et un « gain maximum » qui
+     *   porte sur une case de mise, pas sur la mise totale. À traiter à part
+     *   le jour où on ouvrira le live, pas à mélanger ici.
+     */
+    async lister(recuperer) {
+      return filtrer(
+        await locs(await recuperer(this.origine), recuperer),
+        /\/games\/online-casino\/[^/]+$/,
+      );
+    },
+  },
+  {
+    studio: 'habanero',
+    origine: 'https://habanerosystems.com/sitemap.xml',
+    async lister(recuperer) {
+      // Le sitemap sert les 226 jeux dans une douzaine de langues (`/zh-CN/`,
+      // `/it-IT/`…), soit 904 URL pour un seul catalogue. On ne garde que la
+      // forme sans préfixe.
+      return filtrer(
+        await locs(await recuperer(this.origine), recuperer),
+        /^https:\/\/habanerosystems\.com\/games\/[^/]+$/,
+      );
+    },
+    /*
+     * `SGBattleTheBeast` est un identifiant interne, pas un slug : `SG` pour
+     * slot game, `TG` pour table game, puis le titre en CamelCase. La
+     * normalisation commune en ferait `sgbattlethebeast`. On coupe le préfixe
+     * et on rend les césures — vérifié contre nos 6 fiches existantes, 5
+     * retombent au bon slug et la 6e révèle une vraie divergence (`the-koi-gate`
+     * chez eux, `koi-gate` chez nous), ce que la colonne « chez nous seulement »
+     * est faite pour montrer.
+     */
+    slug(url) {
+      const brut = url.split('/').filter(Boolean).pop() ?? '';
+      return brut
+        .replace(/^(SG|TG)(?=[A-Z0-9])/, '')
+        .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+        .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    },
+  },
+  {
+    studio: 'evoplay',
+    origine: 'https://evoplay.games/sitemap.xml',
+    async lister(recuperer) {
+      const index = locsDuTexte(await recuperer(this.origine));
+      const jeux = index.find((u) => u.endsWith('/game-sitemap.xml'));
+      if (!jeux) return [];
+      // 447 URL pour trois langues : `/pt-br/jogo/`, `/es/juego/`, `/game/`.
+      // Seule la dernière forme nous intéresse.
+      return filtrer(locsDuTexte(await recuperer(jeux)), /^https:\/\/evoplay\.games\/game\/[^/]+\/?$/);
+    },
+  },
 ];
+
+/**
+ * Les studios qu'on ne peut **pas** inventorier automatiquement, et pourquoi.
+ *
+ * Sans cette liste, un studio absent de `SOURCES` se lit comme « pas encore
+ * fait » alors que c'est parfois « pas faisable ». La nuance décide de la
+ * suite : on écrit un adaptateur dans un cas, on ouvre un fichier à la main
+ * dans l'autre.
+ */
+export const SANS_SOURCE_AUTOMATISABLE: Record<string, string> = {
+  blueprint:
+    "blueprintgaming.com sert `User-agent: * / Disallow: /` — le site entier refuse l'exploration. On ne passe pas outre : checklist à tenir à la main.",
+  betsoft:
+    "betsoftgaming.com ne publie aucun sitemap : `/sitemap.xml` rend la page d'accueil en HTML, et robots.txt n'en déclare pas.",
+  booming:
+    "le domaine `boominggames.com` enregistré chez nous ne résout plus (ENOTFOUND). Retrouver leur site avant tout inventaire.",
+};
 
 /**
  * Le slug d'un jeu, déduit de son URL chez le studio.

@@ -2,6 +2,65 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — Sept studios inventoriés, trois qu'on ne peut pas inventorier
+
+Dix studios stagnaient à exactement 6 fiches — 5 pour Booming, 4 pour Wazdan.
+Aucun éditeur n'a six jeux : c'était un reste de seed, pas un catalogue. Sans
+source pour les comparer, rien ne le signalait.
+
+Sept adaptateurs d'inventaire plus tard, le catalogue passe de **2 462 à
+3 945 fiches** (1 483 créées, 11 refusées pour collision de slug) :
+
+| studio | publiés | chez nous avant |
+|---|---|---|
+| Amusnet | 281 | 6 |
+| Evoplay | 270 | 6 |
+| Wazdan | 263 | 4 |
+| Endorphina | 234 | 6 |
+| Habanero | 226 | 6 |
+| Quickspin | 137 | 6 |
+| Thunderkick | 117 | 6 |
+
+Une fiche créée porte un slug, un nom déduit du slug et son studio. Rien
+d'autre : `rtpConfiance` reste à `AUCUNE`, donc `estPublieable` est faux et
+elles restent hors index et hors sitemap. Les 245 fiches prêtes le sont
+toujours, aucune nouvelle n'est entrée.
+
+**Trois studios n'ont pas d'inventaire automatisable**, et la raison décide de
+la suite — d'où `SANS_SOURCE_AUTOMATISABLE`, qui les nomme au lieu de les
+laisser dans un silence qu'on lirait « pas encore fait » :
+
+- **Blueprint** sert `User-agent: * / Disallow: /`. Le site refuse
+  l'exploration ; on ne passe pas outre, sa checklist se tiendra à la main.
+- **Betsoft** ne publie aucun sitemap : `/sitemap.xml` rend la page d'accueil
+  en HTML, et robots.txt n'en déclare pas.
+- **Booming** : le domaine qu'on a en base ne résout plus (ENOTFOUND).
+
+### Deux pièges, un cher
+
+**Le CDATA.** Evoplay enveloppe ses `<loc>` dans `<![CDATA[…]]>`, la forme que
+génère All in One SEO. Notre motif partagé `<loc>([^<]+)</loc>` butait sur le
+`<` de `<![CDATA[` et rendait **zéro**. Rien n'échouait : un sitemap illisible
+et un studio sans jeu rendent exactement le même compte. 270 jeux invisibles
+derrière un succès apparent. Le motif accepte désormais les deux formes, et un
+test le verrouille.
+
+**L'identifiant interne.** Habanero nomme ses pages `SGBattleTheBeast` — `SG`
+pour slot game, `TG` pour table game, puis le titre en CamelCase. La
+normalisation commune en faisait `sgbattlethebeast` : son catalogue aurait été
+compté deux fois, 226 manquants d'un côté et nos 6 fiches en « chez nous
+seulement » de l'autre. D'où le crochet `slug?()` par studio, vérifié contre
+nos fiches existantes : 5 sur 6 retombent juste, et la 6e révèle une vraie
+divergence (`the-koi-gate` chez eux, `koi-gate` chez nous) — exactement ce que
+la colonne est faite pour montrer.
+
+**Amusnet range son catalogue en trois familles** et deux ne sont pas de notre
+ressort : 58 bornes `land-based` auxquelles on ne peut pas jouer depuis une
+page web, et 35 tables `live-casino` dont le modèle de faits est autre (pas de
+panneau de règles, un gain maximum qui porte sur une case de mise). Les
+compter aurait gonflé le dénominateur d'un tiers avec des jeux qu'on ne pourra
+jamais sourcer.
+
 ## 2026-09-11 — Deux tables pour arrêter de deviner : les preuves et les casinos
 
 Le site promet « Where to play Gates of Olympus » et répondait autre chose. Le

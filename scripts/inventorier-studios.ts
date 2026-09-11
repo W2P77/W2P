@@ -27,7 +27,7 @@
  *   npx tsx --env-file=.env.local scripts/inventorier-studios.ts --studio bgaming
  */
 import { prisma } from '@/lib/donnees/prisma';
-import { SOURCES, slugDepuisUrl } from '@/lib/inventaire/sources';
+import { SANS_SOURCE_AUTOMATISABLE, SOURCES, slugDepuisUrl } from '@/lib/inventaire/sources';
 
 const APPLIQUER = process.argv.includes('--appliquer');
 const iS = process.argv.indexOf('--studio');
@@ -84,7 +84,8 @@ async function main() {
       continue;
     }
 
-    const chezEux = new Map(urls.map((u) => [slugDepuisUrl(u), u]));
+    const enSlug = source.slug?.bind(source) ?? slugDepuisUrl;
+    const chezEux = new Map(urls.map((u) => [enSlug(u), u]));
     const nos = await prisma.jeu.findMany({ where: { studioId: studio.id }, select: { slug: true } });
     const chezNous = new Set(nos.map((j) => j.slug));
 
@@ -142,8 +143,29 @@ async function main() {
   }
   console.log(
     '\n« chez nous seulement » : jeux que le studio ne liste plus (retirés de son',
-    'site) ou dont le slug diverge du sien. À regarder, jamais à supprimer d\'office.\n',
+    'site) ou dont le slug diverge du sien. À regarder, jamais à supprimer d\'office.',
   );
+
+  /*
+   * Dire ce qu'on ne sait pas vérifier.
+   *
+   * Un studio absent du tableau se lirait « pas encore fait ». Pour ces
+   * trois-là c'est « pas faisable en l'état », et la raison décide de la suite.
+   */
+  if (!SEUL) {
+    console.log('\nSans inventaire automatisable :');
+    for (const [studio, raison] of Object.entries(SANS_SOURCE_AUTOMATISABLE)) {
+      console.log(`  ${studio.padEnd(12)} ${raison}`);
+    }
+    const couverts = new Set([...SOURCES.map((s) => s.studio), ...Object.keys(SANS_SOURCE_AUTOMATISABLE)]);
+    const restants = (await prisma.studio.findMany({ select: { slug: true } }))
+      .map((s) => s.slug)
+      .filter((s) => !couverts.has(s));
+    if (restants.length) {
+      console.log(`\nSans source ni explication (${restants.length}) : ${restants.join(', ')}`);
+    }
+  }
+  console.log();
 }
 
 main().finally(() => prisma.$disconnect());
