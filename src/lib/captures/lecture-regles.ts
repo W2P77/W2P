@@ -314,8 +314,15 @@ export function extraireLesFaits(texte: string, pages: FaitsLus['pages'] = []): 
    * Pragmatic écrit « The theoretical RTP of this game is 96.00% », Hacksaw
    * « Theoretical payout (RTP): 96.43% ». Exiger `RTP` juste après le mot-clé
    * rendait donc **null** sur un panneau Hacksaw parfaitement lisible.
+   *
+   * BGaming intercale le sigle développé : « The overall theoretical **Return
+   * to Player** (RTP) is 97.04% ». Relevé au mot près sur Adventures (97,1),
+   * All-Star Fruits (97,04) et Alice Wonderluck (97,03), et lu sans faute par
+   * l'OCR — c'est bien l'interprétation qui rendait `null`, pas la lecture.
+   * Trois fiches enrichies d'images et d'aucun chiffre : le mode d'échec le
+   * plus coûteux, puisqu'il ne signale rien.
    */
-  const APRES_LE_MOT = '\\s+(?:payout\\s*)?\\(?\\s*RTP\\s*\\)?';
+  const APRES_LE_MOT = '\\s+(?:payout\\s*)?(?:Return\\s+to\\s+Player\\s*)?\\(?\\s*RTP\\s*\\)?';
   const lire = (mot: string) =>
     new RegExp(`${mot}${APRES_LE_MOT}${jusquAuNombre}${CHIFFRE}`, 'i').exec(t)?.[1] ?? null;
 
@@ -326,13 +333,22 @@ export function extraireLesFaits(texte: string, pages: FaitsLus['pages'] = []): 
 
   const minLu = /MINIMUM\s+BET[^0-9]{0,12}([\d.,]+)/i.exec(t);
   const maxLu = /MAXIMUM\s+BET[^0-9]{0,12}([\d.,]+)/i.exec(t);
-  // Trois formulations : « maximum theoretical win is 5,000x » et « the
-  // maximum win amount is limited to 5,000x bet » chez Pragmatic, « Maximum
-  // achievable win: 10,000x » chez Hacksaw.
+  /*
+   * Quatre formulations : « maximum theoretical win is 5,000x » et « the
+   * maximum win amount is limited to 5,000x bet » chez Pragmatic, « Maximum
+   * achievable win: 10,000x » chez Hacksaw.
+   *
+   * BGaming met le signe **avant** le nombre — « The maximum winning amount is
+   * ×1500 of the bet » (All-Star Fruits), « …amount in the game is ×10000 »
+   * (Alice Wonderluck) — donc aucune des trois premières, qui cherchent toutes
+   * un `x` suffixe, ne pouvait l'attraper. L'OCR rend le `×` en `x` ordinaire,
+   * d'où les deux caractères acceptés.
+   */
   const gainLu =
     /maximum\s+theoretical\s+win[^0-9]{0,40}([\d.,]+)\s*x/i.exec(t) ??
     /maximum\s+win\s+amount\s+is\s+limited\s+to\s+([\d.,]+)\s*x/i.exec(t) ??
-    /maximum\s+achievable\s+win[^0-9]{0,40}([\d.,]+)\s*x/i.exec(t);
+    /maximum\s+achievable\s+win[^0-9]{0,40}([\d.,]+)\s*x/i.exec(t) ??
+    /maximum\s+winning\s+amount[^0-9]{0,20}[x×]\s*([\d.,]+)/i.exec(t);
   const freqLu = /chance\s+to\s+hit\s+of\s+1\s+in\s+([\d.,]+)/i.exec(t);
 
   const volatilite = VOLATILITES.find(([r]) => r.test(t))?.[1] ?? null;

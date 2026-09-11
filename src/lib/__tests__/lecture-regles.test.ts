@@ -18,6 +18,20 @@ describe('le RTP, selon la formule du studio', () => {
     expect(extraireLesFaits('Theoretical payout (RTP): 96.43%').rtp).toBe(96.43);
   });
 
+  /*
+   * Le texte est celui que Tesseract a rendu de la capture d'All-Star Fruits,
+   * recopié sans retouche. La phrase suivante annonce deux RTP d'achat, et
+   * c'est ce voisinage-là qui fait l'intérêt du cas : le studio publie les
+   * trois d'affilée, et seul le premier porte « theoretical ».
+   */
+  it('lit la formule de BGaming, où « RTP » suit le sigle développé', () => {
+    const f = extraireLesFaits(
+      'The overall theoretical Return to Player (RTP) is 97.04%. ' +
+        'RTP for the Buy Bonus feature is 97.01%. RTP for the Buy Magic Spins feature is 97.03%.',
+    );
+    expect(f.rtp).toBe(97.04);
+  });
+
   it('lit une plage comme un défaut et un palier', () => {
     const f = extraireLesFaits(
       'The maximum RTP of this game is 96.03% The minimum RTP of this game is 94.02%',
@@ -62,6 +76,17 @@ describe('le gain maximum, selon la formule du studio', () => {
 
   it('lit « maximum achievable win », la formule de Hacksaw', () => {
     expect(extraireLesFaits('Maximum achievable win: 25,000x').gainMax).toBe(25000);
+  });
+
+  /*
+   * BGaming écrit le multiplicateur **avant** le nombre, et l'OCR rend son
+   * « × » en « x » ordinaire. Les deux tournures relevées à trois jeux d'écart
+   * ne diffèrent que par « in the game », d'où un saut toléré entre le mot-clé
+   * et le signe plutôt que deux expressions séparées.
+   */
+  it('lit la formule de BGaming, où le signe précède le nombre', () => {
+    expect(extraireLesFaits('The maximum winning amount is x1500 of the bet.').gainMax).toBe(1500);
+    expect(extraireLesFaits('The maximum winning amount in the game is ×10000.').gainMax).toBe(10000);
   });
 });
 

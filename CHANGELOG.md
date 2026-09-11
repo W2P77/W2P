@@ -2,6 +2,37 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — BGaming capture, et lit mieux que notre base
+
+L'adaptateur BGaming était écrit depuis des semaines et n'avait jamais tourné.
+Un agent l'a repris, puis a été interrompu au moment de l'inscrire au registre
+— inscrit, donc, sans avoir été essayé. Essai refait avant de commiter.
+
+**Quatre jeux sur huit aboutissent.** `adventures` 97,1 · `alice-wonderluck`
+97,03 · `alien-fruits` 95,97 · `all-star-fruits` 97,04, de 10 à 14 captures
+chacun. Les quatre autres s'arrêtent sur « icône des règles introuvable », ne
+publient rien et restent en file. Un adaptateur qui échoue bruyamment sans rien
+écrire peut être branché ; c'est celui qui écrirait faux qui ne le peut pas.
+La moitié manquante ressemble à l'habillage multiple de Pragmatic — à creuser.
+
+### Deux formules de plus
+
+BGaming intercale le sigle développé — « The overall theoretical **Return to
+Player** (RTP) is 97.04% » — et met le signe **avant** le nombre dans le gain
+maximum — « The maximum winning amount is ×1500 of the bet ». Aucune des
+formules connues n'attrapait l'une ou l'autre : trois fiches se seraient
+enrichies d'images et d'aucun chiffre, le mode d'échec le plus coûteux puisqu'il
+ne signale rien. Deux tests de plus, recopiés du texte OCR sans retouche.
+
+### La base avait tort d'un point
+
+Sur `adventures`, la base portait **96,1** et le panneau annonce **97,1**.
+Un point d'écart pile ressemble à un 6 lu comme un 7 : relu à plus haute
+résolution, le jeu écrit bien « The overall theoretical Return to Player (RTP)
+is 97.1% ». Le 96,1 venait de l'import. Le garde-fou d'écart n'a rien écrasé —
+c'est son rôle — mais il reste un problème : la fiche publierait une capture
+qui dit 97,1 à côté d'un chiffre qui dit 96,1.
+
 ## 2026-09-11 — Huit studios écrits à la main, sept abandons motivés
 
 Les studios que le prospecteur n'a pas su lire sont souvent ceux que nos

@@ -256,9 +256,15 @@ export const PRAGMATIC: Adaptateur = {
   },
 };
 
+import { BGAMING } from './adaptateur-bgaming';
 import { HACKSAW } from './adaptateur-hacksaw';
 
+/*
+ * La clé est le `slug` du studio en base, pas son nom : c'est elle que
+ * `--studio` reçoit et que la requête de `capturer-jeux.ts` compare.
+ */
 export const ADAPTATEURS: Record<string, Adaptateur> = {
   'pragmatic-play': PRAGMATIC,
   'hacksaw-gaming': HACKSAW,
+  bgaming: BGAMING,
 };
