@@ -2,6 +2,27 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — Lire une page, mais seulement la bonne
+
+Les 29 studios du lecteur générique n'ont **aucun chiffre en base** à
+contredire : si le lecteur lit la mauvaise page, rien ne le signale. Or pour
+les studios issus de la prospection, l'adresse de la page est reconstruite à
+partir de notre slug, et une adresse reconstruite peut aboutir ailleurs.
+
+Deux garde-fous, avant toute lecture :
+
+- **L'adresse finale** doit porter encore le slug demandé. Un site qui redirige
+  vers son accueil, une liste ou la fiche d'un autre jeu est ignoré.
+- **Le titre ou le premier intitulé** de la page doit contenir **tous** les
+  mots distinctifs du nom du jeu — un seul suffirait à confondre « Book of
+  Kemet » et « Book of Ra ». Comparaison sans espaces, pour que « Dragon's Gold
+  100 » reconnaisse « dragons gold 100 ». C'est ce qui arrête une « page
+  introuvable » habillée, qui répond 200 sans rediriger.
+
+Sur 46 pages de six studios, aucune n'a été bloquée à tort. Les pages sans
+chiffre observées sont de vrais cas vides : Elbet construit ses fiches en
+JavaScript, rien n'est lisible, rien n'est écrit.
+
 ## 2026-09-11 — Un lecteur générique pour trente et un studios
 
 Un sondage de deux pages produit par studio sur les 84 restants : **34

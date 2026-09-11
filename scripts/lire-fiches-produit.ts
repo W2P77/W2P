@@ -42,7 +42,50 @@ async function recuperer(url: string): Promise<string> {
   return r.text();
 }
 
-type Verdict = 'nouveau' | 'confirme' | 'remplace' | 'desaccord-panneau' | 'sans-chiffre' | 'hors-base' | 'illisible';
+/**
+ * Une page de jeu, avec l'adresse où l'on a vraiment atterri.
+ *
+ * Pour les studios issus de la prospection, l'adresse est reconstruite à partir
+ * de notre slug. Quand elle ne correspond pas à la leur, le site redirige — vers
+ * une page d'accueil, une liste, parfois la page d'un **autre** jeu. Lire cette
+ * page-là attribuerait au jeu demandé le RTP d'un autre, sans qu'aucun
+ * désaccord ne le signale : ces fiches n'ont aucun chiffre en base à contredire.
+ */
+async function recupererPage(url: string): Promise<{ html: string; urlFinale: string }> {
+  const r = await fetch(url, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(25000), redirect: 'follow' });
+  if (!r.ok) throw new Error(`${r.status}`);
+  return { html: await r.text(), urlFinale: r.url };
+}
+
+/*
+ * La page parle-t-elle bien de ce jeu ?
+ *
+ * Une adresse reconstruite peut répondre 200 sans être la bonne page : une
+ * « page introuvable » habillée, une liste, la fiche d'un jeu voisin avec son
+ * propre RTP. Aucune redirection à détecter, et sur ces studios aucun chiffre
+ * en base pour contredire. On exige donc que le titre ou le premier intitulé
+ * de la page contienne **tous** les mots distinctifs du nom du jeu — un seul
+ * suffirait à confondre « Book of Kemet » et « Book of Ra ». La comparaison se
+ * fait sans espaces : « Dragon's Gold 100 » doit reconnaître « dragons gold 100 ».
+ */
+const MOTS_VIDES = new Set([
+  'slot', 'slots', 'game', 'games', 'the', 'and', 'of', 'online', 'free', 'play', 'demo', 'casino',
+]);
+function parleDuJeu(html: string, nom: string): boolean {
+  const norme = (x: string) =>
+    x.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/&[a-z#0-9]+;/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
+  const entete = [/<title[^>]*>([\s\S]*?)<\/title>/i.exec(html)?.[1] ?? '', /<h1[^>]*>([\s\S]*?)<\/h1>/i.exec(html)?.[1] ?? '']
+    .join(' ')
+    .replace(/<[^>]+>/g, ' ');
+  const colle = norme(entete).replace(/ /g, '');
+  const mots = norme(nom).split(' ').filter((m) => m.length >= 3 && !MOTS_VIDES.has(m));
+  // Un nom sans mot distinctif ne permet pas de conclure : on ne bloque pas.
+  return !mots.length || mots.every((m) => colle.includes(m));
+}
+
+type Verdict =
+  | 'nouveau' | 'confirme' | 'remplace' | 'desaccord-panneau' | 'sans-chiffre' | 'hors-base' | 'illisible' | 'redirige'
+  | 'autre-page';
 
 async function main() {
   const studios = arg('studio') ? [arg('studio')!] : Object.keys(LECTEURS);
@@ -54,7 +97,7 @@ async function main() {
     }
     const jeux = await prisma.jeu.findMany({
       where: { studio: { slug: studio } },
-      select: { id: true, slug: true, rtpStudio: true, rtpSource: true, volatilite: true, gainMaxMultiple: true },
+      select: { id: true, slug: true, nom: true, rtpStudio: true, rtpSource: true, volatilite: true, gainMaxMultiple: true },
     });
     const parSlug = new Map(jeux.map((j) => [j.slug, j]));
 
@@ -86,6 +129,7 @@ async function main() {
     const urls = paires.map((p) => p.url);
     const bilan: Record<Verdict, number> = {
       nouveau: 0, confirme: 0, remplace: 0, 'desaccord-panneau': 0, 'sans-chiffre': 0, 'hors-base': 0, illisible: 0,
+      redirige: 0, 'autre-page': 0,
     };
     const aMontrer: string[] = [];
 
@@ -96,7 +140,13 @@ async function main() {
       if (!jeu) { bilan['hors-base'] += 1; continue; }
 
       let f: FaitsFiche;
-      try { f = lire(await recuperer(url)); } catch { bilan.illisible += 1; continue; }
+      try {
+        const { html, urlFinale } = await recupererPage(url);
+        // La page lue doit être celle du jeu demandé, pas celle où l'on a été renvoyé.
+        if (slugDepuisUrl(urlFinale) !== slugDepuisUrl(url)) { bilan.redirige += 1; continue; }
+        if (!parleDuJeu(html, jeu.nom)) { bilan['autre-page'] += 1; continue; }
+        f = lire(html);
+      } catch { bilan.illisible += 1; continue; }
       if (f.rtp == null) { bilan['sans-chiffre'] += 1; continue; }
 
       const base = jeu.rtpStudio == null ? null : Number(jeu.rtpStudio);
@@ -157,7 +207,8 @@ async function main() {
     console.log(
       `  nouveaux ${bilan.nouveau} · confirmés ${bilan.confirme} · remplacés ${bilan.remplace} · ` +
         `désaccords avec le panneau ${bilan['desaccord-panneau']} · sans chiffre ${bilan['sans-chiffre']} · ` +
-        `hors base ${bilan['hors-base']} · illisibles ${bilan.illisible}`,
+        `hors base ${bilan['hors-base']} · illisibles ${bilan.illisible} · redirigées ${bilan.redirige} · ` +
+        `pages d'un autre jeu ${bilan['autre-page']}`,
     );
     for (const l of aMontrer.slice(0, 12)) console.log(l);
   }
