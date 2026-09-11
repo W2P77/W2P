@@ -30,8 +30,18 @@ import { prisma } from '@/lib/donnees/prisma';
 import { SANS_SOURCE_AUTOMATISABLE, SOURCES, slugDepuisUrl } from '@/lib/inventaire/sources';
 
 const APPLIQUER = process.argv.includes('--appliquer');
+/*
+ * `--studio bgaming` et `--studio=bgaming`.
+ *
+ * Les autres scripts du dossier n'acceptent que la forme collée
+ * (`prospecter-studios.ts`, `adopter-prospection.ts`) : celui-ci n'acceptait
+ * que la forme séparée, et `--studio=bgaming` n'y produisait aucune erreur —
+ * il lançait l'inventaire des trente studios au lieu d'un seul, une centaine
+ * de requêtes pour une frappe d'apparence correcte.
+ */
+const COLLE = process.argv.find((a) => a.startsWith('--studio='))?.slice('--studio='.length);
 const iS = process.argv.indexOf('--studio');
-const SEUL = iS >= 0 ? process.argv[iS + 1] : null;
+const SEUL = COLLE ?? (iS >= 0 ? process.argv[iS + 1] : null);
 
 const NAVIGATEUR =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36';
@@ -72,10 +82,6 @@ async function main() {
   const jumeaux: string[] = [];
   for (const source of sources) {
     const studio = await prisma.studio.findUnique({ where: { slug: source.studio } });
-    if (!studio) {
-      console.log(`${source.studio.padEnd(18)}  studio absent de la base`);
-      continue;
-    }
 
     let urls: string[];
     try {
@@ -87,6 +93,24 @@ async function main() {
 
     const enSlug = source.slug?.bind(source) ?? slugDepuisUrl;
     const chezEux = new Map(urls.map((u) => [enSlug(u), u]));
+
+    /*
+     * Un studio sans ligne en base n'est pas une source fautive : c'est un
+     * adaptateur qu'on vient d'écrire, pour un éditeur que personne n'a encore
+     * créé. La version précédente s'arrêtait avant même d'interroger le site
+     * et n'écrivait que « studio absent » — on relisait l'adaptateur en
+     * cherchant l'erreur qui n'y était pas. On interroge donc d'abord, et on
+     * rend le nombre publié, qui est justement ce qu'on voulait vérifier.
+     */
+    if (!studio) {
+      console.log(
+        source.studio.padEnd(18) +
+          String(chezEux.size).padStart(9) +
+          '   ligne Studio à créer avant tout --appliquer',
+      );
+      continue;
+    }
+
     const nos = await prisma.jeu.findMany({ where: { studioId: studio.id }, select: { slug: true } });
     const chezNous = new Set(nos.map((j) => j.slug));
 

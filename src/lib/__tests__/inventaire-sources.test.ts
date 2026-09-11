@@ -69,6 +69,35 @@ describe('slug déduit de l’URL', () => {
     expect(enSlug('https://habanerosystems.com/games/SG12Zodiacs')).toBe('12-zodiacs');
     expect(enSlug('https://habanerosystems.com/games/TGBlackjack')).toBe('blackjack');
   });
+
+  /*
+   * TaDa nomme ses pages en CamelCase, sans séparateur avant les chiffres.
+   * `Crazy777` retombait sur `crazy777` quand le studio titre « Crazy 777 » :
+   * la fiche existait deux fois, une par orthographe.
+   */
+  it('rend un slug lisible pour TaDa', () => {
+    const tada = SOURCES.find((s) => s.studio === 'tada');
+    expect(tada?.slug).toBeTypeOf('function');
+    const enSlug = (u: string) => tada!.slug!(u);
+    expect(enSlug('https://tadagaming.com/PlusIntro/ChinShiHuang')).toBe('chin-shi-huang');
+    expect(enSlug('https://tadagaming.com/PlusIntro/Crazy777')).toBe('crazy-777');
+    expect(enSlug('https://tadagaming.com/PlusIntro/XIYANGYANG')).toBe('xiyangyang');
+  });
+
+  /*
+   * Amatic n'a pas de page par jeu : l'adaptateur porte le titre en ancre, et
+   * `slugDepuisUrl` coupe justement l'ancre — sans ce crochet, les 121 jeux
+   * tomberaient tous sur le même slug « slot-games ».
+   */
+  it('lit le titre mis en ancre par Amatic', () => {
+    const amatic = SOURCES.find((s) => s.studio === 'amatic');
+    expect(amatic?.slug).toBeTypeOf('function');
+    const enSlug = (u: string) => amatic!.slug!(u);
+    const base = 'https://www.amatic.com/products/slot-games';
+    expect(enSlug(`${base}#Book%20Of%20Aztec`)).toBe('book-of-aztec');
+    expect(enSlug(`${base}#Fire%20%26%20Ice`)).toBe('fire-ice');
+    expect(slugDepuisUrl(`${base}#Book%20Of%20Aztec`)).toBe('slot-games');
+  });
 });
 
 describe('couverture des studios', () => {

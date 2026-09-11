@@ -2,6 +2,63 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — Huit studios écrits à la main, sept abandons motivés
+
+Les studios que le prospecteur n'a pas su lire sont souvent ceux que nos
+casinos portent le plus. Un agent a repris les quinze plus portés un par un,
+à la main. Relecture faite, **huit adaptateurs** entrent et le catalogue passe
+de 10 430 à **11 682 fiches** :
+
+| studio | source | jeux créés |
+|---|---|---|
+| Microgaming | `microgaming.io`, index `sitemaps.xml` au pluriel | 214 |
+| TaDa Gaming | sitemap en dix-sept locales, forme nue gardée | 249 |
+| Swintt | pagination annoncée en clair par la page | 193 |
+| Platipus | état SSR du listing | 159 |
+| Tom Horn | sitemap plat | 120 |
+| Amatic | titres lus dans l'`alt` des vignettes | 108 |
+| Reevo | `reevotech.com` — `reevo.com` est un opérateur télécom | 106 |
+| Fugaso | page de listing, faute de sitemap | 103 |
+
+72 slugs déjà pris ailleurs n'ont pas été créés.
+
+### Ce que la relecture a vérifié
+
+**Les domaines surprenants.** `microgaming.io` et `reevotech.com` n'étaient pas
+les formes attendues. Ouverts : ce sont bien les studios. Mais Reevo se décrit
+lui-même comme une *plateforme d'agrégation* — ses 112 jeux pourraient être
+ceux d'autres éditeurs. Aucune page consultée ne crédite de tiers et huit de
+nos casinos le listent comme fournisseur : il entre, et le garde-fou de
+collision refuse tout jeu déjà présent sous son vrai créateur, comme pour
+AvatarUX chez Yggdrasil.
+
+**Amatic ne publie aucune page par jeu.** Le catalogue n'existe que dans la
+vignette du listing, titre en clair dans l'`alt` — le `data-name` voisin colle
+l'année au titre (« Book Of Aztec 2011 »). Ces 108 fiches ne pourront jamais
+recevoir de capture : il n'y a nulle part où lire leur RTP. Elles restent hors
+index, et c'est le prix honnête d'un studio qui ne documente pas ses jeux.
+
+**TaDa nomme ses pages en CamelCase** (`/PlusIntro/FortuneTree`). Mesuré sur
+les 277 : 232 retombent exactement sur le titre publié, 43 sont rattrapés par
+le garde-fou des jumeaux, 4 pages numérotées (`/PlusIntro/81`) sont écartées.
+
+### Sept abandons, chacun nommé
+
+Ezugi (403 Cloudflare), PatePlay (robots.txt interdit `/api/`, seule voie),
+SpadeGaming (API enfouie dans un bundle minifié), VoltEnt (site d'une page),
+Playtech (le piège connu : des logiciels B2B), Novomatic (fabricant de bornes ;
+le catalogue en ligne est chez Greentube, rempli par script) et Lucky Streak
+(deux domaines en vente, et des tables filmées hors périmètre).
+
+### Le même défaut, une troisième fois
+
+`--studio=bgaming` lançait l'inventaire **des trente studios** au lieu d'un
+seul : ce script ne lisait que la forme séparée. Troisième script du dossier
+corrigé pour la même raison. Et un studio sans ligne en base arrêtait
+l'inventaire avant même d'interroger son site — on relisait l'adaptateur en
+cherchant une erreur qui n'y était pas. Le site est désormais interrogé
+d'abord, et la ligne dit le geste qui manque.
+
 ## 2026-09-11 — 723 preuves, et 1 702 fiches volontairement laissées sans
 
 La table `Preuve` existait depuis ce matin et était vide.
