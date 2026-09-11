@@ -48,18 +48,42 @@ async function main() {
   const studios = arg('studio') ? [arg('studio')!] : Object.keys(LECTEURS);
   for (const studio of studios) {
     const lire = LECTEURS[studio];
-    const source = SOURCES.find((s) => s.studio === studio);
-    if (!lire || !source) {
-      console.log(`${studio} : pas de lecteur ou pas d'adaptateur d'inventaire.`);
+    if (!lire) {
+      console.log(`${studio} : pas de lecteur.`);
       continue;
     }
-    const enSlug = source.slug?.bind(source) ?? slugDepuisUrl;
-    const urls = (await source.lister(recuperer)).slice(0, LIMITE);
     const jeux = await prisma.jeu.findMany({
       where: { studio: { slug: studio } },
       select: { id: true, slug: true, rtpStudio: true, rtpSource: true, volatilite: true, gainMaxMultiple: true },
     });
     const parSlug = new Map(jeux.map((j) => [j.slug, j]));
+
+    /*
+     * Où lire les pages : l'adaptateur d'inventaire s'il existe, sinon le
+     * motif d'URL noté à la prospection (« familles /games/<slug> »).
+     *
+     * La plupart des studios à la page produit lisible viennent de la
+     * prospection et n'ont pas d'adaptateur : sans ce second chemin, le script
+     * n'en lisait aucun.
+     */
+    const source = SOURCES.find((s) => s.studio === studio);
+    let paires: Array<{ url: string; jeu: (typeof jeux)[number] | undefined }>;
+    if (source) {
+      const enSlug = source.slug?.bind(source) ?? slugDepuisUrl;
+      paires = (await source.lister(recuperer)).map((url) => ({ url, jeu: parSlug.get(enSlug(url)) }));
+    } else {
+      const fiche = await prisma.studio.findUnique({ where: { slug: studio }, select: { siteUrl: true, ouSourcer: true } });
+      const ou = fiche?.ouSourcer ?? '';
+      const prefixe = /familles\s+(\/[^<\s]*)\/<slug>/.exec(ou)?.[1] ?? (/familles \/<slug>/.test(ou) ? '' : null);
+      if (prefixe == null || !fiche?.siteUrl) {
+        console.log(`${studio} : ni adaptateur d'inventaire ni motif d'URL connu.`);
+        continue;
+      }
+      const racine = fiche.siteUrl.replace(/\/$/, '');
+      paires = jeux.map((jeu) => ({ url: `${racine}${prefixe}/${jeu.slug}`, jeu }));
+    }
+    paires = paires.slice(0, LIMITE);
+    const urls = paires.map((p) => p.url);
     const bilan: Record<Verdict, number> = {
       nouveau: 0, confirme: 0, remplace: 0, 'desaccord-panneau': 0, 'sans-chiffre': 0, 'hors-base': 0, illisible: 0,
     };
@@ -68,8 +92,7 @@ async function main() {
     console.log(`\n### ${studio} — ${urls.length} pages produit`);
     for (let i = 0; i < urls.length; i++) {
       if (i > 0) await new Promise((fin) => setTimeout(fin, PAUSE));
-      const url = urls[i];
-      const jeu = parSlug.get(enSlug(url));
+      const { url, jeu } = paires[i];
       if (!jeu) { bilan['hors-base'] += 1; continue; }
 
       let f: FaitsFiche;
@@ -101,13 +124,22 @@ async function main() {
           confiance: 'STUDIO',
           ...(f.volatilite ? { volatilite: f.volatilite } : {}),
           ...(f.gainMax != null ? { gainMaxMultiple: f.gainMax } : {}),
+          // Plusieurs versions publiées : la première est le défaut, les autres des paliers.
+          ...(f.paliers?.length ? { rtpPaliers: [f.rtp, ...f.paliers] } : {}),
         },
       });
       const deja = new Set(
         (await prisma.preuve.findMany({ where: { jeuId: jeu.id }, select: { champ: true } })).map((p) => p.champ),
       );
       const champs: Array<[string, string, string | null]> = [
-        ['rtpStudio', String(f.rtp), verdict === 'remplace' ? `Remplace ${base} issu de l'import.` : null],
+        [
+          'rtpStudio',
+          String(f.rtp),
+          [
+            verdict === 'remplace' ? `Remplace ${base} issu de l'import.` : null,
+            f.paliers?.length ? `Autres versions publiées : ${f.paliers.join(' · ')} %.` : null,
+          ].filter(Boolean).join(' ') || null,
+        ],
         ...(f.volatilite ? [['volatilite', f.volatilite, null] as [string, string, null]] : []),
         ...(f.gainMax != null ? [['gainMaxMultiple', String(f.gainMax), null] as [string, string, null]] : []),
       ];

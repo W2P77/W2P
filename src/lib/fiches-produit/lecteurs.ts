@@ -28,6 +28,8 @@ export interface FaitsFiche {
   rtp: number | null;
   volatilite: Volatilite | null;
   gainMax: number | null;
+  /** Les autres versions publiées, du plus haut au plus bas — `rtp` étant la première. */
+  paliers?: number[];
 }
 
 /** Le texte visible d'une page : sans scripts, sans styles, sans balises. */
@@ -139,9 +141,84 @@ function lireEndorphina(html: string): FaitsFiche {
   };
 }
 
+/*
+ * ── Le lecteur générique ──────────────────────────────────────────────────
+ *
+ * Trente-quatre studios sur quatre-vingt-quatre écrivent leur RTP en clair sur
+ * leur page produit, chacun à sa façon. Plutôt que trente lecteurs, un seul,
+ * aux règles strictes — et qui ne lit **que le RTP**. Gains maximums et
+ * volatilités y prennent trop de formes piégées (« € 254 953 », « 3000 x bet
+ * per line », « Volatility: 1 / 5 ») pour être lus sans lecteur dédié.
+ *
+ * Les règles, chacune tirée d'une page réelle :
+ *
+ * · **Une liste de versions donne son haut.** Spinomenal écrit « 88.85% |
+ *   91.55% | 93.61% | 95.42% » et Elbet « 92.67% 94.47% 96.34% 97.31% », du
+ *   plus bas au plus haut ; Gaming Corps va dans l'autre sens. Prendre le
+ *   premier nombre serait faux une fois sur deux. Le haut est le défaut, les
+ *   autres des paliers — la convention des panneaux de règles.
+ * · **Jamais à côté d'un achat de bonus ni d'un jackpot.** Print Studios écrit
+ *   « RTP 96.31% · RTP w. Bonus Buy 96.24% », Dragon Gaming « Grand Jackpot Set
+ *   at 94.36% RTP ». Une valeur précédée de ces mots est écartée.
+ * · **Le sigle collé au nombre**, avant ou après : « RTP: 96.52% », « Default
+ *   RTP 96.09% », « 95.68% RTP ». Un nombre isolé ailleurs dans la page ne vaut
+ *   rien.
+ */
+const POURCENT = String.raw`\d{2}[.,]\d{1,2}\s?%`;
+const SUITE = String.raw`(?:\s*(?:\||/|,|or|and|–|-)?\s*${POURCENT})*`;
+const APRES_SIGLE = new RegExp(
+  String.raw`\b(?:Default\s+|Fixed\s+|Theoretical\s+)?RTP\b\s*[:\-]?\s*(${POURCENT}${SUITE})`,
+  'gi',
+);
+const AVANT_SIGLE = new RegExp(String.raw`(${POURCENT}${SUITE})\s*RTP\b`, 'gi');
+const CONTEXTE_EXCLU = /bonus\s*buy|w\.\s*bonus|buy\s*(?:feature|bonus)|feature\s*buy|jackpot/i;
+
+export function lireFicheGenerique(html: string): FaitsFiche {
+  const t = texteDuHtml(html);
+  const candidats = [...t.matchAll(APRES_SIGLE), ...t.matchAll(AVANT_SIGLE)].sort(
+    (a, b) => (a.index ?? 0) - (b.index ?? 0),
+  );
+  for (const m of candidats) {
+    const debut = m.index ?? 0;
+    const contexte = t.slice(Math.max(0, debut - 40), debut + m[0].length);
+    if (CONTEXTE_EXCLU.test(contexte)) continue;
+    const valeurs = [...m[1].matchAll(/(\d{2})[.,](\d{1,2})\s?%/g)]
+      .map((v) => Number(`${v[1]}.${v[2]}`))
+      .filter((v) => v >= 80 && v <= 99.9);
+    if (!valeurs.length) continue;
+    const tri = [...new Set(valeurs)].sort((a, b) => b - a);
+    return { rtp: tri[0], volatilite: null, gainMax: null, ...(tri.length > 1 ? { paliers: tri.slice(1) } : {}) };
+  }
+  return { rtp: null, volatilite: null, gainMax: null };
+}
+
 /** Les studios dont la page produit publie des faits lisibles, par slug de studio. */
+/*
+ * Studios lus par le lecteur générique : leur page produit publie le RTP en
+ * clair, relevé sur deux pages chacun le 11/09/2026.
+ *
+ * Écartés à dessein, malgré un RTP visible :
+ * · **pragmatic-play** — « RTP: 96.50% » sur ses pages, le chiffre rond de
+ *   l'import, là où ses panneaux donnent 96,46 ou 96,36 : une valeur générique
+ *   de catalogue, qui donnerait l'apparence d'une source à un remplissage ;
+ * · **dragon** — le RTP n'apparaît que dans une phrase de jackpot (« Grand
+ *   Jackpot Set at 94.36% RTP ») ;
+ * · **wicked** — des pages « TBD » de jeux à paraître, aux chiffres provisoires ;
+ * · **habanero** — page construite en JavaScript, rien dans le HTML servi.
+ */
+const GENERIQUES = [
+  'amusnet', 'evoplay', 'wazdan', 'fugaso', 'spinomenal', 'spinoro', '1spin4win', 'stakelogic',
+  'fantasma', 'caleta', 'kingmidas', 'gamingcorps', 'popiplay', 'avatarux', 'gamebeat', 'slotopia',
+  'elagames', 'peterandsons', 'gamzix', 'backseat', 'phoenix7', 'formulaspin', 'milliongames',
+  'comtrade', 'printstudios', 'winspinity', 'revolvergaming', 'elbet', 'koala',
+];
+
 export const LECTEURS: Record<string, (html: string) => FaitsFiche> = {
   bgaming: lireBGaming,
   netent: lireNetEnt,
   endorphina: lireEndorphina,
+  // Red Tiger et Nolimit City partagent le gabarit de NetEnt (groupe Evolution).
+  'red-tiger': lireNetEnt,
+  'nolimit-city': lireNetEnt,
+  ...Object.fromEntries(GENERIQUES.map((studio) => [studio, lireFicheGenerique])),
 };

@@ -2,6 +2,38 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-11 — Un lecteur générique pour trente et un studios
+
+Un sondage de deux pages produit par studio sur les 84 restants : **34
+publient un RTP lisible en HTML**, soit environ 4 990 fiches. Chacun à sa
+façon — d'où un seul lecteur générique aux règles strictes plutôt que trente
+lecteurs sur mesure. Il ne lit **que le RTP** : gains maximums et volatilités y
+prennent trop de formes piégées (« € 254 953 », « 3000 x bet per line »,
+« Volatility: 1 / 5 ») pour être lus sans lecteur dédié.
+
+Ses règles, chacune tirée d'une page réelle et verrouillée par un test :
+
+- **Une liste de versions donne son haut.** Spinomenal écrit « 88.85% |
+  91.55% | 93.61% | 95.42% » et Elbet « 92.67% 94.47% 96.34% 97.31% », du plus
+  bas au plus haut ; Gaming Corps va dans l'autre sens. Prendre le premier
+  nombre serait faux une fois sur deux. Le haut devient le taux, les autres des
+  paliers, enregistrés en base et nommés dans la preuve.
+- **Jamais à côté d'un achat de bonus ni d'un jackpot** : « RTP w. Bonus Buy
+  96.24% » (Print Studios), « Grand Jackpot Set at 94.36% RTP » (Dragon Gaming).
+- **Le sigle collé au nombre**, avant ou après ; un nombre isolé ne vaut rien.
+
+Branchés : 29 studios au lecteur générique, Red Tiger et Nolimit City au
+gabarit NetEnt, qu'ils partagent (groupe Evolution). **Écartés malgré un RTP
+visible** : Pragmatic (« RTP: 96.50% » sur ses pages — le chiffre rond de
+l'import, là où ses panneaux donnent 96,46 ou 96,36 : une valeur générique qui
+donnerait l'apparence d'une source à un remplissage), Dragon Gaming (RTP
+seulement dans une phrase de jackpot), Wicked (pages « TBD » de jeux à
+paraître), Habanero (page construite en JavaScript).
+
+`lire-fiches-produit.ts` sait désormais lire les studios issus de la
+prospection, qui n'ont pas d'adaptateur d'inventaire : l'adresse se reconstruit
+à partir du motif noté ce jour-là (« familles /games/<slug> »).
+
 ## 2026-09-11 — 508 RTP lus sur les pages produit, et 16 écarts Pragmatic tranchés
 
 Les lecteurs de fiches produit ont été appliqués aux trois studios dont la page
