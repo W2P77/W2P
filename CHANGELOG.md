@@ -2,6 +2,57 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-13 — Sept studios de plus : 1 556 démos
+
+| studio | trouvées | comment il publie |
+|---|---|---|
+| Spinomenal | **633 / 648** | deux sauts : fiche → bouton « PLAY NOW » → enveloppe |
+| Amusnet | **252 / 280** | son Drupal est ouvert : 10 requêtes pour 491 nœuds |
+| 1spin4win | **226 / 229** | JSON-LD `VideoGame`, `potentialAction.target` |
+| TaDa | **233 / 249** | catalogue en 4 requêtes, démo en `/PlusTrial/<gid>/` |
+| Spinoro | **212 / 231** | lanceur en clair dans l'iframe de la page de jeu |
+| Yggdrasil | en cours | WordPress, `wp-json/wp/v2/games`, démo sans jeton |
+| **Synot** | **0 / 243** | **ne publie aucune démo publique** |
+
+**Le constat Synot vaut autant que les autres.** Ont été essayés : la fiche
+produit (seul bouton « MORE INFO »), `wp-json/wp/v2/games` (246 jeux, `acf`
+vide), la route maison, les 210 ko de JS du thème — où le mot « demo »
+n'apparaît **pas une fois** —, `dev.synotgames.com` et les sous-domaines :
+`demo.` existe mais répond 404 partout, les autres n'ont pas de DNS. Les seules
+démos Synot en ligne sont chez des comparateurs, donc chez des concurrents : le
+script refuse de les écrire. C'est consigné dans son en-tête pour que personne
+ne refasse le tour.
+
+**Un lanceur à jeton refusé, sciemment.** Chez Amusnet, le bouton « Play Demo »
+appelle une API, reçoit un jeton et ouvre `free.games.amusnet.io`. Sans
+`Referer` du domaine, ce lanceur répond **302 vers la page d'accueil
+marketing** — le piège Wazdan à l'identique. C'est donc la fiche produit qui
+est écrite, comme les six lignes déjà en base.
+
+**Ce que les garde-fous ont attrapé.** `amusnet.com/…/20-golden-dice` répond
+**200** avec une page « Game Not Found » : cinq fiches sauvées d'une URL morte
+sous un bouton « jouer ». Le lanceur Amusnet accepte `gameId=999999` et renvoie
+un lanceur d'apparence normale — aucune de ses réponses n'est une preuve.
+Yggdrasil, lui, rend un 403 sur un identifiant inventé : l'existence y est
+réellement vérifiable. Et le `×` U+00D7 de la gamme « Hold&Hit 3×3 » faisait
+sortir **30 jeux Spinomenal** en faux écart de nom.
+
+**Une leçon sur la vérification du nom.** La première version vérifiait TaDa
+sur le `<title>` du build, comme chez Hacksaw : **56 % au lieu de 94 %**. TaDa
+livre ses jeux sous leur nom interne — « Witch » pour « Witches Night » — quand
+il ne les livre pas sans titre. La confrontation est remontée sur la **carte du
+catalogue**, le nom que le studio destine aux joueurs.
+
+**Deux pannes réseau diagnostiquées, utiles bien au-delà de ce script.**
+
+· Le `fetch` de Node **n'a pas de délai par défaut** : Yggdrasil accepte la
+  connexion et ne répond jamais, le script se fige sans une ligne de journal.
+
+· **La reprise de session TLS** était le vrai coupable d'un blocage systématique
+  vers la 121ᵉ fiche, pendant qu'un `curl` obtenait la même page en 2,3 s sur la
+  même IP. Ni bannissement, ni DNS, ni pool undici. Avec
+  `maxCachedSessions: 0` : 200 requêtes d'affilée, zéro échec.
+
 ## 2026-09-12 — Cinq noms tronqués, cinq démos retrouvées
 
 Nolimit City nomme ses mécaniques dans ses titres : « San Quentin » chez nous,
