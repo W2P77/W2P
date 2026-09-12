@@ -2,6 +2,40 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Les titres les plus cherchés n'avaient pas de démo
+
+La vitrine mettait en avant neuf titres écrits à la main — Sweet Bonanza,
+Sugar Rush, Big Bass Bonanza, Wolf Gold — dont **un seul** avait une fiche
+complète. En cherchant pourquoi, on trouve la cause plus bas que prévu :
+**105 jeux Pragmatic n'avaient aucune `demoUrl`**, et ces sept-là en faisaient
+partie.
+
+L'enchaînement se tenait tout seul : pas de démo → le pipeline de captures ne
+peut pas les prendre → pas de capture → la fiche n'est pas publiable. Les
+titres que les gens cherchent par leur nom étaient les seuls à manquer.
+
+`extraire-demos-pragmatic.ts` ne traitait que les fiches ayant déjà une page
+produit en `demoUrl`. Il couvre maintenant aussi celles à `null`, dont la page
+produit se déduit du slug. **101 URLs écrites**, 619 → 699 jeux Pragmatic avec
+une démo jouable.
+
+Puis captures : **5 vedettes publiées** — Sweet Bonanza 1000 (96,53 %), Sugar
+Rush (96,50 %), Big Bass Bonanza (96,71 %), Gates of Olympus 1000 (96,50 %) et
+Wolf Gold. Le catalogue passe de 769 à 774 fiches visibles.
+
+**Deux résistent** : Madame Destiny Megaways et Starlight Princess, « icône des
+règles introuvable », de façon reproductible — ce n'est donc pas un aléa de
+chargement mais un cas que l'adaptateur ne sait pas traiter. À diagnostiquer.
+
+**Un écart signalé, pas écrasé** : Wolf Gold porte 96,01 en base, le panneau
+affiche 96. Ses captures sont publiées, son RTP non — le panneau fait autorité
+mais un écart veut presque toujours dire autre chose, et l'écraser en silence
+effacerait l'indice.
+
+**Au passage**, le script exécutait sa campagne complète dès qu'on l'importait :
+`lireDemo` est exportée, et l'importer pour tester sept jeux déclenchait 724
+requêtes en arrière-plan. Une garde d'exécution a été ajoutée.
+
 ## 2026-09-12 — Les fiches non finies sortent de la navigation
 
 Le seuil de publication ne posait qu'un `noindex` : Google ne voyait plus les

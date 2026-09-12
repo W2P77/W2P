@@ -23,7 +23,7 @@
  * Usage : npx tsx scripts/extraire-demos-pragmatic.ts [--appliquer] [--limite N]
  */
 import { config as loadEnv } from 'dotenv';
-import { resolve } from 'node:path';
+import { basename, resolve } from 'node:path';
 
 loadEnv({ path: resolve(process.cwd(), '.env.local'), quiet: true });
 
@@ -53,15 +53,41 @@ async function main() {
     adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
   });
 
+  /*
+   * ── Deux cas, pas un ─────────────────────────────────────────────────────
+   *
+   * Le script ne traitait que les fiches dont `demoUrl` portait déjà la page
+   * produit. Or **105 jeux Pragmatic n'ont aucune `demoUrl`** — dont Sweet
+   * Bonanza 1000, Sugar Rush, Starlight Princess et Wolf Gold, c'est-à-dire
+   * les titres que les gens cherchent par leur nom. Sans démo, le pipeline de
+   * captures ne peut pas les prendre ; sans capture, la fiche n'est pas
+   * publiable. Les plus demandés du catalogue étaient donc invisibles.
+   *
+   * Leur page produit existe et se déduit du slug. On la construit, on la lit
+   * comme les autres, et les échecs sont rapportés nommément : un slug qui ne
+   * correspond pas chez Pragmatic ne doit pas passer pour une absence de démo.
+   */
   const jeux = (
     await prisma.jeu.findMany({
-      where: { studio: { slug: 'pragmatic-play' }, demoUrl: { contains: 'pragmaticplay.com' } },
+      where: {
+        studio: { slug: 'pragmatic-play' },
+        OR: [{ demoUrl: { contains: 'pragmaticplay.com' } }, { demoUrl: null }],
+      },
       select: { id: true, slug: true, demoUrl: true },
       orderBy: { slug: 'asc' },
     })
   ).slice(0, limite);
 
-  console.log(`${jeux.length} fiches produit Pragmatic à lire.\n`);
+  /** La page produit : celle déjà en base, ou celle que le slug désigne. */
+  const pageProduit = (j: { slug: string; demoUrl: string | null }) =>
+    j.demoUrl ?? `https://www.pragmaticplay.com/en/games/${j.slug}/`;
+
+  const sansDemo = jeux.filter((j) => !j.demoUrl).length;
+  console.log(
+    `${jeux.length} fiches produit Pragmatic à lire` +
+      (sansDemo ? ` — dont ${sansDemo} sans demoUrl, page déduite du slug.` : '.') +
+      '\n',
+  );
 
   const trouves: Array<{ id: string; slug: string; demo: string; symbole: string }> = [];
   const echecs: string[] = [];
@@ -70,7 +96,7 @@ async function main() {
     await Promise.all(
       jeux.slice(i, i + PARALLELE).map(async (j) => {
         try {
-          const r = await fetch(j.demoUrl!, { headers: { 'User-Agent': NAVIGATEUR } });
+          const r = await fetch(pageProduit(j), { headers: { 'User-Agent': NAVIGATEUR } });
           if (!r.ok) return echecs.push(`${j.slug} (HTTP ${r.status})`);
           const lu = lireDemo(await r.text());
           if (!lu) return echecs.push(`${j.slug} (pas de data-game-src)`);
@@ -106,7 +132,16 @@ async function main() {
   await prisma.$disconnect();
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+/*
+ * Le script ne s'exécute que lancé directement.
+ *
+ * `lireDemo` est exportée et réutilisable ; sans cette garde, l'importer
+ * depuis un autre script déclenchait une campagne complète de 724 requêtes en
+ * arrière-plan — constaté en voulant simplement tester sept jeux.
+ */
+if (process.argv[1] && import.meta.url.endsWith(basename(process.argv[1]))) {
+  main().catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}
