@@ -2,6 +2,23 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — La volatilité est attribuée, plus affirmée
+
+Le panneau de règles déclare une volatilité, et nous la lisions comme le
+reste. Vérifié à l'image sur quatre jeux : Pragmatic écrit bien **« LOW
+VOLATILITY — Low volatility games pay out more often in smaller amounts »**
+en tête des règles de Christmas Carol Megaways (plafond 20 000x) et de
+Barnyard Megahays Megaways (10 000x). Ce n'est pas une erreur de lecture : le
+badge distingue bien les jeux, Gates of Olympus ressort en très haute.
+
+Mais un plafond et un RTP sont des mesures ; ce badge est un **classement**
+dont nous ignorons la base. **108 de nos 240 jeux « basse » plafonnent
+au-dessus de 5 000x** : publier ce mot comme notre verdict tromperait le
+joueur.
+
+La fiche l'attribue donc désormais — « Low · as the game states it ». C'est
+exact, c'est vérifiable par la capture, et c'est l'argument du site : dire
+d'où vient chaque chiffre plutôt que trancher sans source.
 ## 2026-09-12 — Trois secondes sous notre marque avant de partir
 
 La sortie vers un partenaire était une 302 immédiate : le visiteur quittait

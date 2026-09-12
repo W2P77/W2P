@@ -319,9 +319,26 @@ export default async function PageJeu({
 
             <dl>
               <Fiche libelle="Provider" valeur={jeu.studio.nom} />
+              {/*
+                * La volatilité est attribuée, pas affirmée.
+                *
+                * Elle vient du panneau de règles, comme le RTP — mais c'est un
+                * classement, pas une mesure. Pragmatic étiquette « low
+                * volatility » des Megaways à 20 000x : 108 de nos 240 jeux
+                * « basse » plafonnent au-dessus de 5 000x. Publier ce mot
+                * comme notre verdict tromperait le joueur ; le publier comme
+                * la déclaration du jeu est exact, et c'est l'argument du site.
+                */}
               <Fiche
                 libelle="Volatility"
-                valeur={jeu.volatilite ? VOLATILITE_EN[jeu.volatilite] : null}
+                valeur={
+                  jeu.volatilite ? (
+                    <>
+                      {VOLATILITE_EN[jeu.volatilite]}
+                      <span className="ml-1.5 text-[11px] text-texte-faible">as the game states it</span>
+                    </>
+                  ) : null
+                }
               />
               <Fiche
                 libelle="Max win"
