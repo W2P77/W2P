@@ -75,7 +75,19 @@ export const HACKSAW: Adaptateur = {
   studio: 'hacksaw-gaming',
 
   /** Leur `demoUrl` est la page produit : c'est de là qu'on part. */
-  demoExploitable: (url) => /hacksawgaming\.com\/games\//.test(url),
+  /*
+   * Deux formes, parce que Hacksaw a retire ses pages produit sans retirer les
+   * jeux. Sur 246 tuiles de son catalogue, 101 n'ont plus qu'un bouton « Try
+   * it » : leur page `/games/<slug>` renvoie un 302 vers `/Start`, qui repond
+   * 404. Le jeu, lui, vit toujours sur `static-live` — d'ou la seconde forme,
+   * `static-live.hacksawgaming.com/<gameid>/<version>/index.html`.
+   *
+   * Le numero de version y est obligatoire : sans lui la page repond 403. Ces
+   * URL se perimeront donc au prochain correctif du studio, et
+   * `scripts/reparer-demos-hacksaw.ts` est a relancer periodiquement.
+   */
+  demoExploitable: (url) =>
+    /hacksawgaming\.com\/games\//.test(url) || /static-live\.hacksawgaming\.com\//.test(url),
 
   /** Cloudflare refuse un Chromium sans tête devant leur RGS de démo. */
   avecTete: true,

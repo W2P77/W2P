@@ -2,6 +2,46 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Hacksaw : 36 pages produit retirées, 36 jeux bien vivants
+
+Une campagne de captures venait d'échouer sur **36 jeux sur 39**, tous en
+`ERR_HTTP_RESPONSE_CODE_FAILURE`. Leur `demoUrl` répond par un **302 vers
+`/Start`**, qui rend lui-même un 404.
+
+**Le studio a retiré la page produit, pas le jeu.** Sur les 246 tuiles de son
+catalogue, 145 ont un bouton « Read more » vers une page produit et **101 n'ont
+plus qu'un bouton « Try it »**. Les 36 mortes sont toutes dans ce second lot.
+La tuile porte le `data-gameid` que leur lanceur maison passe à
+`static-live.hacksawgaming.com/<gameid>/<version>/index.html`.
+
+**36 retrouvées sur 36. Aucun jeu réellement retiré.**
+
+**Le garde-fou du 200 a servi une fois de plus** : `static-live/9999/…`
+répond 200 et sert un vrai jeu — intitulé **« Slottemplate »**, le gabarit
+interne du studio. Le `gameid` n'est donc jamais déduit d'un compteur, il est
+lu dans la tuile. Et quatre jeux sortaient d'abord en « retiré » parce que
+Hacksaw échappe ses apostrophes en hexadécimal (« Frank's Farm »).
+
+**Une erreur de méthode rattrapée en cours de route**, qui vaut d'être notée :
+un premier jet lisait le catalogue **après** avoir sondé les 145 fiches, se
+faisait repousser, recevait une liste vide et **déclarait 58 jeux retirés**
+alors qu'ils étaient tous en ligne. Le catalogue se lit maintenant en premier,
+un code inattendu donne « sondage impossible » et non un verdict, et un
+catalogue de moins de 100 tuiles arrête le script.
+
+`demoExploitable` de l'adaptateur accepte désormais les deux formes — sans
+quoi les 36 fiches réparées seraient devenues invisibles au runner.
+
+⚠️ **Aucune campagne Hacksaw ne passerait aujourd'hui.** Les démos affichent
+« Connection lost to wallet », y compris celles dont la page produit est
+vivante et lancées depuis le site du studio, sans aucun appel à leur RGS.
+Trois mesures concordantes dont une après pause. Soit leur wallet de démo est
+en panne, soit notre IP a été repoussée — précédent BGaming du 11/09. À
+trancher depuis une IP reposée avant de relancer.
+
+⚠️ **Ces URL portent un numéro de version de build** et se périmeront au
+prochain correctif du studio. Le script est à relancer périodiquement.
+
 ## 2026-09-12 — Push Gaming : le blocage n'était pas celui qu'on croyait
 
 **Correction d'une entrée de ce carnet.** Il y est écrit que le lanceur Push
