@@ -2,6 +2,27 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — La carte de partage porte enfin la marque
+
+Deux défauts, tous deux visibles au premier coup d'œil sur un lien partagé.
+
+**La police n'était celle de personne.** Satori n'a pas de CSS : il ne peut pas
+se servir de `next/font`, et sans police fournie il compose dans sa fonte par
+défaut. La carte sortait donc dans un caractère qui n'existe nulle part sur le
+site. Saira Condensed — celle des titres — est déposée dans `public/fonts/` et
+téléchargée par la carte, comme la jaquette : `public/` n'existe pas sur le
+disque d'une fonction serverless.
+
+**La signature était un mot gris.** Le logo la remplace. Il est rendu à 230 px
+de large, pas 150 : à la taille d'une mention discrète il n'était plus qu'une
+tache, et une signature illisible signe moins bien qu'un mot lisible. Le ratio
+d'origine est conservé pour ne pas l'écraser, et la composition a été
+rééquilibrée — jaquette ramenée à 640 px, marge verticale ajoutée, puisque les
+plateformes recadrent et qu'on ne colle rien au bord.
+
+Le repli tient dans les deux cas : sans police, la carte se compose quand même ;
+sans logo, le mot revient. Vérifié sur une fiche avec jaquette et une sans.
+
 ## 2026-09-12 — Les titres les plus cherchés n'avaient pas de démo
 
 La vitrine mettait en avant neuf titres écrits à la main — Sweet Bonanza,

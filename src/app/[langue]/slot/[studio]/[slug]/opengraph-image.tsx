@@ -78,6 +78,28 @@ async function fondBase64(chemin: string | null): Promise<string | null> {
   }
 }
 
+/**
+ * La police des titres du site, pour la carte de partage.
+ *
+ * Satori n'a pas de CSS : il ne peut pas se servir de `next/font`, et sans
+ * police fournie il compose dans sa fonte par défaut. La carte sortait donc
+ * dans un caractère qui n'est nulle part sur le site — c'est justement ce que
+ * les gens voient en premier quand un lien est partagé.
+ *
+ * Le fichier est servi par le CDN et téléchargé ici, comme la jaquette :
+ * `public/` n'existe pas sur le disque d'une fonction serverless.
+ */
+async function policeDesTitres(): Promise<ArrayBuffer | null> {
+  try {
+    const r = await fetch(new URL('/fonts/saira-condensed-800.ttf', SITE_URL), {
+      cache: 'force-cache',
+    });
+    return r.ok ? await r.arrayBuffer() : null;
+  } catch {
+    return null;
+  }
+}
+
 export default async function Image({
   params,
 }: {
@@ -86,7 +108,11 @@ export default async function Image({
   const { slug } = await params;
   const jeu = await jeuParSlug(slug);
 
-  const visuel = await fondBase64(jeu?.visuelUrl ?? null);
+  const [visuel, logo, police] = await Promise.all([
+    fondBase64(jeu?.visuelUrl ?? null),
+    fondBase64('/images/marque-w2s.webp'),
+    policeDesTitres(),
+  ]);
   const rtp = jeu?.rtpStudio ? `${Number(jeu.rtpStudio).toFixed(2)}% RTP` : null;
 
   return new ImageResponse(
@@ -101,6 +127,8 @@ export default async function Image({
           justifyContent: 'center',
           background: '#05070d',
           position: 'relative',
+          // La carte est recadrée par les plateformes : on ne colle rien au bord.
+          padding: '26px 0',
         }}
       >
         {/* Le halo reprend le néon de la marque sans imiter le logo. */}
@@ -118,8 +146,8 @@ export default async function Image({
           <img
             src={visuel}
             alt=""
-            width={760}
-            height={427}
+            width={640}
+            height={360}
             style={{ borderRadius: 18, objectFit: 'cover' }}
           />
         ) : null}
@@ -128,10 +156,20 @@ export default async function Image({
             display: 'flex',
             alignItems: 'center',
             gap: 18,
-            marginTop: visuel ? 34 : 0,
+            marginTop: visuel ? 26 : 0,
           }}
         >
-          <div style={{ display: 'flex', fontSize: 46, fontWeight: 800, color: '#ffffff' }}>
+          <div
+            style={{
+              display: 'flex',
+              fontFamily: 'Saira Condensed',
+              fontSize: 52,
+              fontWeight: 800,
+              letterSpacing: '-0.01em',
+              textTransform: 'uppercase',
+              color: '#ffffff',
+            }}
+          >
             {jeu?.nom ?? 'where2spin'}
           </div>
           {rtp ? (
@@ -150,11 +188,31 @@ export default async function Image({
             </div>
           ) : null}
         </div>
-        <div style={{ display: 'flex', marginTop: 14, fontSize: 22, color: '#8b93a7' }}>
-          where2spin
-        </div>
+        {/*
+          * Le logo plutôt que le mot : une carte de partage se reconnaît à une
+          * forme avant de se lire. Le mot reste en repli si l'image n'a pas pu
+          * être chargée — une carte sans signature vaudrait moins que celle-ci.
+          */}
+        {logo ? (
+          /*
+           * 264 de large, pas 150 : à la taille d'une mention discrète, le
+           * logo n'était plus qu'une tache — une signature illisible signe
+           * moins bien qu'un mot lisible. Le ratio d'origine (677×369) est
+           * conservé pour ne pas l'écraser.
+           */
+          <img src={logo} alt="" width={230} height={125} style={{ marginTop: 2 }} />
+        ) : (
+          <div style={{ display: 'flex', marginTop: 14, fontSize: 22, color: '#8b93a7' }}>
+            where2spin
+          </div>
+        )}
       </div>
     ),
-    size,
+    {
+      ...size,
+      ...(police
+        ? { fonts: [{ name: 'Saira Condensed', data: police, weight: 800 as const, style: 'normal' as const }] }
+        : {}),
+    },
   );
 }
