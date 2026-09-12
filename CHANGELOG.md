@@ -2,6 +2,45 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — NetEnt et Evoplay débloqués, et 24 démos qui mentaient
+
+**311 démos trouvées** : NetEnt 221 sur 237 (93 %), Evoplay 90 sur 269. Les
+deux studios n'en avaient respectivement que 24 et 6.
+
+NetEnt tourne sur la plateforme de Red Tiger — même `tableId`, même route
+`/demo/<tableId>`. La forme `www.netent.com/en/game/<slug>/`, présente sur
+quatre lignes en base, **est morte** : 404 y compris pour Starburst. Evoplay ne
+publie rien sur ses fiches et renvoie vers son portail `player.city` ; deux
+voies y mènent et il faut les deux, le sitemap du portail rattrapant les jeux
+qu'Evoplay oublie de lier depuis sa propre fiche. Son plafond est structurel :
+101 pages de jeu pour 269 fiches, **90 trouvées sur ~94 atteignables**.
+
+**Le garde-fou du nom a payé immédiatement.** `netent.com/games/victorious/`
+annonce aujourd'hui « Victorious MAX™ » — un autre jeu — tout en gardant le
+`tableId` de l'ancien. Sans confrontation du nom, on écrivait une démo qui
+ouvre le mauvais jeu.
+
+**24 `demoUrl` qui menaient ailleurs qu'au jeu annoncé.** En cherchant les
+doublons, onze groupes de fiches partageaient une même adresse :
+
+· **14 jeux Hacksaw** pointaient vers `hacksawgaming.com/games` — la **liste**
+  des jeux, pas un jeu. Quatorze boutons « démo » qui ouvraient un catalogue.
+
+· **Dix paires** partageaient un lanceur. Certaines sont de vrais doublons de
+  slug (`the-dog-house` / `the-dog-house-slot`), mais d'autres portent des noms
+  **différents** — « Big Catch Game » et « Treasures of The Gods », « Dwarven
+  Gold Deluxe » et « Dwarven Gold » : là, l'une des deux ouvrait le jeu de
+  l'autre.
+
+Dans chaque paire, la fiche gardée est celle qui a des captures : ses images
+prouvent que la démo ouvrait bien ce jeu-là. L'autre voit sa `demoUrl` vidée.
+
+⚠️ **Reste à trancher** : `dwarven-gold-deluxe-slot` et `dwarven-gold-slot` ont
+**chacune huit captures prises avec la même URL** — l'une porte donc les images
+de l'autre. Vider l'adresse arrête le mensonge du bouton, pas celui des images.
+Même question pour `floating-dragon` / `floating-dragon-hold-and-spin` et les
+deux `jokers-jewels`.
+
 ## 2026-09-12 — Les dates de sortie ne sont pas publiées, et on n'en invente pas
 
 227 fiches visibles n'ont aucune `sortieLe` — **164 chez Pragmatic, 63 chez

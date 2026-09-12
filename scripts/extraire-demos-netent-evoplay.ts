@@ -15,10 +15,18 @@
  *
  * ── Les deux studios ne se lisent pas de la même façon ────────────────────
  *
- * NetEnt sert une page Next.js dont le payload porte un `tableId`, et son
- * propre bouton « Demo » pointe vers `/demo/<tableId>`. Le jeu y est lancé par
- * le SDK `window.nolimit.load()` : il n'existe aucune iframe statique à
+ * NetEnt sert une page Next.js dont le `__NEXT_DATA__` porte un `tableId`, et
+ * son propre bouton « Demo » pointe vers `/demo/<tableId>`. Le jeu y est lancé
+ * par le SDK `window.nolimit.load()` : il n'existe aucune iframe statique à
  * extraire, cette page **est** l'entrée publique de la démo.
+ *
+ * C'est la plateforme de Red Tiger, et elle en partage les deux pièges, déjà
+ * payés dans `extraire-demos-red-tiger.ts`. `netent.com/demo/<n'importe quoi>`
+ * répond 200 : un code HTTP ne prouve rien, seule la lecture du `tableId` dans
+ * la page fait foi. Et le payload est lu en JSON, jamais au regex — la page
+ * embarque des carrousels de jeux voisins dont un regex attraperait le
+ * `tableId` du premier venu. Le nom lu est confronté à celui de la base, et
+ * une démo annoncée à une date future n'est pas écrite.
  *
  * Deux formes d'URL cohabitaient en base. `www.netent.com/en/game/<slug>/` est
  * morte aujourd'hui — elle répond 404, y compris pour Starburst. Seule
@@ -28,11 +36,20 @@
  *
  * Evoplay ne publie aucune démo sur sa fiche produit : elle renvoie vers son
  * portail `player.city`, dont la page porte enfin le lien jouable
- * (`demo.demo-evoplay.games`). D'où deux sauts, et pas un seul : le slug du
- * portail **diverge** du nôtre — `bandit-bust-bonus-buy` y devient
- * `bandit-bust-bb`. Construire l'URL du portail depuis notre slug produirait
- * des 404 sur les jeux existants, et pire, un jour, la démo d'un autre jeu.
- * Seule la fiche produit sait vers quoi elle pointe : on la lit.
+ * (`demo.demo-evoplay.games`). Deux voies y mènent, et il faut les deux.
+ *
+ * Le sitemap du portail est la liste que le studio publie lui-même : 101
+ * pages, qu'on lit en une requête. Quand notre slug y figure, on ouvre la page
+ * et on **vérifie que son payload porte bien ce slug** avant de retenir la
+ * démo. Ce n'est pas une URL construite au hasard : c'est une page annoncée,
+ * puis confirmée.
+ *
+ * Mais la fiche produit d'Evoplay sous-référence son propre portail : 176 de
+ * nos 269 jeux n'y ont aucun bouton de démo, dont des jeux qui en ont pourtant
+ * une (`anubis-moon`). À l'inverse, le bouton est seul à savoir que notre
+ * `bandit-bust-bonus-buy` se lit `bandit-bust-bb` chez eux — construire ce
+ * slug nous-mêmes donnerait un 404, et pire, un jour, la démo d'un autre jeu.
+ * D'où l'ordre : le sitemap d'abord, le bouton en second recours.
  *
  * ── La cadence n'est pas une précaution de style ──────────────────────────
  *
@@ -53,13 +70,53 @@ const NAVIGATEUR =
 const PARALLELE = 4;
 const PAUSE_MS = 250;
 
-type Jeu = { id: string; slug: string; demoUrl: string | null };
+type Jeu = { id: string; slug: string; nom: string; demoUrl: string | null };
 type Echec = { slug: string; cause: string };
+type FicheNetEnt = {
+  tableId: string;
+  nom: string;
+  demoReleaseDate: string | null;
+  exclusiveReleaseDate: string | null;
+};
 
-/** Le `tableId` du payload NetEnt : l'identifiant que la démo attend. */
-export function lireTableIdNetEnt(html: string): string | null {
-  const m = /"tableId":"([A-Za-z0-9_-]+)"/.exec(html);
-  return m ? m[1] : null;
+/**
+ * Pour confronter deux noms sans buter sur la typographie : le studio écrit
+ * « Starburst™ », la base « Starburst ».
+ */
+const normaliserNom = (nom: string) =>
+  nom.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]/g, '');
+
+/**
+ * La fiche produit NetEnt, lue dans son payload.
+ *
+ * On passe par le JSON et par la requête nommée plutôt que par un regex sur
+ * `tableId` : la page embarque aussi des carrousels de jeux voisins, et un
+ * regex y attraperait le `tableId` du premier venu.
+ */
+export function lireFicheNetEnt(html: string): FicheNetEnt | null {
+  const bloc = /<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/.exec(html);
+  if (!bloc) return null;
+
+  let donnees: {
+    props?: { pageProps?: { initialState?: { cmsApi?: { queries?: Record<string, { data?: Record<string, unknown> }> } } } };
+  };
+  try {
+    donnees = JSON.parse(bloc[1]);
+  } catch {
+    return null;
+  }
+
+  const requetes = donnees?.props?.pageProps?.initialState?.cmsApi?.queries ?? {};
+  const cle = Object.keys(requetes).find((k) => k.startsWith('getPopulatedGameBySlugV2'));
+  const jeu = cle ? requetes[cle]?.data : null;
+  if (typeof jeu?.tableId !== 'string' || typeof jeu?.name !== 'string') return null;
+
+  return {
+    tableId: jeu.tableId,
+    nom: jeu.name,
+    demoReleaseDate: (jeu.demoReleaseDate as string | null) ?? null,
+    exclusiveReleaseDate: (jeu.exclusiveReleaseDate as string | null) ?? null,
+  };
 }
 
 /**
@@ -74,6 +131,24 @@ function pageProduitNetEnt(jeu: Jeu): string {
   const vivante = jeu.demoUrl && /netent\.com\/games\//.test(jeu.demoUrl);
   if (!vivante) return `https://netent.com/games/${jeu.slug}/`;
   return jeu.demoUrl!.replace(/^https?:\/\/(www\.)?netent\.com/, 'https://netent.com').replace(/\/?$/, '/');
+}
+
+/**
+ * Les pages de jeu que le portail Evoplay déclare, lues une seule fois.
+ *
+ * Une requête au lieu de 269 : la liste sert à savoir s'il est utile d'aller
+ * frapper à une porte, pas à deviner son adresse.
+ */
+let sitemapPortail: Promise<Set<string>> | null = null;
+function slugsDuPortail(): Promise<Set<string>> {
+  sitemapPortail ??= (async () => {
+    const r = await recuperer('https://player.city/sitemap.xml');
+    if (!r.ok) return new Set<string>();
+    return new Set(
+      [...r.html.matchAll(/https:\/\/player\.city\/game\/([a-z0-9-]+)\//g)].map((m) => m[1]),
+    );
+  })();
+  return sitemapPortail;
 }
 
 /** Le bouton « Play Now » de la fiche Evoplay, vers le portail de démo. */
@@ -109,22 +184,52 @@ async function recuperer(url: string): Promise<{ ok: true; html: string } | { ok
 async function demoNetEnt(jeu: Jeu): Promise<string | { cause: string }> {
   const page = await recuperer(pageProduitNetEnt(jeu));
   if (!page.ok) return { cause: page.cause };
-  const tableId = lireTableIdNetEnt(page.html);
-  if (!tableId) return { cause: 'fiche sans tableId' };
-  return `https://netent.com/demo/${tableId}?showNavbar=true`;
+
+  const fiche = lireFicheNetEnt(page.html);
+  if (!fiche) return { cause: 'pas de tableId dans la page' };
+
+  /* Un slug qui mène à un autre jeu écrirait une démo fausse sans rien signaler. */
+  if (normaliserNom(fiche.nom) !== normaliserNom(jeu.nom)) {
+    return { cause: `la page annonce « ${fiche.nom} »` };
+  }
+
+  /*
+   * La fiche produit paraît avant que la démo n'ouvre. Écrire l'URL quand même
+   * donnerait un bouton qui répond « Demo is not available yet » : mieux vaut
+   * l'échec, le jeu repassera au lot suivant une fois la date atteinte.
+   */
+  const attente = [fiche.demoReleaseDate, fiche.exclusiveReleaseDate].find(
+    (d) => d && Date.parse(d) > Date.now(),
+  );
+  if (attente) return { cause: `démo ouverte le ${attente.slice(0, 10)}` };
+
+  return `https://netent.com/demo/${fiche.tableId}?showNavbar=true`;
 }
 
-/** Evoplay : deux sauts. La fiche produit désigne le portail, le portail la démo. */
+/** La démo d'une page du portail, une fois vérifié qu'elle parle bien de ce jeu. */
+async function demoDuPortail(url: string, slugAttendu?: string): Promise<string | { cause: string }> {
+  const page = await recuperer(url);
+  if (!page.ok) return { cause: `portail ${page.cause}` };
+  /* Une page annoncée par le sitemap reste à confirmer : on exige son slug dans le payload. */
+  if (slugAttendu && !page.html.includes(`"slug\\":\\"${slugAttendu}\\"`)) {
+    return { cause: 'page du portail ne correspondant pas au jeu' };
+  }
+  const demo = lireDemoEvoplay(page.html);
+  if (!demo) return { cause: 'portail sans playDemoUrl' };
+  return demo;
+}
+
+/** Evoplay : le portail quand il annonce le jeu, la fiche produit sinon. */
 async function demoEvoplay(jeu: Jeu): Promise<string | { cause: string }> {
+  if ((await slugsDuPortail()).has(jeu.slug)) {
+    const direct = await demoDuPortail(`https://player.city/game/${jeu.slug}/`, jeu.slug);
+    if (typeof direct === 'string') return direct;
+  }
   const fiche = await recuperer(`https://evoplay.games/game/${jeu.slug}/`);
   if (!fiche.ok) return { cause: `fiche produit ${fiche.cause}` };
   const portail = lireLienPortailEvoplay(fiche.html);
   if (!portail) return { cause: 'aucun bouton de démo sur la fiche' };
-  const page = await recuperer(portail);
-  if (!page.ok) return { cause: `portail ${page.cause}` };
-  const demo = lireDemoEvoplay(page.html);
-  if (!demo) return { cause: 'portail sans playDemoUrl' };
-  return demo;
+  return demoDuPortail(portail);
 }
 
 const STUDIOS = {
@@ -166,7 +271,7 @@ async function main() {
         studio: { slug: studio },
         OR: [{ demoUrl: { contains: reglage.domaineFicheProduit } }, { demoUrl: null }],
       },
-      select: { id: true, slug: true, demoUrl: true },
+      select: { id: true, slug: true, nom: true, demoUrl: true },
       orderBy: { slug: 'asc' },
     })
   ).slice(0, limite);
