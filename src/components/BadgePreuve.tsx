@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Le niveau de preuve d'un chiffre — l'argument du site, rendu visible.
  *
@@ -9,29 +11,20 @@
  * nouveauté sort le jour même en `AUCUNE`, et la fiche se bonifie quand la
  * source arrive.
  */
+import { useLangue } from '@/i18n/useLangue';
+
 export type Confiance = 'STUDIO' | 'RECOUPE' | 'UNIQUE' | 'AUCUNE';
 
-const NIVEAUX: Record<Confiance, { court: string; detail: string; classe: string }> = {
-  STUDIO: {
-    court: 'Studio-verified',
-    detail: 'Published by the game studio — source on file',
-    classe: 'border-neon-cyan/60 bg-neon-cyan/10 text-neon-cyan',
-  },
-  RECOUPE: {
-    court: 'Cross-checked',
-    detail: 'Two independent sources agree, no studio page on file',
-    classe: 'border-emerald-400/50 bg-emerald-400/10 text-emerald-300',
-  },
-  UNIQUE: {
-    court: 'Single source',
-    detail: 'One source only, not cross-checked',
-    classe: 'border-note/50 bg-note/10 text-note',
-  },
-  AUCUNE: {
-    court: 'Unverified',
-    detail: 'No reliable source yet — treat with caution',
-    classe: 'border-texte-faible/40 bg-texte-faible/10 text-texte-doux',
-  },
+/*
+ * Le niveau se dit dans la langue du visiteur : c'est l'argument du site, et
+ * un argument qui ne se lit pas ne sert à rien. La couleur, elle, ne se
+ * traduit pas — elle reste ici.
+ */
+const CLASSES: Record<Confiance, string> = {
+  STUDIO: 'border-neon-cyan/60 bg-neon-cyan/10 text-neon-cyan',
+  RECOUPE: 'border-emerald-400/50 bg-emerald-400/10 text-emerald-300',
+  UNIQUE: 'border-note/50 bg-note/10 text-note',
+  AUCUNE: 'border-texte-faible/40 bg-texte-faible/10 text-texte-doux',
 };
 
 export function BadgePreuve({
@@ -41,15 +34,27 @@ export function BadgePreuve({
   niveau: Confiance;
   taille?: 'normal' | 'petit';
 }) {
-  const n = NIVEAUX[niveau];
+  const { t } = useLangue();
+  const COURT: Record<Confiance, string> = {
+    STUDIO: t.preuveStudioCourt,
+    RECOUPE: t.preuveRecoupeCourt,
+    UNIQUE: t.preuveUniqueCourt,
+    AUCUNE: t.preuveAucuneCourt,
+  };
+  const DETAIL: Record<Confiance, string> = {
+    STUDIO: t.preuveStudioDetail,
+    RECOUPE: t.preuveRecoupeDetail,
+    UNIQUE: t.preuveUniqueDetail,
+    AUCUNE: t.preuveAucuneDetail,
+  };
   return (
     <span
-      title={n.detail}
-      className={`inline-flex items-center rounded-full border font-semibold uppercase tracking-wide ${n.classe} ${
+      title={DETAIL[niveau]}
+      className={`inline-flex items-center rounded-full border font-semibold uppercase tracking-wide ${CLASSES[niveau]} ${
         taille === 'petit' ? 'px-1.5 py-px text-[9px]' : 'px-2.5 py-0.5 text-[10px]'
       }`}
     >
-      {n.court}
+      {COURT[niveau]}
     </span>
   );
 }

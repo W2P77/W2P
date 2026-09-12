@@ -38,7 +38,13 @@ function moisDe(d: Date) {
   return d.toLocaleDateString('en', { month: 'long', year: 'numeric' });
 }
 
-export default async function Nouveautes() {
+export default async function Nouveautes({
+  params,
+}: {
+  params: Promise<{ langue: string }>;
+}) {
+  const { langue: brutL } = await params;
+  const t = textes(estUneLangue(brutL) ? brutL : LANGUE_DEFAUT);
   const jeux = await prisma.jeu.findMany({
     where: { sortieLe: { not: null } },
     orderBy: { sortieLe: 'desc' },
@@ -65,15 +71,12 @@ export default async function Nouveautes() {
       <main className="mx-auto max-w-[1400px] px-6 py-8">
         <div className="mb-2 flex items-center gap-4">
           <h1 className="font-titre text-[24px] font-black uppercase tracking-tight text-white">
-            New releases
+            {t.titreNouveautes}
           </h1>
           <Tirets />
         </div>
         <p className="mb-7 max-w-2xl text-[13px] leading-relaxed text-texte-doux">
-          The most recent games in the catalogue. A brand-new slot rarely has a
-          published RTP on day one — when that is the case we say so rather than
-          copying a number from elsewhere, and the page is updated once the
-          studio publishes.
+          {t.nouveautesIntro}
         </p>
 
         <div className="space-y-9">

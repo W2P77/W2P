@@ -6,6 +6,7 @@ import { buildAffiliateRedirectUrl, resolveCasinoPlayUrl } from '@/lib/tracking/
 import { enregistrerClic } from '@/lib/tracking/clics';
 import { notifierClicDiscord } from '@/lib/discord/notif-clic';
 import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
+import { offreTraduite } from '@/lib/traduire-donnees';
 
 import { EcranDeSortie } from './EcranDeSortie';
 
@@ -63,7 +64,7 @@ export default async function PageDeSortie({
       cible={cible}
       nom={casino.nom}
       logo={casino.logo}
-      bonus={casino.bonusTexte}
+      bonus={offreTraduite(casino.bonusTexte, langue)}
       langue={langue}
     />
   );

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Lien } from '@/components/Lien';
 
 import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
-import { textes } from '@/i18n/textes';
+import { remplir, textes } from '@/i18n/textes';
 import { metadonneesDePage } from '@/lib/metadonnees';
 import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
@@ -64,10 +64,12 @@ export default async function Demos({
       <main className="mx-auto max-w-[1400px] px-6 py-8">
         <div className="mb-2 flex items-center gap-4">
           <h1 className="font-titre text-[24px] font-black uppercase tracking-tight text-white">
-            Free demos
+            {t.titreDemos}
           </h1>
           <Tirets />
-          <span className="font-mono text-[12px] text-texte-faible">{total} games</span>
+          <span className="font-mono text-[12px] text-texte-faible">
+            {remplir(t.nbJeux, { n: String(total) })}
+          </span>
         </div>
         <p className="mb-6 max-w-2xl text-[13px] text-texte-doux">
           {t.accrocheDemos}
@@ -83,13 +85,13 @@ export default async function Demos({
           <nav className="mt-8 flex items-center justify-center gap-3" aria-label={t.pagination}>
             {page > 1 && (
               <Lien href={`/demos?page=${page - 1}`} className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan">
-                ← Previous
+                {t.precedent}
               </Lien>
             )}
             <span className="font-mono text-[12px] text-texte-faible">{page} / {pages}</span>
             {page < pages && (
               <Lien href={`/demos?page=${page + 1}`} className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan">
-                Next →
+                {t.suivant}
               </Lien>
             )}
           </nav>

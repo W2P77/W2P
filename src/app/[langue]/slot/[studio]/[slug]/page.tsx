@@ -17,6 +17,7 @@ import { SITE_URL } from '@/lib/site';
 import { Lien } from '@/components/Lien';
 import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
 import { remplir, textes } from '@/i18n/textes';
+import { mecaniqueTraduite } from '@/lib/traduire-donnees';
 
 export const revalidate = 3600;
 
@@ -115,7 +116,10 @@ export default async function PageJeu({
 }) {
   const { studio, slug } = await params;
   const { langue: brutLangue } = await params;
-  const t = textes(estUneLangue(brutLangue) ? brutLangue : LANGUE_DEFAUT);
+  const langue = estUneLangue(brutLangue) ? brutLangue : LANGUE_DEFAUT;
+  const t = textes(langue);
+  /* Les milliers d'un plafond s'écrivent selon la langue : 21 100 / 21,100 / 21.100. */
+  const LOCALE = { en: 'en-GB', fr: 'fr-FR', de: 'de-DE' } as const;
   const jeu = await jeuParSlug(slug);
   if (!jeu) notFound();
 
@@ -294,13 +298,13 @@ export default async function PageJeu({
 
               {paliers.length > 0 && (
                 <p className="mt-2 text-[11px] leading-relaxed text-texte-doux">
-                  Operators may configure a lower tier:{' '}
+                  {t.paliersOperateur}{' '}
                   <span className="font-mono">{paliers.map((p) => `${p}%`).join(' · ')}</span>
                 </p>
               )}
               {jeu.rtpAchatBonus != null && (
                 <p className="mt-1 text-[11px] text-texte-doux">
-                  Bonus buy:{' '}
+                  {t.etiquetteAchatBonus}{' '}
                   <span className="font-mono">{Number(jeu.rtpAchatBonus).toFixed(2)}%</span>
                 </p>
               )}
@@ -311,18 +315,17 @@ export default async function PageJeu({
                   rel="noopener noreferrer nofollow"
                   className="mt-2 inline-block text-[11px] text-neon-cyan hover:underline"
                 >
-                  Source: {new URL(jeu.rtpSource).hostname} →
+                  {remplir(t.etiquetteSource, { hote: new URL(jeu.rtpSource).hostname })} →
                 </a>
               ) : (
                 <p className="mt-2 text-[11px] text-texte-faible">
-                  No studio page on file — we have not confirmed this figure
-                  ourselves.
+                  {t.ficheSansSourceStudio}
                 </p>
               )}
             </div>
 
             <dl>
-              <Fiche libelle="Provider" valeur={jeu.studio.nom} />
+              <Fiche libelle={t.ficheFournisseur} valeur={jeu.studio.nom} />
               {/*
                 * La volatilité est attribuée, pas affirmée.
                 *
@@ -334,29 +337,33 @@ export default async function PageJeu({
                 * la déclaration du jeu est exact, et c'est l'argument du site.
                 */}
               <Fiche
-                libelle="Volatility"
+                libelle={t.ficheVolatilite}
                 valeur={
                   jeu.volatilite ? (
                     <>
                       {VOLATILITE_EN[jeu.volatilite]}
-                      <span className="ml-1.5 text-[11px] text-texte-faible">as the game states it</span>
+                      <span className="ml-1.5 text-[11px] text-texte-faible">{t.ficheSelonLeJeu}</span>
                     </>
                   ) : null
                 }
               />
               <Fiche
-                libelle="Max win"
-                valeur={jeu.gainMaxMultiple ? `${jeu.gainMaxMultiple.toLocaleString('en')}x` : null}
+                libelle={t.ficheGainMax}
+                valeur={jeu.gainMaxMultiple ? `${jeu.gainMaxMultiple.toLocaleString(LOCALE[langue])}x` : null}
               />
-              <Fiche libelle="Grid" valeur={jeu.grille} />
-              <Fiche libelle="Paylines" valeur={jeu.lignesPaiement} />
+              <Fiche libelle={t.ficheGrille} valeur={jeu.grille} />
+              <Fiche libelle={t.ficheLignes} valeur={jeu.lignesPaiement} />
               <Fiche
-                libelle="Bonus buy"
-                valeur={jeu.achatBonus == null ? null : jeu.achatBonus ? 'Yes' : 'No'}
+                libelle={t.ficheAchatBonus}
+                valeur={jeu.achatBonus == null ? null : jeu.achatBonus ? t.oui : t.non}
               />
               <Fiche
-                libelle="Features"
-                valeur={jeu.mecaniques.length ? jeu.mecaniques.join(' · ') : null}
+                libelle={t.ficheMecaniques}
+                valeur={
+                jeu.mecaniques.length
+                  ? jeu.mecaniques.map((m) => mecaniqueTraduite(m, langue)).join(' · ')
+                  : null
+              }
               />
             </dl>
           </aside>
@@ -366,7 +373,7 @@ export default async function PageJeu({
           <section className="mt-10">
             <div className="mb-4 flex items-center gap-3">
               <h2 className="font-titre text-[16px] font-bold uppercase tracking-wide text-white">
-                More from {jeu.studio.nom}
+                {remplir(t.plusDeStudio, { studio: jeu.studio.nom })}
               </h2>
               <Tirets />
             </div>

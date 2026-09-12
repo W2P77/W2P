@@ -37,8 +37,7 @@ export async function generateMetadata({
   const t = textes(langue);
   const filtre = sp.q || sp.studio || sp.volatilite || sp.preuve || sp.rtpMin || sp.page;
 
-  const description =
-    'Every slot with its RTP, volatility and max win — and where each number comes from.';
+  const description = t.catalogueDescription;
 
   // Une vue filtrée n'est pas une page : elle pointe sa canonique et son
   // partage vers le catalogue entier, et sort de l'index.
@@ -106,7 +105,8 @@ export default async function Catalogue({
           </h1>
           <Tirets />
           <span className="font-mono text-[12px] text-texte-faible">
-            {resultat.total} games · {studios.length} providers
+            {remplir(t.nbJeux, { n: String(resultat.total) })} ·{' '}
+            {remplir(t.nbStudios, { n: String(studios.length) })}
           </span>
         </div>
 
@@ -140,9 +140,7 @@ export default async function Catalogue({
               )}
             </p>
             <p className="mx-auto mt-2 max-w-md text-[13px] text-texte-doux">
-              {sp.q
-                ? 'It may not be in the catalogue yet — we are adding games continuously. Try the provider name, or a shorter part of the title.'
-                : 'Try widening one criterion — the minimum RTP is the one that excludes the most games.'}
+              {sp.q ? t.catalogueRienRecherche : t.catalogueRienFiltres}
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-2.5">
               <Lien href="/catalogue" className="tube tube-cyan">{t.effacerFiltres}</Lien>
@@ -161,7 +159,7 @@ export default async function Catalogue({
           <nav className="mt-8 flex items-center justify-center gap-2" aria-label={t.pagination}>
             {resultat.page > 1 && (
               <Lien href={lien(resultat.page - 1)} className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan">
-                ← Previous
+                {t.precedent}
               </Lien>
             )}
             <span className="font-mono text-[12px] text-texte-faible">
@@ -169,7 +167,7 @@ export default async function Catalogue({
             </span>
             {resultat.page < resultat.pages && (
               <Lien href={lien(resultat.page + 1)} className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan">
-                Next →
+                {t.suivant}
               </Lien>
             )}
           </nav>

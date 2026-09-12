@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { Tirets } from './DecorNeon';
 import { filtrerCasinosParPays, nomDuPays } from '@/lib/geo/filtrer-casinos';
 import { useLangue } from '@/i18n/useLangue';
+import { remplir } from '@/i18n/textes';
+import { offreTraduite } from '@/lib/traduire-donnees';
 
 /**
  * « Où jouer à ce jeu » — le bloc qui transforme une visite en lead.
@@ -90,23 +92,18 @@ export function OuJouer({
 
       {liste.length === 0 ? (
         <p className="mt-3 text-[13px] text-texte-doux">
-          None of our partner casinos currently carries {studio} games.
+          {remplir(t.ouJouerAucun, { studio })}
         </p>
       ) : (
         <>
           <p className="mb-4 font-corps text-[12px] text-texte-faible">
-            {resultat.filtre ? (
-              <>
-                {resultat.casinos.length} of our partners carry {studio} games
-                and are part of our selection in {nomDuPays(resultat.pays!)}.
-              </>
-            ) : (
-              <>
-                {resultat.casinos.length} of our partners carry {studio} games. A
-                brand-new release may still be exclusive to one operator for a
-                few weeks.
-              </>
-            )}
+            {resultat.filtre
+              ? remplir(t.ouJouerAvecPays, {
+                  n: String(resultat.casinos.length),
+                  studio,
+                  pays: nomDuPays(resultat.pays!),
+                })
+              : remplir(t.ouJouerSansPays, { n: String(resultat.casinos.length), studio })}
           </p>
 
           <ul className="grid grid-cols-[minmax(0,1fr)] gap-2.5 sm:grid-cols-2">
@@ -137,12 +134,12 @@ export function OuJouer({
                     </span>
                     {c.bonusTexte && (
                       <span className="block truncate font-corps text-[11px] text-texte-doux">
-                        {c.bonusTexte}
+                        {offreTraduite(c.bonusTexte, langue)}
                       </span>
                     )}
                   </span>
                   <span className="biseau-petit shrink-0 border border-neon-magenta px-3 py-1 font-ui text-[10px] font-bold uppercase tracking-wide text-white transition group-hover:bg-neon-magenta/25">
-                    Play
+                    {t.jouer}
                   </span>
                 </a>
               </li>
@@ -155,7 +152,9 @@ export function OuJouer({
               onClick={() => setTout(true)}
               className="tube tube-cyan mt-4 w-full sm:w-auto"
             >
-              Show {caches} more {caches === 1 ? 'partner' : 'partners'}
+              {caches === 1
+                ? t.afficherPlusPartenaireUn
+                : remplir(t.afficherPlusPartenaires, { n: String(caches) })}
             </button>
           )}
 
@@ -167,15 +166,16 @@ export function OuJouer({
            */}
           {resultat.filtre && casinos.length > resultat.casinos.length && (
             <p className="mt-3 font-corps text-[11px] text-texte-faible">
-              {casinos.length - resultat.casinos.length} more partners carry{' '}
-              {studio} games outside our {nomDuPays(resultat.pays!)} selection.
+              {remplir(t.partenairesHorsSelection, {
+                n: String(casinos.length - resultat.casinos.length),
+                studio,
+                pays: nomDuPays(resultat.pays!),
+              })}
             </p>
           )}
 
           <p className="mt-3 font-corps text-[10px] leading-relaxed text-texte-faible">
-            Advertising disclosure — we earn a commission when you sign up
-            through these links. It never changes which games we list or the
-            figures we publish.
+            {t.divulgationPub}
           </p>
         </>
       )}

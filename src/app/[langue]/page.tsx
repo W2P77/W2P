@@ -10,7 +10,7 @@ import { jeuxEnAvant, compterCatalogue } from '@/lib/donnees/jeux';
 import { studiosDuCatalogue } from '@/lib/donnees/catalogue';
 import { Lien } from '@/components/Lien';
 import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
-import { textes } from '@/i18n/textes';
+import { remplir, textes } from '@/i18n/textes';
 
 // Les chiffres viennent de la base, jamais du texte : un nombre recopié dans
 // une page dérive dès qu'un jeu entre ou sort.
@@ -68,7 +68,7 @@ export default async function Home({ params }: { params: Promise<{ langue: strin
             >
               {t.accroche}
               <br />
-              reel adventure
+              {t.accrocheLigne2}
             </h1>
           </div>
 
@@ -123,8 +123,11 @@ export default async function Home({ params }: { params: Promise<{ langue: strin
           </div>
 
           <p className="mt-5 font-ui text-[12px] tracking-wide text-texte-faible">
-            {compte.jeux} games · {compte.studios} studios ·{' '}
-            <span className="text-neon-cyan">{compte.sourcés} studio-verified RTPs</span>
+            {remplir(t.nbJeux, { n: String(compte.jeux) })} ·{' '}
+            {remplir(t.nbStudios, { n: String(compte.studios) })} ·{' '}
+            <span className="text-neon-cyan">
+              {remplir(t.nbRtpVerifies, { n: String(compte.sourcés) })}
+            </span>
           </p>
         </Panneau>
 
@@ -166,7 +169,7 @@ export default async function Home({ params }: { params: Promise<{ langue: strin
                       </span>
                     )}
                     <span className="font-ui text-[10px] tabular-nums text-texte-faible">
-                      {s._count.jeux} games
+                      {remplir(t.nbJeux, { n: String(s._count.jeux) })}
                     </span>
                   </Lien>
                 </li>
@@ -176,7 +179,7 @@ export default async function Home({ params }: { params: Promise<{ langue: strin
               href="/catalogue"
               className="mt-3 inline-block font-ui text-[12px] font-semibold uppercase tracking-wide text-neon-cyan hover:underline"
             >
-              All {studios.length} providers →
+              {remplir(t.tousLesStudiosNb, { n: String(studios.length) })} →
             </Lien>
           </div>
         </Panneau>

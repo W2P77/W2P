@@ -36,7 +36,7 @@ export default async function Favoris({
       <main className="mx-auto max-w-[1400px] px-6 py-8">
         <div className="mb-2 flex items-center gap-4">
           <h1 className="font-titre text-[24px] font-black uppercase tracking-tight text-white">
-            Favorites
+            {t.titreFavoris}
           </h1>
           <Tirets />
         </div>

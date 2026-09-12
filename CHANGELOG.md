@@ -2,6 +2,53 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Le site parle vraiment trois langues
+
+Une passe complète sur l'interface : la version française lisait l'anglais sur
+une bonne moitié de l'écran, et rien ne le signalait — une chaîne écrite en
+dur compile parfaitement.
+
+**Ce qui était en dur dans les composants.** Étiquettes de la fiche, filtres
+du catalogue, pied de page, pagination, titres de pages, bouton
+d'enregistrement : une trentaine de textes ont rejoint `src/i18n/textes.ts`,
+où le typage force les trois langues. Vingt-quatre clés nouvelles.
+
+**Le piège qui a coûté le plus de temps.** Le test de garde ne voyait pas les
+nœuds JSX qui **mêlent une interpolation et des mots en dur** — `{total}
+games`, `Show {n} more partners`, `{g.minutes} min read`. Sa capture excluait
+les accolades, donc il les ignorait tous et passait au vert sur une page à
+moitié anglaise. Il les prend maintenant, retire les interpolations, et juge
+ce qui reste ; un seul mot anglais suffit désormais à le faire échouer.
+
+**Trois guides sur quatre n'existaient qu'en anglais.** Le repli de
+`contenuDuGuide` est un filet, pas une destination : il affichait l'anglais
+sans jamais dire qu'il manquait une traduction. Les trois sont écrits en
+français et en allemand, et un test refuse désormais un guide incomplet.
+
+**Les titres de captures se traduisent, les noms de mécaniques non.** Les
+6 793 captures portent 114 titres écrits par le pipeline en anglais — « The
+base game », « Game rules, page 2 ». Les écrans génériques d'une démo sont
+traduits, la pagination garde son numéro. Mais Megaways, Cluster Pays, Hold &
+Spin, Pay Anywhere restent tels quels : ce sont les noms que les studios leur
+donnent, et les traduire inventerait un nom qui n'existe nulle part.
+
+**Les mécaniques et les offres sont traduites au rendu, pas en base.** 5 805
+mécaniques distinctes et 44 offres : les stocker traduites, c'est 17 000
+lignes à maintenir et deux traductions périmées dès qu'un partenaire change
+son bonus. `src/lib/traduire-donnees.ts` les dérive — dictionnaire des termes
+génériques, puis règles de préfixe où le terme connu passe en français et le
+reste est conservé. **Aucun chiffre n'est touché** : les tests comparent la
+suite des nombres avant et après, dans les trois langues.
+
+**L'écran de sortie s'affichait sans aucun style.** `/go` vit hors de
+`[langue]`, donc hors du layout qui charge la feuille de style et les trois
+polices — et `src/app/go/layout.tsx` était resté celui que `create-next-app`
+écrit : titre « Next.js », `lang="en"` en dur, aucun CSS. La dernière page
+qu'un visiteur voit de nous avant de partir chez un partenaire s'affichait en
+Times New Roman sur fond blanc. Elle est maintenant à la marque, en
+`noindex` — une page de tracking n'a rien à faire dans un index — et son
+attribut `lang` suit la langue demandée.
+
 ## 2026-09-12 — La démo remonte à sa place, et se joue sur la fiche
 
 Le bouton de démo vivait **après la liste des casinos** — c'est-à-dire après

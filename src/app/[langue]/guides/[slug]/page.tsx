@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Lien } from '@/components/Lien';
 import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
-import { textes } from '@/i18n/textes';
+import { remplir, textes } from '@/i18n/textes';
 
 import { metadonneesDePage } from '@/lib/metadonnees';
 import { notFound } from 'next/navigation';
@@ -59,7 +59,7 @@ export default async function Guide({ params }: { params: Promise<{ slug: string
           {c.titre}
         </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-texte-doux">{c.chapo}</p>
-        <p className="mt-2 font-mono text-[11px] text-texte-faible">{g.minutes} min read</p>
+        <p className="mt-2 font-mono text-[11px] text-texte-faible">{remplir(t.minutesLecture, { n: String(g.minutes) })}</p>
 
         <article className="mt-8 space-y-8">
           {c.sections.map((section, n) => (

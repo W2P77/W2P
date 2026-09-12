@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { Capture } from '@/data/captures';
+import { remplir } from '@/i18n/textes';
+import { useLangue } from '@/i18n/useLangue';
 import { RACINE_CAPTURES } from '@/lib/site';
 
 /**
@@ -32,6 +34,7 @@ import { RACINE_CAPTURES } from '@/lib/site';
  * page — et c'est un coût bien supérieur au bénéfice de l'agrandissement.
  */
 export function GalerieCaptures({ captures, jeu }: { captures: Capture[]; jeu: string }) {
+  const { t } = useLangue();
   const [ouverte, setOuverte] = useState<number | null>(null);
   const fermer = useCallback(() => setOuverte(null), []);
 
@@ -68,7 +71,7 @@ export function GalerieCaptures({ captures, jeu }: { captures: Capture[]; jeu: s
               type="button"
               onClick={() => setOuverte(i)}
               className="biseau-petit group relative block w-full overflow-hidden border border-fond-bordure bg-fond transition hover:border-neon-cyan"
-              aria-label={`Enlarge: ${c.titre}`}
+              aria-label={`${t.galerieAgrandir} : ${c.titre}`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -79,7 +82,7 @@ export function GalerieCaptures({ captures, jeu }: { captures: Capture[]; jeu: s
               />
               <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-fond/0 transition group-hover:bg-fond/40">
                 <span className="biseau-petit border-2 border-neon-cyan bg-fond/85 px-3 py-1.5 font-ui text-[11px] font-bold uppercase tracking-[0.1em] text-neon-cyan opacity-0 transition group-hover:opacity-100">
-                  Enlarge
+                  {t.galerieAgrandir}
                 </span>
               </span>
             </button>
@@ -120,7 +123,7 @@ export function GalerieCaptures({ captures, jeu }: { captures: Capture[]; jeu: s
             onClick={fermer}
             className="biseau-petit absolute right-5 top-5 border-2 border-neon-magenta px-3.5 py-1.5 font-ui text-[12px] font-bold uppercase tracking-[0.1em] text-white transition hover:bg-neon-magenta/25"
           >
-            Close
+            {t.galerieFermer}
           </button>
 
           {/* Le clic sur l'image elle-même ne referme pas : on vient de
@@ -143,7 +146,10 @@ export function GalerieCaptures({ captures, jeu }: { captures: Capture[]; jeu: s
             </span>
             {captures.length > 1 && (
               <span className="mt-2 block font-ui text-[11px] uppercase tracking-[0.1em] text-texte-faible">
-                {ouverte! + 1} / {captures.length} — arrow keys to browse, Esc to close
+                {remplir(t.galerieNavigation, {
+                  i: String(ouverte! + 1),
+                  n: String(captures.length),
+                })}
               </span>
             )}
           </p>

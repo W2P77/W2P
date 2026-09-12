@@ -71,7 +71,7 @@ export function ChampRecherche({ className = '' }: { className?: string }) {
             />
             <button
               type="submit"
-              aria-label="Search"
+              aria-label={t.rechercher}
               className="shrink-0 text-texte-doux transition hover:text-neon-cyan"
             >
               <svg viewBox="0 0 24 24" className="h-[21px] w-[21px]" fill="none" aria-hidden>

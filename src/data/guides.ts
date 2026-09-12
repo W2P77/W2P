@@ -225,6 +225,62 @@ export const GUIDES: Guide[] = [
             ],
           },],
       },
+      fr: {
+        titre: 'Lire un RTP : studio, opérateur, achat de bonus',
+        chapo:
+          "La même machine a souvent trois RTP différents, et la plupart des sites n'en publient qu'un — parfois le mauvais.",
+        sections: [
+          {
+            titre: "Une machine n'a pas un seul RTP",
+            paragraphes: [
+              "La plupart des studios livrent un jeu avec plusieurs configurations de RTP. Le studio publie une valeur par défaut — la plus haute — et l'opérateur peut choisir un palier plus bas. Les jeux Pragmatic Play en proposent généralement trois ; Relax Gaming documente des versions à 94 % et 90 % à côté de la valeur par défaut.",
+              "Ce n'est pas caché : c'est écrit dans la documentation du studio. Mais un agrégateur qui n'affiche qu'un seul chiffre ne peut pas te dire lequel tu regardes, et la valeur servie dans un casino peut être plus basse que celle annoncée ailleurs.",
+            ],
+          },
+          {
+            titre: "L'achat de bonus a son propre RTP",
+            paragraphes: [
+              "Acheter un bonus change généralement le taux de retour. Il est souvent plus élevé que celui du jeu de base — c'est pour cela qu'il finit cité comme s'il était le RTP du jeu.",
+              "Nous l'avons mesuré sur nos propres données : sur huit titres de Nolimit City, Hacksaw, ELK et Relax, six portaient un chiffre qui était en réalité le retour d'un achat de bonus. Sur un jeu, l'écart atteignait 0,79 point — de quoi le faire passer de moyen à excellent dans un tableau comparatif.",
+            ],
+          },
+          {
+            titre: 'Comment vérifier soi-même',
+            paragraphes: [
+              "La table des gains affichée dans le jeu est le seul chiffre qui s'applique à la session que tu joues. Elle reflète le palier configuré par ton opérateur, pas la valeur par défaut du studio.",
+              "Sur chaque fiche de jeu ici, le RTP porte un niveau de preuve. « Vérifié auprès du studio » signifie que nous avons la page du studio en archive et que tu peux l'ouvrir. Quand nous n'avons pas confirmé un chiffre, nous le disons, plutôt que de le présenter avec la même assurance qu'un chiffre vérifié.",
+            ],
+          },
+        ],
+      },
+      de: {
+        titre: 'Einen RTP richtig lesen: Studio, Betreiber, Bonuskauf',
+        chapo:
+          'Derselbe Slot hat oft drei verschiedene RTP-Werte, und die meisten Seiten veröffentlichen nur einen davon — manchmal den falschen.',
+        sections: [
+          {
+            titre: 'Ein Slot hat nicht nur einen RTP',
+            paragraphes: [
+              'Die meisten Studios liefern ein Spiel mit mehreren RTP-Konfigurationen aus. Das Studio veröffentlicht einen Standardwert — den höchsten — und Betreiber dürfen eine niedrigere Stufe wählen. Spiele von Pragmatic Play bieten üblicherweise drei; Relax Gaming dokumentiert neben dem Standard Versionen mit 94 % und 90 %.',
+              'Das ist nicht versteckt: Es steht in den Unterlagen des Studios. Aber ein Aggregator, der eine einzige Zahl listet, kann dir nicht sagen, welche du gerade siehst — und der Wert in einem Casino kann niedriger sein als der anderswo beworbene.',
+            ],
+          },
+          {
+            titre: 'Der Bonuskauf hat seinen eigenen RTP',
+            paragraphes: [
+              'Ein Bonuskauf verändert in der Regel die Auszahlungsquote. Sie liegt häufig über der des Basisspiels — deshalb wird sie am Ende so zitiert, als wäre sie der RTP des Spiels.',
+              'Wir haben das an unseren eigenen Daten gemessen: Von acht Titeln von Nolimit City, Hacksaw, ELK und Relax trugen sechs eine Zahl, die in Wahrheit die Quote eines Bonuskaufs war. Bei einem Spiel betrug der Abstand 0,79 Punkte — genug, um es in einer Vergleichstabelle von durchschnittlich auf ausgezeichnet zu heben.',
+            ],
+          },
+          {
+            titre: 'Wie du es selbst prüfst',
+            paragraphes: [
+              'Die Gewinntabelle im Spiel ist die einzige Zahl, die für deine Sitzung gilt. Sie zeigt die Stufe, die dein Betreiber eingestellt hat, nicht den Standard des Studios.',
+              'Auf jeder Spielseite hier trägt der RTP eine Belegstufe. „Vom Studio geprüft“ heißt, dass uns die Studioseite vorliegt und du sie öffnen kannst. Wenn wir eine Zahl nicht bestätigt haben, sagen wir das, statt sie mit derselben Sicherheit zu präsentieren wie eine geprüfte.',
+            ],
+          },
+        ],
+      },
     },
   },
   {
@@ -256,6 +312,60 @@ export const GUIDES: Guide[] = [
               'When no studio source exists, we do not pick the most flattering number. We mark the figure as unverified and leave it visible, so you know exactly what you are reading.',
             ],
           },],
+      },
+      fr: {
+        titre: 'Pourquoi deux sites affichent deux RTP différents pour la même machine',
+        chapo:
+          "C'est rarement une faute de frappe. Le désaccord dit en général quelle source chaque site a recopiée.",
+        sections: [
+          {
+            titre: "Un écart d'environ un point",
+            paragraphes: [
+              "Quand deux sites diffèrent d'à peu près un point entier — 96,06 % contre 95,05 %, par exemple — tu regardes presque à coup sûr deux paliers opérateur différents du même jeu. Un site a pris la valeur par défaut du studio, l'autre la configuration qu'un casino donné faisait tourner.",
+              "Nous avons trouvé quatre titres Red Tiger exactement dans cette situation. Les valeurs basses correspondaient exactement à celles d'un agrégateur, ce qui indique assez clairement d'où elles ont été recopiées.",
+            ],
+          },
+          {
+            titre: 'Un écart de quelques dixièmes',
+            paragraphes: [
+              "Les écarts plus petits — 0,2 à 0,8 point — pointent en général vers un chiffre d'achat de bonus, ou vers une variante du jeu confondue avec le titre de base. Big Bass Hold & Spinner et sa version Megaways sont deux jeux distincts avec deux chiffres distincts, et on les intervertit régulièrement.",
+            ],
+          },
+          {
+            titre: 'Ce que nous en faisons',
+            paragraphes: [
+              "Nous allons chez le studio. Quand le chiffre est publié — page produit, communiqué, parfois le paquet du jeu lui-même — nous enregistrons l'adresse à côté du nombre, et tu peux l'ouvrir depuis la fiche.",
+              "Quand aucune source studio n'existe, nous ne choisissons pas le chiffre le plus flatteur. Nous marquons la valeur comme non vérifiée et la laissons visible, pour que tu saches exactement ce que tu lis.",
+            ],
+          },
+        ],
+      },
+      de: {
+        titre: 'Warum zwei Seiten zwei verschiedene RTP-Werte für denselben Slot zeigen',
+        chapo:
+          'Das ist selten ein Tippfehler. Die Abweichung verrät meist, welche Quelle jede Seite abgeschrieben hat.',
+        sections: [
+          {
+            titre: 'Ein Abstand von etwa einem Punkt',
+            paragraphes: [
+              'Wenn zwei Seiten um rund einen ganzen Punkt auseinanderliegen — etwa 96,06 % gegen 95,05 % — siehst du fast sicher zwei verschiedene Betreiberstufen desselben Spiels. Die eine Seite nahm den Studiostandard, die andere die Konfiguration, die ein bestimmtes Casino betrieb.',
+              'Wir haben vier Red-Tiger-Titel in genau dieser Lage gefunden. Die niedrigeren Werte stimmten exakt mit denen eines Aggregators überein — ein deutliches Zeichen dafür, woher sie kopiert wurden.',
+            ],
+          },
+          {
+            titre: 'Ein Abstand von wenigen Zehnteln',
+            paragraphes: [
+              'Kleinere Abstände — 0,2 bis 0,8 Punkte — deuten meist auf einen Bonuskauf-Wert hin oder auf eine Spielvariante, die mit dem Basistitel verwechselt wird. Big Bass Hold & Spinner und seine Megaways-Version sind zwei eigene Spiele mit eigenen Zahlen, und ihre Werte werden regelmäßig vertauscht.',
+            ],
+          },
+          {
+            titre: 'Was wir damit machen',
+            paragraphes: [
+              'Wir gehen zum Studio. Wenn die Zahl veröffentlicht ist — Produktseite, Pressemitteilung, manchmal das Spielpaket selbst — halten wir die Adresse neben der Zahl fest, und du kannst sie von der Spielseite aus öffnen.',
+              'Wenn es keine Studioquelle gibt, wählen wir nicht die schmeichelhafteste Zahl. Wir kennzeichnen den Wert als ungeprüft und lassen ihn sichtbar, damit du genau weißt, was du liest.',
+            ],
+          },
+        ],
       },
     },
   },
@@ -289,6 +399,62 @@ export const GUIDES: Guide[] = [
               'Here, a game with no published volatility shows nothing at all. An empty field is visible and can be fixed; an invented one gets believed.',
             ],
           },],
+      },
+      fr: {
+        titre: "Volatilité : ce que l'étiquette ne dit pas",
+        chapo:
+          'Basse, moyenne, haute — trois mots pour un spectre que chaque studio mesure sur sa propre échelle.',
+        sections: [
+          {
+            titre: "Il n'existe pas d'échelle commune",
+            paragraphes: [
+              "Certains studios publient un indice de volatilité chiffré, d'autres un simple mot. ELK note ses jeux sur dix ; Nolimit City publie une valeur qui dépasse régulièrement vingt sur sa propre échelle. Une volatilité « haute » chez un studio et une volatilité « haute » chez un autre ne décrivent pas la même expérience.",
+              "C'est pourquoi nous affichons l'étiquette du studio quand elle existe, plutôt que de tout convertir sur une échelle maison — une conversion serait plus propre à regarder et dirait moins.",
+            ],
+          },
+          {
+            titre: "La fréquence de gain compte plus que l'étiquette",
+            paragraphes: [
+              "La fréquence à laquelle un jeu paie quelque chose façonne une session bien plus qu'un mot de volatilité. Un jeu qui paie sur 14 % des tours n'a rien à voir avec un jeu qui paie sur 32 %, même si les deux portent l'étiquette haute.",
+              "Quand un studio la publie, cette valeur mérite plus d'attention que l'étiquette.",
+            ],
+          },
+          {
+            titre: "Une valeur absente n'est pas une valeur neutre",
+            paragraphes: [
+              "Beaucoup de catalogues remplissent un champ de volatilité vide avec « moyenne ». Cela se lit comme une information ; c'est une supposition.",
+              "Ici, un jeu sans volatilité publiée n'affiche rien du tout. Un champ vide se voit et peut être corrigé ; un champ inventé, on le croit.",
+            ],
+          },
+        ],
+      },
+      de: {
+        titre: 'Volatilität: was das Etikett nicht verrät',
+        chapo:
+          'Niedrig, mittel, hoch — drei Wörter für ein Spektrum, das jedes Studio auf seiner eigenen Skala misst.',
+        sections: [
+          {
+            titre: 'Es gibt keine gemeinsame Skala',
+            paragraphes: [
+              'Manche Studios veröffentlichen einen Volatilitätsindex als Zahl, andere nur ein Wort. ELK bewertet Spiele auf einer Skala bis zehn; Nolimit City nennt Werte, die auf der eigenen Skala regelmäßig über zwanzig liegen. Ein „hoch“ des einen Studios und ein „hoch“ des anderen beschreiben nicht dieselbe Erfahrung.',
+              'Deshalb zeigen wir das Etikett des Studios, wenn es existiert, statt alles auf eine eigene Skala umzurechnen — eine Umrechnung sähe ordentlicher aus und sagte weniger.',
+            ],
+          },
+          {
+            titre: 'Die Trefferquote zählt mehr als das Etikett',
+            paragraphes: [
+              'Wie oft ein Spiel überhaupt etwas auszahlt, prägt eine Sitzung weit stärker als ein Volatilitätswort. Ein Spiel, das auf 14 % der Drehungen zahlt, fühlt sich völlig anders an als eines, das auf 32 % zahlt — auch wenn beide als hoch gelten.',
+              'Wenn ein Studio diese Zahl veröffentlicht, verdient sie mehr Aufmerksamkeit als das Etikett.',
+            ],
+          },
+          {
+            titre: 'Ein fehlender Wert ist kein neutraler Wert',
+            paragraphes: [
+              'Viele Kataloge füllen ein leeres Volatilitätsfeld mit „mittel“. Das liest sich wie eine Information; es ist eine Vermutung.',
+              'Hier zeigt ein Spiel ohne veröffentlichte Volatilität gar nichts an. Ein leeres Feld ist sichtbar und lässt sich korrigieren; ein erfundenes wird geglaubt.',
+            ],
+          },
+        ],
       },
     },
   },

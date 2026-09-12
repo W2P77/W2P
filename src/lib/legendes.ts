@@ -184,6 +184,83 @@ export const LEGENDES_ECRITES: Record<string, Record<string, Record<Langue, stri
   },
 };
 
+/**
+ * Le titre d'une capture, dans la langue du visiteur.
+ *
+ * Les titres viennent du pipeline et sont écrits en anglais — « The base
+ * game », « Game rules, page 2 », « Settings menu ». Ils s'affichaient tels
+ * quels sur les trois versions du site : un lecteur français lisait une
+ * légende française sous un titre anglais.
+ *
+ * Ce qui est traduit ici, ce sont les écrans **génériques** d'une démo. Les
+ * noms de mécaniques — Hold & Win, Powernudge, Megaways — restent tels quels :
+ * ce sont les noms que le studio leur donne, et les traduire reviendrait à
+ * inventer un nom qui n'existe nulle part.
+ */
+const TITRES: Record<string, { fr: string; de: string }> = {
+  'the base game': { fr: 'Le jeu de base', de: 'Das Basisspiel' },
+  'game rules': { fr: 'Règles du jeu', de: 'Spielregeln' },
+  'a game rules': { fr: 'Règles du jeu', de: 'Spielregeln' },
+  '- game rules': { fr: 'Règles du jeu', de: 'Spielregeln' },
+  'how to play': { fr: 'Comment jouer', de: 'So wird gespielt' },
+  'settings menu': { fr: 'Le menu des réglages', de: 'Das Einstellungsmenü' },
+  'autoplay': { fr: 'Le jeu automatique', de: 'Der Autoplay-Modus' },
+  'max win': { fr: 'Le gain maximum', de: 'Der Maximalgewinn' },
+  'buying the feature': { fr: "L'achat de bonus", de: 'Der Bonuskauf' },
+  'bonus buy': { fr: "L'achat de bonus", de: 'Der Bonuskauf' },
+  'buy free spins': { fr: "L'achat de tours gratuits", de: 'Der Freispielkauf' },
+  'free spins': { fr: 'Les tours gratuits', de: 'Die Freispiele' },
+  'free games': { fr: 'Les parties gratuites', de: 'Die Gratisrunden' },
+  'free spins rules': { fr: 'Les règles des tours gratuits', de: 'Die Freispielregeln' },
+  'free spins feature': { fr: 'La fonction tours gratuits', de: 'Die Freispielfunktion' },
+  'free spins options': { fr: 'Les options de tours gratuits', de: 'Die Freispieloptionen' },
+  'collect free spins': { fr: 'La collecte de tours gratuits', de: 'Das Sammeln von Freispielen' },
+  'features': { fr: 'Les fonctionnalités', de: 'Die Funktionen' },
+  'general': { fr: 'Généralités', de: 'Allgemeines' },
+  'special symbols': { fr: 'Les symboles spéciaux', de: 'Die Spezialsymbole' },
+  'golden symbols': { fr: 'Les symboles dorés', de: 'Die goldenen Symbole' },
+  'colossal symbols': { fr: 'Les symboles géants', de: 'Die Kolossalsymbole' },
+  'symbol values': { fr: 'La valeur des symboles', de: 'Die Symbolwerte' },
+  'ways to win': { fr: 'Les façons de gagner', de: 'Die Gewinnwege' },
+  'wild': { fr: 'Le symbole Wild', de: 'Das Wild-Symbol' },
+  'scatter': { fr: 'Le symbole Scatter', de: 'Das Scatter-Symbol' },
+  'sticky wilds': { fr: 'Les Wilds collants', de: 'Die klebenden Wilds' },
+  'expanding wild': { fr: 'Le Wild extensible', de: 'Das expandierende Wild' },
+  'expanding wilds': { fr: 'Les Wilds extensibles', de: 'Die expandierenden Wilds' },
+  'special wilds': { fr: 'Les Wilds spéciaux', de: 'Die speziellen Wilds' },
+  'bonus': { fr: 'Le bonus', de: 'Der Bonus' },
+  'bonus game': { fr: 'Le jeu bonus', de: 'Das Bonusspiel' },
+  'bonus rules': { fr: 'Les règles du bonus', de: 'Die Bonusregeln' },
+  'bonus feature': { fr: 'La fonction bonus', de: 'Die Bonusfunktion' },
+  'bonus feature rules': { fr: 'Les règles de la fonction bonus', de: 'Die Regeln der Bonusfunktion' },
+  'a medium volatility': { fr: 'Une volatilité moyenne', de: 'Eine mittlere Volatilität' },
+  'medium volatility': { fr: 'Une volatilité moyenne', de: 'Eine mittlere Volatilität' },
+  'a high volatility': { fr: 'Une volatilité haute', de: 'Eine hohe Volatilität' },
+  'high volatility': { fr: 'Une volatilité haute', de: 'Eine hohe Volatilität' },
+  'low volatility': { fr: 'Une volatilité basse', de: 'Eine niedrige Volatilität' },
+  'the studio states its own rtp': { fr: 'Le studio annonce son propre RTP', de: 'Das Studio nennt seinen eigenen RTP' },
+  'tumble and multipliers': { fr: 'Les cascades et les multiplicateurs', de: 'Kaskaden und Multiplikatoren' },
+  'free spins and ante bet': { fr: 'Les tours gratuits et la mise Ante', de: 'Freispiele und Ante-Einsatz' },
+  'modifiers': { fr: 'Les modificateurs', de: 'Die Modifikatoren' },
+  'spin modifiers': { fr: 'Les modificateurs de tour', de: 'Die Dreh-Modifikatoren' },
+};
+
+/** « Game rules, page 7 » : la pagination se traduit, le numéro se garde. */
+const PAGE_DE_REGLES = /^(?:a\s+)?game rules,?\s*page\s*(\d+)$/i;
+
+export function titreDeCapture(titre: string, langue: Langue): string {
+  const brut = (titre ?? '').trim();
+  if (langue === 'en' || !brut) return brut;
+
+  const page = brut.match(PAGE_DE_REGLES);
+  if (page) {
+    return langue === 'fr' ? `Règles du jeu, page ${page[1]}` : `Spielregeln, Seite ${page[1]}`;
+  }
+
+  const connu = TITRES[brut.toLowerCase()];
+  return connu ? connu[langue] : brut;
+}
+
 export function legendeDeCapture(
   capture: { titre: string; legende?: string | null },
   faits: FaitsDeCapture & { slug: string },

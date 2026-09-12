@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
-import { textes } from '@/i18n/textes';
+import { remplir, textes } from '@/i18n/textes';
 import { metadonneesDePage } from '@/lib/metadonnees';
 import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
@@ -38,7 +38,7 @@ export default async function Guides({
       <main className="mx-auto max-w-[900px] px-6 py-8">
         <div className="mb-2 flex items-center gap-4">
           <h1 className="font-titre text-[24px] font-black uppercase tracking-tight text-white">
-            Guides
+            {t.titreGuides}
           </h1>
           <Tirets />
         </div>
@@ -56,7 +56,7 @@ export default async function Guides({
                 <p className="font-titre text-[16px] font-bold text-white">{contenuDuGuide(g, langue).titre}</p>
                 <p className="mt-1.5 text-[13px] leading-relaxed text-texte-doux">{contenuDuGuide(g, langue).chapo}</p>
                 <span className="mt-2.5 inline-block font-mono text-[11px] text-neon-cyan">
-                  {g.minutes} min read →
+                  {remplir(t.minutesLecture, { n: String(g.minutes) })} →
                 </span>
               </a>
             </li>

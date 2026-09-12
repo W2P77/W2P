@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Lien } from '@/components/Lien';
 import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
-import { textes } from '@/i18n/textes';
+import { remplir, textes } from '@/i18n/textes';
 
 import { metadonneesDePage } from '@/lib/metadonnees';
 import { notFound } from 'next/navigation';
@@ -49,14 +49,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { langue: brutLangue, studio } = await params;
   const s = await prisma.studio.findUnique({ where: { slug: studio } });
-  if (!s) return { title: 'Provider not found' };
+  if (!s) return { title: textes(estUneLangue(brutLangue) ? brutLangue : LANGUE_DEFAUT).studioIntrouvable };
   // Cette page n'avait pas non plus de canonique : elle est atteignable
   // depuis le catalogue et la navigation, chacune pouvant traîner ses
   // paramètres de pagination.
   return metadonneesDePage({
     langue: estUneLangue(brutLangue) ? brutLangue : LANGUE_DEFAUT,
-    titre: `${s.nom} slots — RTP, volatility and demos`,
-    description: `Every ${s.nom} slot with its RTP, volatility and max win — and where each number comes from.`,
+    titre: remplir(textes(estUneLangue(brutLangue) ? brutLangue : LANGUE_DEFAUT).studioTitre, { studio: s.nom }),
+    description: remplir(textes(estUneLangue(brutLangue) ? brutLangue : LANGUE_DEFAUT).studioDescription, { studio: s.nom }),
     chemin: `/slot/${s.slug}`,
   });
 }
@@ -91,11 +91,11 @@ export default async function PageStudio({
 
         <div className="mb-6 flex items-center gap-4">
           <h1 className="font-titre text-[26px] font-black uppercase tracking-tight text-white">
-            {s.nom} slots
+            {remplir(t.slotsDuStudio, { studio: s.nom })}
           </h1>
           <Tirets />
           <span className="font-mono text-[12px] text-texte-faible">
-            {s._count.jeux} games
+            {remplir(t.nbJeux, { n: String(s._count.jeux) })}
           </span>
         </div>
 
@@ -112,7 +112,7 @@ export default async function PageStudio({
                 href={`/slot/${s.slug}?page=${page - 1}`}
                 className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan"
               >
-                ← Previous
+                {t.precedent}
               </Lien>
             )}
             <span className="font-mono text-[12px] text-texte-faible">
@@ -123,7 +123,7 @@ export default async function PageStudio({
                 href={`/slot/${s.slug}?page=${page + 1}`}
                 className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan"
               >
-                Next →
+                {t.suivant}
               </Lien>
             )}
           </nav>

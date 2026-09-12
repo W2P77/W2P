@@ -24,11 +24,10 @@ export default function Introuvable() {
       <main className="mx-auto max-w-2xl px-6 py-24 text-center">
         <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-neon-cyan">404</p>
         <h1 className="mt-3 font-titre text-[32px] font-black uppercase leading-tight tracking-tight text-white">
-          We don&apos;t have this one
+          {t.introuvableTitre}
         </h1>
         <p className="mx-auto mt-3 max-w-md text-[14px] text-texte-doux">
-          The page you were looking for does not exist — or the game is not in
-          the catalogue yet. Try searching for it.
+          {t.introuvableTexte}
         </p>
 
         <form action="/catalogue" role="search" className="mx-auto mt-7 max-w-md">

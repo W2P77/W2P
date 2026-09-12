@@ -57,9 +57,7 @@ export function MesJeux() {
     return (
       <div className="panneau p-8 text-center">
         <p className="text-[14px] text-texte-doux">{t.aucunFavori}</p>
-        <Lien href="/catalogue" className="tube tube-cyan mt-5 inline-block">
-          Browse the catalogue
-        </Lien>
+        <Lien href="/catalogue" className="tube tube-cyan mt-5 inline-block">{t.parcourirCatalogue}</Lien>
       </div>
     );
   }

@@ -4,7 +4,7 @@ import { GalerieCaptures } from './GalerieCaptures';
 import type { Capture } from '@/data/captures';
 import { useLangue } from '@/i18n/useLangue';
 import { remplir } from '@/i18n/textes';
-import { legendeDeCapture, type FaitsDeCapture } from '@/lib/legendes';
+import { legendeDeCapture, titreDeCapture, type FaitsDeCapture } from '@/lib/legendes';
 
 /**
  * Les captures faites dans la démo officielle du studio.
@@ -60,6 +60,7 @@ export function CapturesJeu({
    */
   const legendees = lot.map((c) => ({
     ...c,
+    titre: titreDeCapture(c.titre, langue),
     legende: legendeDeCapture(c, { ...faits, nom: jeu, slug }, langue),
   }));
 

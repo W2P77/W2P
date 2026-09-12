@@ -49,9 +49,13 @@ const corps = Barlow({
  * `lang="fr"` restait de l'amorçage : il annonçait du français aux lecteurs
  * d'écran et aux moteurs sur des pages entièrement rédigées en anglais.
  */
-const TITRE = 'where2spin — where to spin the slots you are looking for';
-const DESCRIPTION =
-  'RTP, volatility, max win and free demos. Every number says where it comes from, and how well it is verified.';
+/*
+ * Le titre et la description par défaut suivent la langue de l'URL.
+ *
+ * Ils étaient figés à l'import, donc en anglais pour les trois versions : une
+ * page qui ne pose pas ses propres métadonnées annonçait un site anglais aux
+ * moteurs et aux réseaux sociaux, même sous /fr.
+ */
 
 /*
  * L'image de partage n'est déclarée que si le fichier existe.
@@ -70,7 +74,16 @@ const OG = existsSync(join(process.cwd(), 'public', 'images', 'og.jpg'))
 
 const OG_URL = OG;
 
-export const metadata: Metadata = {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ langue: string }>;
+}): Promise<Metadata> {
+  const { langue: brut } = await params;
+  const t = textes(estUneLangue(brut) ? brut : LANGUE_DEFAUT);
+  const TITRE = t.siteTitre;
+  const DESCRIPTION = t.siteDescription;
+  return {
   metadataBase: new URL(SITE_URL),
   title: { default: TITRE, template: '%s · where2spin' },
   description: DESCRIPTION,
@@ -83,14 +96,16 @@ export const metadata: Metadata = {
     ...(OG_URL ? { images: [{ url: OG_URL, width: 1200, height: 630, alt: 'where2spin' }] } : {}),
   },
   twitter: {
-    card: OG ? 'summary_large_image' : 'summary',
-    title: TITRE,
-    description: DESCRIPTION,
-    ...(OG_URL ? { images: [OG_URL] } : {}),
-  },
-};
+      card: OG ? 'summary_large_image' : 'summary',
+      title: TITRE,
+      description: DESCRIPTION,
+      ...(OG_URL ? { images: [OG_URL] } : {}),
+    },
+  };
+}
 
 import { LANGUES, estUneLangue, langue as trouverLangue, LANGUE_DEFAUT } from '@/i18n/langues';
+import { textes } from '@/i18n/textes';
 
 /**
  * Les trois langues sont pré-rendues.

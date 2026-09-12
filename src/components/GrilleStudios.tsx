@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { CarteJeu, type JeuVignette } from './CarteJeu';
+import { remplir } from '@/i18n/textes';
 import { useLangue } from '@/i18n/useLangue';
 
 /**
@@ -88,7 +89,7 @@ export function GrilleStudios({ studios }: { studios: StudioVignette[] }) {
                   {s.nom}
                 </span>
                 <span className="font-mono text-[11px] text-texte-faible">
-                  {s.nbJeux} game{s.nbJeux > 1 ? 's' : ''}
+                  {s.nbJeux > 1 ? remplir(t.nbJeux, { n: String(s.nbJeux) }) : t.nbJeuxUn}
                 </span>
               </span>
 
@@ -120,7 +121,11 @@ export function GrilleStudios({ studios }: { studios: StudioVignette[] }) {
                         href={`/slot/${s.slug}`}
                         className="mt-4 inline-block text-[12px] text-neon-cyan hover:underline"
                       >
-                        See all {cache[s.slug].length} {s.nom} games →
+                        {remplir(t.voirTousLesJeux, {
+                          n: String(cache[s.slug].length),
+                          studio: s.nom,
+                        })}{' '}
+                        →
                       </a>
                     )}
                   </>

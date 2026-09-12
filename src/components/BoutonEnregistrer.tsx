@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { lireMesJeux, basculerJeu } from './MesJeux';
+import { useLangue } from '@/i18n/useLangue';
 import type { JeuVignette } from './CarteJeu';
 
 /**
@@ -18,6 +19,7 @@ import type { JeuVignette } from './CarteJeu';
  * change d'apparence sous les doigts au premier chargement.
  */
 export function BoutonEnregistrer({ jeu }: { jeu: JeuVignette }) {
+  const { t } = useLangue();
   const [enregistre, setEnregistre] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -35,7 +37,7 @@ export function BoutonEnregistrer({ jeu }: { jeu: JeuVignette }) {
           : 'border-fond-bordure text-texte-doux hover:border-neon-magenta hover:text-white'
       }`}
     >
-      {enregistre ? '★ Saved' : '☆ Save this game'}
+      {enregistre ? t.jeuEnregistre : t.enregistrerJeu}
     </button>
   );
 }

@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
 import { useLangue } from '@/i18n/useLangue';
+import { textes } from '@/i18n/textes';
 
 /**
  * Les filtres du catalogue.
@@ -11,35 +12,41 @@ import { useLangue } from '@/i18n/useLangue';
  * partage, s'indexe et supporte le bouton retour. Un filtre qui ne change pas
  * l'adresse produit un site où l'on ne peut envoyer un lien à personne.
  */
-const VOLATILITES = [
-  { valeur: '', libelle: 'Any volatility' },
-  { valeur: 'BASSE', libelle: 'Low' },
-  { valeur: 'MOYENNE', libelle: 'Medium' },
-  { valeur: 'HAUTE', libelle: 'High' },
-  { valeur: 'TRES_HAUTE', libelle: 'Very high' },
-];
+/*
+ * Les listes dépendent de la langue : elles se construisent donc dans le
+ * composant, pas au chargement du module. Un tableau figé à l'import aurait
+ * gardé l'anglais pour les trois versions du site.
+ */
+type Textes = ReturnType<typeof textes>;
 
-const PREUVES = [
-  { valeur: '', libelle: 'Any evidence level' },
-  { valeur: 'STUDIO', libelle: 'Studio-verified only' },
-  { valeur: 'RECOUPE', libelle: 'Cross-checked' },
-  { valeur: 'AUCUNE', libelle: 'Unverified' },
-];
-
-const TRIS = [
-  { valeur: 'preuve', libelle: 'Best sourced first' },
-  { valeur: 'nom', libelle: 'Name A-Z' },
-  { valeur: 'rtp-desc', libelle: 'Highest RTP' },
-  { valeur: 'gain-desc', libelle: 'Biggest max win' },
-  { valeur: 'recent', libelle: 'Newest first' },
-];
-
-const RTP_MIN = [
-  { valeur: '', libelle: 'Any RTP' },
-  { valeur: '96', libelle: 'RTP 96%+' },
-  { valeur: '96.5', libelle: 'RTP 96.5%+' },
-  { valeur: '97', libelle: 'RTP 97%+' },
-];
+const listes = (t: Textes) => ({
+  VOLATILITES: [
+    { valeur: '', libelle: t.filtreToutesVolatilites },
+    { valeur: 'BASSE', libelle: t.volBasse },
+    { valeur: 'MOYENNE', libelle: t.volMoyenne },
+    { valeur: 'HAUTE', libelle: t.volHaute },
+    { valeur: 'TRES_HAUTE', libelle: t.volTresHaute },
+  ],
+  PREUVES: [
+    { valeur: '', libelle: t.filtreToutePreuve },
+    { valeur: 'STUDIO', libelle: t.preuveStudioSeul },
+    { valeur: 'RECOUPE', libelle: t.preuveRecoupeCourt },
+    { valeur: 'AUCUNE', libelle: t.preuveAucuneCourt },
+  ],
+  TRIS: [
+    { valeur: 'preuve', libelle: t.triMieuxSource },
+    { valeur: 'nom', libelle: t.triNom },
+    { valeur: 'rtp-desc', libelle: t.triRtp },
+    { valeur: 'gain-desc', libelle: t.triGain },
+    { valeur: 'recent', libelle: t.triRecent },
+  ],
+  RTP_MIN: [
+    { valeur: '', libelle: t.filtreToutRtp },
+    { valeur: '96', libelle: 'RTP 96%+' },
+    { valeur: '96.5', libelle: 'RTP 96.5%+' },
+    { valeur: '97', libelle: 'RTP 97%+' },
+  ],
+});
 
 export function BarreFiltres({
   studios,
@@ -47,6 +54,7 @@ export function BarreFiltres({
   studios: { slug: string; nom: string; _count: { jeux: number } }[];
 }) {
   const { t } = useLangue();
+  const { VOLATILITES, PREUVES, TRIS, RTP_MIN } = listes(t);
   const router = useRouter();
   const params = useSearchParams();
 
@@ -93,7 +101,7 @@ export function BarreFiltres({
           className={champ}
           value={params.get('studio') ?? ''}
           onChange={(e) => majParam('studio', e.target.value)}
-          aria-label="Provider"
+          aria-label={t.ficheFournisseur}
         >
           <option value="">{t.tousStudios}</option>
           {studios.map((s) => (
@@ -104,10 +112,10 @@ export function BarreFiltres({
         </select>
 
         {[
-          { cle: 'volatilite', options: VOLATILITES, label: 'Volatility' },
-          { cle: 'rtpMin', options: RTP_MIN, label: 'Minimum RTP' },
-          { cle: 'preuve', options: PREUVES, label: 'Evidence level' },
-          { cle: 'tri', options: TRIS, label: 'Sort by' },
+          { cle: 'volatilite', options: VOLATILITES, label: t.ficheVolatilite },
+          { cle: 'rtpMin', options: RTP_MIN, label: t.filtreRtpMin },
+          { cle: 'preuve', options: PREUVES, label: t.filtreNiveauPreuve },
+          { cle: 'tri', options: TRIS, label: t.filtreTri },
         ].map(({ cle, options, label }) => (
           <select
             key={cle}

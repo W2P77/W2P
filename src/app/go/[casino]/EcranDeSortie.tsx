@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import { textes } from '@/i18n/textes';
-import type { Langue } from '@/i18n/langues';
+import { langue as trouverLangue, type Langue } from '@/i18n/langues';
 
 /** Trois secondes : le temps de lire le bonus, pas celui de changer d'avis. */
 const SECONDES = 3;
@@ -31,6 +31,15 @@ export function EcranDeSortie({
 }) {
   const t = textes(langue);
   const [reste, setReste] = useState(SECONDES);
+
+  /*
+   * Le layout de `/go` rend `lang="en"` : il n'a pas accès au paramètre de
+   * requête qui porte la langue. On le corrige ici, où on la connaît — sans
+   * quoi un lecteur d'écran prononcerait le français à l'anglaise.
+   */
+  useEffect(() => {
+    document.documentElement.lang = trouverLangue(langue).htmlLang;
+  }, [langue]);
 
   useEffect(() => {
     const tic = setInterval(() => setReste((n) => (n <= 1 ? 0 : n - 1)), 1000);

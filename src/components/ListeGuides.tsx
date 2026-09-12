@@ -2,6 +2,7 @@
 
 import { contenuDuGuide, GUIDES } from '@/data/guides';
 import { Lien } from '@/components/Lien';
+import { remplir } from '@/i18n/textes';
 import { useLangue } from '@/i18n/useLangue';
 
 /**
@@ -39,7 +40,7 @@ function Vignette({ rang }: { rang: number }) {
 }
 
 export function ListeGuides() {
-  const { langue } = useLangue();
+  const { langue, t } = useLangue();
   return (
     <ul className="divide-y divide-fond-bordure">
       {GUIDES.map((g, i) => (
@@ -51,10 +52,8 @@ export function ListeGuides() {
                 {contenuDuGuide(g, langue).titre}
               </span>
               <span className="mt-1.5 flex items-center gap-2">
-                <span className="font-ui text-[11px] font-semibold uppercase tracking-[0.08em] text-neon-cyan">
-                  Read more
-                </span>
-                <span className="font-ui text-[11px] text-texte-faible">{g.minutes} min</span>
+                <span className="font-ui text-[11px] font-semibold uppercase tracking-[0.08em] text-neon-cyan">{t.lireLaSuite}</span>
+                <span className="font-ui text-[11px] text-texte-faible">{remplir(t.minutesCourt, { n: String(g.minutes) })}</span>
               </span>
             </span>
           </Lien>

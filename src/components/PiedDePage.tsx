@@ -43,8 +43,7 @@ export function PiedDePage() {
               className="mb-3 h-[86px] w-auto"
             />
             <p className="mt-2 text-[12px] leading-relaxed text-texte-doux">
-              A slot catalogue that tells you where every number comes from —
-              studio-published, cross-checked, or not verified at all.
+              {t.piedAccroche}
             </p>
           </div>
 
@@ -69,8 +68,7 @@ export function PiedDePage() {
 
         <div className="mt-8 border-t border-fond-bordure pt-5">
           <p className="text-[11px] leading-relaxed text-texte-faible">
-            18+ only. Gambling involves risk — never bet more than you can afford
-            to lose. Free help is available at{' '}
+            {t.piedJeuResponsable}{' '}
             <a
               href="https://www.begambleaware.org"
               target="_blank"
@@ -82,8 +80,7 @@ export function PiedDePage() {
             .
           </p>
           <p className="mt-2 text-[11px] leading-relaxed text-texte-faible">
-            We earn a commission when you sign up through our links. It never
-            changes which games we list, nor the figures we publish.
+            {t.piedCommission}
           </p>
         </div>
       </div>

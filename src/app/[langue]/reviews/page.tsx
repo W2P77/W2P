@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
-import { textes } from '@/i18n/textes';
+import { remplir, textes } from '@/i18n/textes';
 import { metadonneesDePage } from '@/lib/metadonnees';
 import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
@@ -38,7 +38,13 @@ export async function generateMetadata({
  *
  * La page dit donc ce qu'elle est. Les avis rédigés viendront s'y ajouter.
  */
-export default async function Reviews() {
+export default async function Reviews({
+  params,
+}: {
+  params: Promise<{ langue: string }>;
+}) {
+  const { langue: brutL } = await params;
+  const t = textes(estUneLangue(brutL) ? brutL : LANGUE_DEFAUT);
   const [verifies, recoupes, total] = await Promise.all([
     prisma.jeu.findMany({
       where: { rtpConfiance: 'STUDIO' },
@@ -59,16 +65,16 @@ export default async function Reviews() {
       <main className="mx-auto max-w-[1400px] px-6 py-8">
         <div className="mb-2 flex items-center gap-4">
           <h1 className="font-titre text-[24px] font-black uppercase tracking-tight text-white">
-            Verified slots
+            {t.titreAvis}
           </h1>
           <Tirets />
         </div>
         <p className="mb-6 max-w-2xl text-[13px] leading-relaxed text-texte-doux">
-          These {verifies.length} games have an RTP we checked against the
-          studio, with the source recorded and openable from each page.{' '}
-          {recoupes} more are cross-checked against two independent sources, and
-          the rest of the {total} in the catalogue are shown as unverified —
-          because pretending otherwise is the mistake we set out to avoid.
+          {remplir(t.avisIntro, {
+            verifies: String(verifies.length),
+            recoupes: String(recoupes),
+            total: String(total),
+          })}
         </p>
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
