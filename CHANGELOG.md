@@ -2,6 +2,34 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Trois fiches en double supprimées, et la boucle qui les recréait
+
+Les trois paires suspectes sont tranchées, et le verdict n'était pas celui
+qu'on croyait : **elles portent le même `gameSymbol`**. `vs25dwarves_new` pour
+les deux « Dwarven Gold », `vs10floatdrg` pour les deux « Floating Dragon »,
+`vs5jokjewhs` pour les deux « Joker's Jewels ». Chez Pragmatic c'est **un seul
+jeu** — les captures n'étaient donc pas fausses, seulement dupliquées.
+
+Le titre de la page produit dit lequel est le bon : Pragmatic publie « Dwarven
+Gold Deluxe », « Floating Dragon Hold and Spin », et `jokers-jewels-hold-spin`
+(l'autre slug est en 404 chez eux). Les trois fiches mal nommées sont
+supprimées — elles créaient une seconde page indexable pour un seul jeu.
+
+Vérification avant suppression : `jokers-jewels-hold-and-spin` portait trois
+preuves, mais la fiche gardée porte **les mêmes valeurs** (10 000x, 96,52 %,
+volatilité moyenne). Rien n'a été perdu.
+
+**Et la boucle.** Vider les `demoUrl` en double ne suffisait pas : le script
+Pragmatic déduit la page produit du slug, donc `wolf-gold-slot` rendait le même
+lanceur que `wolf-gold` et le doublon renaissait au passage suivant. Le script
+refuse désormais d'écrire un lanceur déjà pris par une autre fiche, et le
+rapporte comme « doublon de catalogue » plutôt que de l'écrire en silence.
+
+Six paires restent dans cet état — `the-dog-house`, `fruit-party`,
+`wild-west-gold`… Leur `demoUrl` est vidée côté doublon, mais les deux fiches
+existent toujours. Elles se traiteront comme ces trois-là : titre officiel
+d'abord, suppression ensuite.
+
 ## 2026-09-12 — NetEnt et Evoplay débloqués, et 24 démos qui mentaient
 
 **311 démos trouvées** : NetEnt 221 sur 237 (93 %), Evoplay 90 sur 269. Les

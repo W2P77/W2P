@@ -110,6 +110,33 @@ async function main() {
     if ((i / PARALLELE) % 20 === 0) process.stdout.write(`  ${i + PARALLELE}/${jeux.length}\r`);
   }
 
+  /*
+   * ── Deux fiches ne peuvent pas partager un lanceur ───────────────────────
+   *
+   * Le slug déduit mène parfois à la page d'un jeu déjà couvert : chez
+   * Pragmatic, `wolf-gold-slot` et `wolf-gold` rendent le même `gameSymbol`,
+   * parce que ce sont deux fiches pour un seul jeu. Écrire les deux donnait un
+   * bouton « démo » identique sur deux pages indexables — et le nettoyage fait
+   * à la main était défait au passage suivant.
+   *
+   * On garde la première rencontrée, par ordre de slug, et on rapporte
+   * l'autre : c'est un doublon de catalogue à trancher, pas une démo perdue.
+   */
+  const dejaVues = new Map<string, string>();
+  for (const j of jeux) if (j.demoUrl?.includes('openGame.do')) dejaVues.set(j.demoUrl, j.slug);
+  const retenus: typeof trouves = [];
+  for (const t of trouves) {
+    const jumelle = dejaVues.get(t.demo);
+    if (jumelle && jumelle !== t.slug) {
+      echecs.push(`${t.slug} (même lanceur que ${jumelle} — doublon de catalogue)`);
+      continue;
+    }
+    dejaVues.set(t.demo, t.slug);
+    retenus.push(t);
+  }
+  trouves.length = 0;
+  trouves.push(...retenus);
+
   console.log(`\n${trouves.length} démos trouvées, ${echecs.length} échecs.`);
   for (const t of trouves.slice(0, 4)) console.log(`  ${t.slug.padEnd(30)} ${t.symbole}`);
   for (const e of echecs.slice(0, 6)) console.log(`  ! ${e}`);
