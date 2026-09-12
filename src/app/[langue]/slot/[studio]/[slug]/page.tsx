@@ -224,8 +224,10 @@ export default async function PageJeu({
              */}
             <CapturesJeu
               jeu={jeu.nom}
+              slug={jeu.slug}
               captures={jeu.captures}
               faitesLe={jeu.capturesLe}
+              faits={{ rtp, gainMax: jeu.gainMaxMultiple, volatilite: jeu.volatilite }}
             />
 
             <OuJouer jeu={jeu.nom} studio={jeu.studio.nom} casinos={casinos} />

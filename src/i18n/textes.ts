@@ -22,6 +22,7 @@ import type { Langue } from './langues';
  * exactement le garde-fou qu'on attend.
  */
 const EN = {
+  capturesIntro: "Captured in the studio's own free demo{date}. Nothing below is taken from a press release or another site — it is what the game shows when you open it.",
   sortieVers: 'Heading to {casino}',
   sortieDans: 'Automatic redirect in {n}s…',
   sortieSecours: 'Click here if nothing happens →',
@@ -128,6 +129,7 @@ const EN = {
 export type CleTexte = keyof typeof EN;
 
 const FR: Record<CleTexte, string> = {
+  capturesIntro: "Capturé dans la démo gratuite du studio{date}. Rien ici ne vient d'un communiqué ni d'un autre site : c'est ce que le jeu affiche quand on l'ouvre.",
   sortieVers: 'Direction {casino}',
   sortieDans: 'Redirection automatique dans {n} s…',
   sortieSecours: 'Clique ici si rien ne se passe →',
@@ -221,6 +223,7 @@ const FR: Record<CleTexte, string> = {
 };
 
 const DE: Record<CleTexte, string> = {
+  capturesIntro: 'Aufgenommen in der kostenlosen Demo des Studios{date}. Nichts davon stammt aus einer Pressemitteilung oder von einer anderen Seite — es ist das, was das Spiel beim Öffnen zeigt.',
   sortieVers: 'Weiter zu {casino}',
   sortieDans: 'Automatische Weiterleitung in {n} s…',
   sortieSecours: 'Hier klicken, wenn nichts passiert →',

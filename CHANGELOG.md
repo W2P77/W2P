@@ -2,6 +2,40 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Chaque capture a son texte, dans les trois langues
+
+Sur Gates of Olympus, chaque capture porte une légende écrite ; ailleurs, la
+plupart sortaient nues. Mesuré : **5 018 captures sans légende sur 6 777**, et
+les 1 759 restantes en anglais sur les trois versions du site. Le pipeline
+n'en écrivait que pour trois cas — le jeu de base, la page qui porte les
+chiffres, l'achat de bonus.
+
+**Les légendes sont désormais calculées au rendu**, pas stockées. Les écrire à
+la main, c'était 5 018 textes en trois langues ; les stocker, c'était les
+figer — une capture refaite avec de nouveaux chiffres aurait gardé sa vieille
+légende. Elles se déduisent de ce que la capture montre (jeu de base, table de
+gains, mécanique, commandes, réglages, jeu automatique, page de règles,
+plafond, achat) et de ce que le jeu déclare : justes par construction,
+traduites par construction.
+
+La page qui porte les chiffres reprend les valeurs dans l'écriture de la
+langue — « RTP 96,51 % · gain maximum 21 100× » en français, « 21,100× » en
+anglais, « 21.100× » en allemand — et **attribue la volatilité au jeu**
+(« volatilité annoncée très haute »), conformément à la décision d'hier.
+
+**Les six légendes écrites à la main de Gates of Olympus sont conservées et
+traduites**, pas régénérées : elles décrivent des mécaniques qu'aucun modèle
+ne résume. Toute autre fiche peut en recevoir — une entrée dans la table
+l'emporte sur le modèle. Les formules posées par le pipeline, elles, sont
+reconnues et remplacées.
+
+L'introduction du bloc et la date de capture passent aussi en trois langues.
+Les **titres** restent tels quels : ce sont les noms des pages du jeu (« How
+to play », « Settings menu »), on cite son interface plutôt que de la traduire.
+
+8 tests : reconnaissance du type de capture, aucune capture sans texte dans
+les trois langues, écriture des nombres par langue, attribution de la
+volatilité, priorité des textes écrits à la main.
 ## 2026-09-12 — La volatilité est attribuée, plus affirmée
 
 Le panneau de règles déclare une volatilité, et nous la lisions comme le

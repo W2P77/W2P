@@ -3,6 +3,8 @@
 import { GalerieCaptures } from './GalerieCaptures';
 import type { Capture } from '@/data/captures';
 import { useLangue } from '@/i18n/useLangue';
+import { remplir } from '@/i18n/textes';
+import { legendeDeCapture, type FaitsDeCapture } from '@/lib/legendes';
 
 /**
  * Les captures faites dans la démo officielle du studio.
@@ -21,14 +23,18 @@ import { useLangue } from '@/i18n/useLangue';
  */
 export function CapturesJeu({
   jeu,
+  slug,
   captures,
   faitesLe,
+  faits,
 }: {
   jeu: string;
+  slug: string;
   captures: unknown;
   faitesLe: Date | null;
+  faits: Omit<FaitsDeCapture, 'nom'>;
 }) {
-  const { t } = useLangue();
+  const { langue, t } = useLangue();
   /*
    * Le champ vient d'une colonne JSON : rien ne garantit sa forme à la
    * lecture. On la vérifie ici plutôt que de laisser une fiche tomber en 500
@@ -42,9 +48,20 @@ export function CapturesJeu({
     : [];
   if (lot.length === 0) return null;
 
+  const LOCALE = { en: 'en-GB', fr: 'fr-FR', de: 'de-DE' } as const;
   const date = faitesLe
-    ? new Date(faitesLe).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+    ? new Date(faitesLe).toLocaleDateString(LOCALE[langue], { day: 'numeric', month: 'long', year: 'numeric' })
     : null;
+
+  /*
+   * La légende est calculée ici, pas lue en base : 5 018 captures sur 6 777
+   * n'en avaient aucune, et celles qui existaient étaient en anglais sur les
+   * trois versions du site. Voir `src/lib/legendes.ts`.
+   */
+  const legendees = lot.map((c) => ({
+    ...c,
+    legende: legendeDeCapture(c, { ...faits, nom: jeu, slug }, langue),
+  }));
 
   return (
     <section className="biseau mt-6 border border-fond-bordure bg-fond-panneau p-5">
@@ -52,11 +69,12 @@ export function CapturesJeu({
         {t.dansLeJeu}
       </h2>
       <p className="mt-2 max-w-3xl font-corps text-[13px] leading-relaxed text-texte-doux">
-        Captured in the studio&apos;s own free demo{date ? ` on ${date}` : ''}. Nothing below is
-        taken from a press release or another site — it is what the game shows when you open it.
+        {remplir(t.capturesIntro, {
+          date: date ? (langue === 'fr' ? ` le ${date}` : langue === 'de' ? ` am ${date}` : ` on ${date}`) : '',
+        })}
       </p>
 
-      <GalerieCaptures captures={lot} jeu={jeu} />
+      <GalerieCaptures captures={legendees} jeu={jeu} />
     </section>
   );
 }
