@@ -9,7 +9,6 @@ import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
 import { GUIDES, contenuDuGuide, guideParSlug } from '@/data/guides';
 import { jeuxCites } from '@/lib/donnees/catalogue';
-import { BadgePreuve, type Confiance } from '@/components/BadgePreuve';
 
 export function generateStaticParams() {
   return GUIDES.map((g) => ({ slug: g.slug }));
@@ -102,7 +101,6 @@ export default async function Guide({ params }: { params: Promise<{ slug: string
                               ? t.rtpInconnu
                               : `${Number(jeu.rtpStudio).toFixed(2)}%`}
                           </span>
-                          <BadgePreuve niveau={jeu.rtpConfiance as Confiance} />
                         </span>
                       </Lien>
                     </li>

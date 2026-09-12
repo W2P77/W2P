@@ -2,6 +2,27 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Le badge de preuve disparaît, le fait reste
+
+Quatre niveaux de preuve, une pastille sur chaque jaquette, un filtre dédié et
+un tri « mieux sourcé ». Sur les 769 fiches désormais publiables, **90,4 %
+portent le même badge** et `RECOUPE` n'en concerne que **9**. Un badge que neuf
+pages sur dix affichent ne distingue plus rien : il décore.
+
+**Ce qui le remplace existait déjà.** Le texte d'analyse dit la provenance en
+toutes lettres — « Le chiffre vient de pragmaticplay.com, et la page est liée
+plus haut » — ou l'absence de confirmation, tout aussi franchement. Une phrase
+est plus claire qu'une pastille de trois lettres, et elle nomme la source au
+lieu de la classer.
+
+Retiré : `BadgePreuve` (carte, fiche, guides), le filtre « niveau de preuve »,
+le tri « mieux sourcé », et les 12 clés i18n devenues orphelines dans les trois
+langues.
+
+**Le tri par défaut du catalogue ne bouge pas.** Il classe toujours les mieux
+sourcées d'abord — c'est un bon ordre par défaut. Il n'est simplement plus
+proposé comme un choix à faire au visiteur, parce que ce n'en était pas un.
+
 ## 2026-09-12 — La vitrine dit enfin ce qu'elle montre
 
 La section d'accueil s'appelait « les mieux notées cette semaine » et affichait

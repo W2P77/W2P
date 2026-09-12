@@ -27,14 +27,7 @@ const listes = (t: Textes) => ({
     { valeur: 'HAUTE', libelle: t.volHaute },
     { valeur: 'TRES_HAUTE', libelle: t.volTresHaute },
   ],
-  PREUVES: [
-    { valeur: '', libelle: t.filtreToutePreuve },
-    { valeur: 'STUDIO', libelle: t.preuveStudioSeul },
-    { valeur: 'RECOUPE', libelle: t.preuveRecoupeCourt },
-    { valeur: 'AUCUNE', libelle: t.preuveAucuneCourt },
-  ],
   TRIS: [
-    { valeur: 'preuve', libelle: t.triMieuxSource },
     { valeur: 'nom', libelle: t.triNom },
     { valeur: 'rtp-desc', libelle: t.triRtp },
     { valeur: 'gain-desc', libelle: t.triGain },
@@ -54,7 +47,7 @@ export function BarreFiltres({
   studios: { slug: string; nom: string; _count: { jeux: number } }[];
 }) {
   const { t } = useLangue();
-  const { VOLATILITES, PREUVES, TRIS, RTP_MIN } = listes(t);
+  const { VOLATILITES, TRIS, RTP_MIN } = listes(t);
   const router = useRouter();
   const params = useSearchParams();
 
@@ -114,7 +107,6 @@ export function BarreFiltres({
         {[
           { cle: 'volatilite', options: VOLATILITES, label: t.ficheVolatilite },
           { cle: 'rtpMin', options: RTP_MIN, label: t.filtreRtpMin },
-          { cle: 'preuve', options: PREUVES, label: t.filtreNiveauPreuve },
           { cle: 'tri', options: TRIS, label: t.filtreTri },
         ].map(({ cle, options, label }) => (
           <select

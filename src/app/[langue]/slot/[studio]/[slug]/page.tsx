@@ -3,7 +3,6 @@ import { notFound, redirect } from 'next/navigation';
 import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
 import { CarteJeu } from '@/components/CarteJeu';
-import { BadgePreuve, type Confiance } from '@/components/BadgePreuve';
 import { Tirets, Equerre } from '@/components/DecorNeon';
 import { jeuParSlug, memeStudio, casinosPourStudio } from '@/lib/donnees/catalogue';
 import { OuJouer } from '@/components/OuJouer';
@@ -337,7 +336,6 @@ export default async function PageJeu({
                 <span className="text-[10px] uppercase tracking-wide text-texte-faible">
                   RTP
                 </span>
-                <BadgePreuve niveau={jeu.rtpConfiance as Confiance} taille="petit" />
               </div>
               <p className="mt-1 font-mono text-[26px] font-bold text-white">
                 {rtp == null ? '—' : `${rtp.toFixed(2)}%`}

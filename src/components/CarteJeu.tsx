@@ -1,4 +1,3 @@
-import { BadgePreuve, type Confiance } from './BadgePreuve';
 import { EtoileEnregistrer } from './EtoileEnregistrer';
 import { Lien } from '@/components/Lien';
 
@@ -107,9 +106,6 @@ export function CarteJeu({ jeu, index = 0 }: { jeu: JeuVignette; index?: number 
                 </span>
               </span>
             )}
-            <span className="absolute left-1.5 top-1.5">
-              <BadgePreuve niveau={jeu.rtpConfiance as Confiance} taille="petit" />
-            </span>
           </span>
 
           {/*
