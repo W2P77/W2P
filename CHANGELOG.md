@@ -2,6 +2,42 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Les dates de sortie ne sont pas publiées, et on n'en invente pas
+
+227 fiches visibles n'ont aucune `sortieLe` — **164 chez Pragmatic, 63 chez
+Hacksaw**, zéro ailleurs. Toutes nos dates viennent de l'import initial, et ce
+sont justement les deux studios qu'il ne couvrait pas. Chez Hacksaw, six fiches
+visibles sur dix sont donc absentes de « Dernières sorties ».
+
+**Ni l'un ni l'autre ne publie la date.** Les pages produit donnent le RTP, les
+fonctionnalités, la table de gains — jamais la date de mise en ligne. Quatre
+substituts ont été testés, chacun **confronté aux dates que nous possédons
+déjà**, seul contrôle qui vaille :
+
+| substitut | écart mesuré |
+|---|---|
+| `datePublished` du JSON-LD Pragmatic | −51 à +109 jours |
+| communiqués de presse Pragmatic | médiane **+121 jours**, 5 bons sur 41 |
+| `Last-Modified` des vignettes Hacksaw | médiane **−61 jours**, 1 bon sur 24 |
+| `lastmod` du sitemap Hacksaw | figé à 2022-03-01 |
+
+Deux à quatre mois d'erreur : exactement de quoi faire passer un jeu de mai
+pour un jeu de mars dans un bloc qui vend la fraîcheur. **Rien n'est écrit.**
+
+Le script existe quand même (`scripts/completer-dates-sortie.ts`) : il n'accepte
+qu'un `releaseDate` de JSON-LD ou une étiquette explicite suivie d'une date au
+jour près, refuse une année seule plutôt que d'inventer un 1ᵉʳ janvier — le
+projet a déjà été mordu par des centaines de fiches datées ainsi — et son
+en-tête consigne les quatre substituts **avec leurs écarts**, pour que personne
+ne refasse le tour. En simulation : 0 date retenue sur 227, 9 refus pour
+imprécision, 1 slug décalé (`jokers-jewels-hold-and-spin` contre
+`jokers-jewels-hold-spin` chez Pragmatic).
+
+**La vraie voie est commerciale** : demander aux deux studios un tableur
+« titre / date de mise en ligne ». C'est une demande banale pour un affilié,
+elle règle les 227 d'un coup et elle est attestable. Pour les jeux à venir,
+`detecter-nouveautes.ts` fait déjà le travail au bon moment.
+
 ## 2026-09-12 — Red Tiger : 348 démos retrouvées
 
 355 jeux en base, **26 avec une `demoUrl`**. Sans démo, pas de capture ; sans

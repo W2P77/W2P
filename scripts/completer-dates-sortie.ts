@@ -5,11 +5,11 @@
  *
  * La page d'accueil trie « Dernières sorties » par `sortieLe`. Une fiche sans
  * date passe derrière toutes les autres : elle n'apparaît jamais, quelle que
- * soit sa fraîcheur réelle. Au 12/09/2026, 221 des 796 fiches visibles (RTP
- * **et** au moins une capture) sont dans ce cas, et elles tiennent en deux
- * studios : Pragmatic Play 158, Hacksaw Gaming 63. Aucun autre studio n'est
- * concerné — les dates que nous avons viennent toutes du lot d'import initial,
- * qui les portait déjà.
+ * soit sa fraîcheur réelle. Au 12/09/2026, 227 des 811 fiches visibles (RTP
+ * **et** au moins une capture) sont dans ce cas — le compte monte à chaque
+ * campagne de captures — et elles tiennent en deux studios : Pragmatic Play
+ * 164, Hacksaw Gaming 63. Aucun autre studio n'est concerné : les dates que
+ * nous avons viennent toutes du lot d'import initial, qui les portait déjà.
  *
  * ── Pourquoi ce script trouve si peu, et pourquoi c'est voulu ─────────────
  *
@@ -176,22 +176,23 @@ async function main() {
    * d'accueil, qui est tout l'objet ; et deux définitions du « visible » qui
    * divergent, c'est le prochain écart à débusquer.
    */
-  const jeux = (
-    await prisma.jeu.findMany({
-      where: {
-        ...(await filtrePubliable()),
-        sortieLe: null,
-        ...(STUDIO ? { studio: { slug: STUDIO } } : {}),
-      },
-      select: { id: true, slug: true, nom: true, studio: { select: { slug: true } } },
-      orderBy: [{ studio: { slug: 'asc' } }, { slug: 'asc' }],
-    })
-  ).slice(0, LIMITE);
+  const candidats = await prisma.jeu.findMany({
+    where: {
+      ...(await filtrePubliable()),
+      sortieLe: null,
+      ...(STUDIO ? { studio: { slug: STUDIO } } : {}),
+    },
+    select: { id: true, slug: true, nom: true, studio: { select: { slug: true } } },
+    orderBy: [{ studio: { slug: 'asc' } }, { slug: 'asc' }],
+  });
 
+  // La répartition se compte avant `--limite` : l'état du manque ne dépend pas
+  // du nombre de fiches qu'on a décidé d'interroger aujourd'hui.
   const parStudio = new Map<string, number>();
-  for (const j of jeux) parStudio.set(j.studio.slug, (parStudio.get(j.studio.slug) ?? 0) + 1);
+  for (const j of candidats) parStudio.set(j.studio.slug, (parStudio.get(j.studio.slug) ?? 0) + 1);
 
-  console.log(`${jeux.length} fiches visibles sans date de sortie :`);
+  const jeux = candidats.slice(0, LIMITE);
+  console.log(`${candidats.length} fiches visibles sans date de sortie :`);
   for (const [studio, n] of [...parStudio].sort((a, b) => b[1] - a[1])) {
     console.log(`  ${studio.padEnd(20)} ${String(n).padStart(4)}` + (PAGE_PRODUIT[studio] ? '' : '   (aucune page produit connue)'));
   }
