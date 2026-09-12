@@ -2,6 +2,43 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Onze doublons fusionnés puis supprimés
+
+Les onze paires que `resoudre-doublons.ts` refusait de supprimer sont
+résolues : leur contenu était **réparti entre les deux fiches**, et parfois
+contradictoire. `scripts/fusionner-doublons.ts` le rassemble avant que l'autre
+script ne supprime.
+
+**La règle d'arbitrage tient en trois lignes.** Une valeur prouvée gagne
+toujours — la table `Preuve` enregistre ce qui a été lu dans le panneau du jeu.
+Sinon une valeur présente bat une valeur absente. Sinon, deux valeurs
+différentes dont aucune n'est prouvée : on ne touche à rien et on signale.
+
+Deux corrections dans le sens « la fiche gardée avait tort » : `the-dog-house`
+passe de volatilité HAUTE à MOYENNE, prouvée par le panneau. Et deux dans
+l'autre : `vikings` garde 5 600x et non 10 000x, `san-quentin-2-death-row`
+garde 96,13 %.
+
+**Deux garde-fous que les données ont imposés, et qui n'étaient pas prévus.**
+
+· `rtpSource`, `rtpConfiance` et `rtpVerifieLe` **ne voyagent qu'avec le
+  `rtpStudio` qu'ils attestent**. Les recopier sur une fiche affichant un autre
+  taux déclarerait sourcé un chiffre que la source ne dit pas.
+
+· **Les captures sont adossées au RTP elles aussi.** Leurs légendes portent le
+  chiffre en toutes lettres — « Stated by the game itself: RTP 96.47% ». Les
+  déplacer vers une fiche qui annonce 96,50 publierait la contradiction à
+  l'écran, en image, sous le label le plus fort du site.
+
+**Le blocage final tenait à un seul chiffre.** `fruit-party` affichait 96,50
+sans aucune source ; son doublon portait 96,47 lu dans le panneau, confiance
+STUDIO, capture à l'appui. Le panneau fait autorité : la fiche gardée est
+alignée, et les onze paires deviennent fusionnables.
+
+Restent quatre contradictions non tranchées sur `mustang-gold` et
+`the-dog-house` — gain max 12 000 contre 10 000, deux listes de mécaniques, une
+date. Aucune n'a de preuve : deux relectures de panneau les régleront.
+
 ## 2026-09-12 — Dix doublons supprimés, onze refusés, et un jeu sauvé
 
 `scripts/resoudre-doublons.ts` sépare trois questions qu'on confondait :
