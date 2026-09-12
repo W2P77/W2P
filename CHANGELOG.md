@@ -2,6 +2,34 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — La vitrine dit enfin ce qu'elle montre
+
+La section d'accueil s'appelait « les mieux notées cette semaine » et affichait
+une **liste de neuf slugs écrite à la main**. Ni notées — on ne note pas les
+jeux et aucun champ ne le permettrait — ni de cette semaine : Gates of Olympus
+est sorti en 2021.
+
+Elle affiche maintenant les **dernières sorties**, triées par date, parmi les
+seules fiches publiables. Un titre par studio d'abord, pour qu'un studio qui
+publie cinq jeux le même mois n'occupe pas la rangée entière ; le reste
+complète si la variété ne suffit pas.
+
+**Pourquoi « dernières sorties » et pas « de la semaine ».** Parce que ce
+serait faux la plupart du temps : **9 992 fiches sur 11 682 n'ont aucune date
+de sortie**, et le catalogue n'en a enregistré qu'**une en août**, zéro en
+septembre. Un libellé promet quelque chose ; celui-là ne promet que ce qu'on
+tient.
+
+**Ce que la liste écrite cachait.** Sur ses neuf titres, **un seul** avait une
+fiche complète (Gates of Olympus). Sweet Bonanza, Sugar Rush, Big Bass Bonanza,
+Book of Dead n'ont aucune capture : la vitrine mettait en avant des pages que
+le site lui-même ne propose pas aux moteurs. Les capturer reste le travail le
+plus rentable — ce sont les titres que les gens cherchent par leur nom.
+
+À traiter séparément : 85 % du catalogue sans date de sortie, et une seule
+nouveauté détectée en août. `scripts/detecter-nouveautes.ts` existe ; il n'a
+manifestement pas tourné depuis un moment.
+
 ## 2026-09-12 — On ne publie plus que les fiches finies
 
 Le seuil de publication était « un RTP présent ». Il laissait passer **5 831**

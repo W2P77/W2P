@@ -11,37 +11,6 @@ const CHAMPS_VIGNETTE = {
   studio: { select: { nom: true, slug: true } },
 } as const;
 
-/**
- * Les titres que le public cherche par leur nom.
- *
- * ── Pourquoi une liste écrite à la main ───────────────────────────────────
- *
- * La vitrine était triée par niveau de preuve puis par ordre alphabétique,
- * avec un jeu par studio pour éviter huit « Big Bass » à la suite. Le résultat
- * montrait la **couverture** du catalogue — Annihilator, Cygnus 2, Dead
- * Canary — mais aucun des titres pour lesquels les gens arrivent. Or l'accueil
- * n'a pas à démontrer l'étendue : il a à faire reconnaître quelque chose en
- * une seconde.
- *
- * Aucun critère en base ne peut produire cette liste. Ni le RTP, ni la date,
- * ni le nombre de casinos qui le proposent ne disent qu'un jeu est célèbre. Le
- * volume de recherche est la seule mesure qui le dirait, et il n'est pas dans
- * nos données. Une liste écrite est donc la solution honnête — à condition
- * d'être maintenue.
- *
- * L'ordre compte : ce sont les quatre premiers qui portent la première rangée.
- */
-const VEDETTES = [
-  'gates-of-olympus',
-  'sweet-bonanza-1000',
-  'sugar-rush',
-  'starlight-princess',
-  'big-bass-bonanza',
-  'gates-of-olympus-1000',
-  'book-of-dead',
-  'wolf-gold',
-  'madame-destiny-megaways',
-];
 
 /**
  * Les slugs des fiches réellement finies.
@@ -78,32 +47,50 @@ export async function jeuxEnAvant(limite = 8) {
    * le sitemap peut entrer dans la vitrine, rien d'autre.
    */
   const publiables = new Set(await slugsPubliables());
+  /*
+   * ── Pourquoi la date de sortie, et pas une note ─────────────────────────
+   *
+   * La section s'appelait « les mieux notées cette semaine » et affichait une
+   * liste écrite à la main : ni notées, ni de cette semaine. On ne note pas
+   * les jeux, et aucun champ ne le permettrait.
+   *
+   * La date de sortie, elle, est un fait. Le libellé dit « dernières sorties »
+   * et non « de la semaine », parce que **9 992 fiches sur 11 682 n'ont aucune
+   * date** et que le catalogue enregistre une poignée de sorties par mois :
+   * promettre une fraîcheur hebdomadaire serait faux la plupart des semaines.
+   *
+   * Les fiches sans date passent en dernier plutôt que d'être exclues : elles
+   * complètent la rangée quand les sorties récentes ne suffisent pas.
+   */
   const tous = (
     await prisma.jeu.findMany({
       where: { visuelUrl: { not: null } },
-      orderBy: [{ rtpConfiance: 'asc' }, { nom: 'asc' }],
+      orderBy: [{ sortieLe: { sort: 'desc', nulls: 'last' } }, { nom: 'asc' }],
       select: CHAMPS_VIGNETTE,
     })
   ).filter((j) => publiables.has(j.slug));
 
-  const parSlug = new Map(tous.map((j) => [j.slug, j]));
-  const vedettes = VEDETTES.map((slug) => parSlug.get(slug)).filter((j) => j != null);
-
   /*
-   * Le complément garde la règle d'un titre par studio : si la liste écrite
-   * devient trop courte — un jeu retiré, une jaquette perdue — la rangée se
-   * remplit avec de la variété plutôt qu'avec le premier venu par ordre
-   * alphabétique.
+   * Un titre par studio.
+   *
+   * Sans cette règle, un studio qui publie cinq jeux le même mois occupe la
+   * rangée entière — la vitrine montrerait son calendrier à lui plutôt que le
+   * catalogue.
    */
-  const dejaLa = new Set(vedettes.map((j) => j!.slug));
-  const studiosVus = new Set(vedettes.map((j) => j!.studio.nom));
-  const complement = tous.filter((j) => {
-    if (dejaLa.has(j.slug) || studiosVus.has(j.studio.nom)) return false;
+  const studiosVus = new Set<string>();
+  const varies = tous.filter((j) => {
+    if (studiosVus.has(j.studio.nom)) return false;
     studiosVus.add(j.studio.nom);
     return true;
   });
 
-  return [...vedettes, ...complement].slice(0, limite) as typeof tous;
+  /*
+   * Si la variété ne suffit pas à remplir la rangée, on complète avec le reste
+   * dans l'ordre des sorties : une rangée incomplète se voit plus qu'un studio
+   * cité deux fois.
+   */
+  const dejaLa = new Set(varies.map((j) => j.slug));
+  return [...varies, ...tous.filter((j) => !dejaLa.has(j.slug))].slice(0, limite) as typeof tous;
 }
 
 export async function compterCatalogue() {
