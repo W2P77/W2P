@@ -2,6 +2,41 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Cinq noms tronqués, cinq démos retrouvées
+
+Nolimit City nomme ses mécaniques dans ses titres : « San Quentin » chez nous,
+**« San Quentin xWays® »** chez eux. Le nom tronqué empêchait le script de
+rapprocher la fiche de sa page, et il refusait d'écrire.
+
+**Ce refus était la bonne règle**, et c'est le point : c'est exactement lui qui
+a arrêté `game-1`, dont le slug générique mène en réalité à « Fire In The
+Hole 4 » — le piège Victorious MAX. Assouplir la comparaison des noms aurait
+débloqué cinq fiches **et** lié une démo au mauvais jeu. Corriger les noms à la
+source débloque les cinq sans rien concéder.
+
+Corrigés : Apocalypse Super xNudge®, East Coast VS West Coast, San Quentin
+xWays®, Warrior Graveyard xNudge®, xWays Hoarder xSplit®. Nolimit City passe de
+137 à **142 démos**. `game-1` reste seul, non corrigé et non lié.
+
+## 2026-09-12 — Une campagne à la fois, et pourquoi
+
+Trois campagnes lancées en parallèle ont fait monter le poste à `load average
+23` avec quinze Chromium. Les jeux ne finissaient plus de charger dans le délai
+prévu, l'adaptateur cliquait avant que l'écran soit prêt, et le journal rendait
+**« icône des règles introuvable »** — le diagnostic d'un adaptateur mal réglé.
+
+BGaming a publié **2 jeux sur 107** dans ces conditions. Relancé seul, il rend
+11 et 10 captures avec les RTP lus (97,10 et 95,97). Une heure a été passée à
+soupçonner un ban du studio, puis un adaptateur cassé ; la cause était la
+machine, et rien ne le signalait.
+
+Le même parallélisme avait déjà fait rendre un 502 à Supabase, tuant une
+campagne de 261 jeux à sa quatorzième fiche.
+
+**La règle** : enchaîner, ne pas superposer. Et avant de conclure qu'un
+adaptateur est cassé, regarder `uptime` puis retester deux jeux seuls — trente
+secondes, et ça tranche.
+
 ## 2026-09-12 — Evoplay, et deux façons de peindre le même écran
 
 71 fiches débloquées, et une observation qui aurait fait échouer la campagne
