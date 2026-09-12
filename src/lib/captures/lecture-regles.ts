@@ -346,7 +346,17 @@ export function extraireLesFaits(texte: string, pages: FaitsLus['pages'] = []): 
     new RegExp(`game\\s+average\\s+return\\s+to\\s+player\\s*:?\\s*${CHIFFRE}`, 'i').exec(t)?.[1] ??
     null;
 
-  let brutHaut = lire('theoretical') ?? lire('maximum') ?? formulationWazdan;
+  /*
+   * Evoplay affiche le taux dans le **bandeau** de son panneau, présent sur
+   * chaque page : « Rules / Fruit Nova (RTP 96.00%) ». Son corps de texte, lui,
+   * écrit « The overall theoretical return to player is 96.00 % » — sans le
+   * sigle après « Return to Player », donc hors de portée de `lire`. Le
+   * bandeau est la forme la plus sûre : il ne dépend pas de la page atteinte.
+   */
+  const bandeauEvoplay =
+    new RegExp(`\\(\\s*RTP\\s+${CHIFFRE}\\s*%`, 'i').exec(t)?.[1] ?? null;
+
+  let brutHaut = lire('theoretical') ?? lire('maximum') ?? formulationWazdan ?? bandeauEvoplay;
   let brutBas = lire('minimum');
 
   /*

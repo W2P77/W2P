@@ -132,6 +132,23 @@ describe('la formulation Wazdan, qui n’écrit pas le sigle', () => {
   });
 });
 
+/*
+ * Evoplay écrit « The overall theoretical return to player is 96.00 % » — sans
+ * le sigle après « Return to Player », donc hors de portée de la règle
+ * générale. Son bandeau, lui, le porte sur chaque page du panneau : c'est la
+ * forme la plus sûre, elle ne dépend pas de la page atteinte.
+ */
+describe('le bandeau Evoplay', () => {
+  it('lit le taux entre parenthèses du bandeau', () => {
+    expect(extraireLesFaits('Rules / Fruit Nova (RTP 96.00%)').rtp).toBe(96);
+    expect(extraireLesFaits('Rules / Hot Volcano ( RTP 95,92 % )').rtp).toBe(95.92);
+  });
+
+  it('ne confond pas le bandeau avec une phrase qui cite le sigle', () => {
+    expect(extraireLesFaits('Gamble will not impact the overall RTP').rtp).toBeNull();
+  });
+});
+
 describe('le gain maximum, selon la formule du studio', () => {
   it('lit « maximum theoretical win »', () => {
     expect(extraireLesFaits('The maximum theoretical win is 5,000x the bet').gainMax).toBe(5000);

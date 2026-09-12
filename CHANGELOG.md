@@ -2,6 +2,42 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Evoplay, et deux façons de peindre le même écran
+
+71 fiches débloquées, et une observation qui aurait fait échouer la campagne
+sans qu'on comprenne pourquoi.
+
+**Evoplay peint le même habillage de deux façons.** Sur Anubis' Moon, toute
+l'interface est du HTML — `.ui-rules`, `scrollTop` lisible et inscriptible. Sur
+**dix des onze jeux sondés**, le document ne contient **pas un seul
+`<button>`** : le même écran est peint dans le canvas. S'appuyer sur les
+sélecteurs aurait marché à la reconnaissance et échoué en campagne. L'adaptateur
+ne clique donc qu'à des coordonnées.
+
+**Le témoin d'ouverture était le piège.** Il cherchait `/RTP/i` dans le texte
+lu. Sur B-Ball Blitz, l'OCR rend « Rul . B-Ball oan 0%) » — panneau **grand
+ouvert**, sept tentatives, jeu renvoyé en file avec le diagnostic d'un
+adaptateur mal réglé. Le témoin est devenu `GAME DESCRIPTION`, lu sans une
+faute sur les cinq jeux relevés.
+
+**Les onglets sont ancrés en bas**, pas en haut : une entrée « Bonus Buy »
+décale tout le groupe d'un cran, et une même ordonnée désigne « Paytable » dans
+une disposition et « Rules » dans l'autre. L'adaptateur essaie les deux, en
+commençant par celle qui est inerte sur l'autre disposition. Et l'entrée
+« Bonus Buy » n'existe que si le jeu vend la fonction : c'est le jeu qui répond,
+au lieu de viser un bouton qui se déplace.
+
+**`lecture-regles.ts` apprend le bandeau Evoplay.** Leur corps de texte écrit
+« The overall theoretical return to player is 96.00 % » — sans le sigle après
+« Return to Player », hors de portée de la règle générale. Mais leur bandeau le
+porte sur **chaque** page : « Rules / Fruit Nova (RTP 96.00%) ». C'est la forme
+la plus sûre, elle ne dépend pas de la page atteinte.
+
+**Le périmètre réel est de 71 jeux, pas 90** : sont écartés 7 jeux de table
+(leur bandeau n'affiche aucun taux et la colonne gagne deux entrées), 9 dont
+l'URL rend un 404 nginx — le défaut est dans la `demoUrl`, pas dans
+l'adaptateur — et 3 qui pointent encore la page marketing.
+
 ## 2026-09-12 — Un 502 de Supabase tuait une campagne entière
 
 La campagne Wazdan est morte **à la quatorzième fiche sur 261** : un `502 Bad

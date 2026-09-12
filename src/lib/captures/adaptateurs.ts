@@ -273,6 +273,7 @@ import { PUSH_GAMING } from './adaptateur-push-gaming';
 import { HACKSAW } from './adaptateur-hacksaw';
 import { RED_TIGER } from './adaptateur-red-tiger';
 import { WAZDAN } from './adaptateur-wazdan';
+import { EVOPLAY } from './adaptateur-evoplay';
 
 /*
  * La clé est le `slug` du studio en base, pas son nom : c'est elle que
@@ -305,6 +306,13 @@ export const ADAPTATEURS: Record<string, Adaptateur> = {
    * ne rapportaient que des captures du site du studio, sans la moindre erreur.
    */
   wazdan: WAZDAN,
+  /*
+   * Evoplay peint le meme habillage de deux facons : en HTML sur un jeu sur
+   * onze, dans le canvas sur les dix autres. S'appuyer sur les selecteurs
+   * marchait a la reconnaissance et aurait echoue sur la campagne — d'ou un
+   * adaptateur qui ne clique qu'a des coordonnees.
+   */
+  evoplay: EVOPLAY,
   /*
    * Red Tiger et NetEnt tournent sur la meme plateforme Evolution : meme page
    * hote, meme lanceur signe, meme application Vue, memes selecteurs. Un seul
