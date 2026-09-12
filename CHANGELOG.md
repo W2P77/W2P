@@ -2,6 +2,31 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Les clics arrivent enfin dans Redis
+
+Le projet Vercel `w2-p` n'avait que **deux** variables en production :
+`DATABASE_URL` et `DISCORD_WEBHOOK_CLICS`. Aucune variable Upstash. `redis`
+valait donc `null` et `enregistrerClic` renonçait avant même d'essayer — après
+la correction du `lpush`, c'était la seconde cause du même symptôme.
+
+`UPSTASH_REDIS_REST_URL` et `UPSTASH_REDIS_REST_TOKEN` posées en production
+(Sensitive), redéploiement, puis clic réel vérifié de bout en bout :
+
+    avant : 51 clics · 1 where2spin
+    apres : 52 clics · 2 where2spin
+       megafishwins  w2p-ef9af8cb-b53d-41d2-a407-8695e4e51e34
+
+**Ce que cette panne apprend sur le diagnostic.** Deux causes différentes ont
+produit exactement le même symptôme, et aucune ne se voyait dans le code : la
+seconde s'est révélée en comparant **deux origines d'exécution** — le même
+appel écrivait depuis le poste et pas depuis la production. Relire le code
+n'aurait jamais donné la réponse ; il était correct.
+
+Ce qui n'est **pas** sur Vercel, et n'a pas à y être : `SUPABASE_URL` et
+`SUPABASE_SERVICE_ROLE_KEY` ne servent qu'à téléverser une capture depuis un
+script (`src/lib/visuels/stockage.ts`). Le site n'en a pas besoin au runtime,
+les captures étant servies par URL publique.
+
 ## 2026-09-12 — Un clic perdu le dit maintenant dans les logs
 
 Entrée écrite après coup pour le commit `b14bfd6`, poussé sans elle — la règle
