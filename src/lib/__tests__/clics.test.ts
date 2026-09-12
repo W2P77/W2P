@@ -74,10 +74,38 @@ describe('l’entrée écrite', () => {
     expect(e.casinoSlug).toBe('vave');
   });
 
-  it('marque l’origine de deux façons', () => {
+  /*
+   * `source` dit le CANAL (web / discord), `site` dit le SITE. Les confondre
+   * afficherait « Source URL : where2spin » dans le dashboard BetsRank, à la
+   * place d'une information que la colonne existe pour porter.
+   */
+  it('sépare le canal d’arrivée du site d’origine', () => {
     const e = entreeDeClic(CLIC);
-    expect(e.source).toBe('where2spin');
+    expect(e.source).toBe('web');
     expect(e.site).toBe('w2p');
+    expect(entreeDeClic({ ...CLIC, origine: 'discord' }).source).toBe('discord');
+  });
+
+  it('reprend ce que la requête dit du visiteur', () => {
+    const e = entreeDeClic({
+      ...CLIC,
+      ip: '88.173.241.10',
+      userAgent: 'Mozilla/5.0',
+      pays: 'FR',
+      referer: 'https://where2spin.com/fr',
+    });
+    expect(e.ip).toBe('88.173.241.10');
+    expect(e.userAgent).toBe('Mozilla/5.0');
+    expect(e.country).toBe('FR');
+    expect(e.referer).toBe('https://where2spin.com/fr');
+  });
+
+  it('laisse à null ce que la requête ne dit pas, sans rien supposer', () => {
+    const e = entreeDeClic({ ...CLIC, ip: null, userAgent: null, pays: null, referer: null });
+    expect(e.ip).toBeNull();
+    expect(e.userAgent).toBeNull();
+    expect(e.country).toBeNull();
+    expect(e.referer).toBeNull();
   });
 
   it('n’invente aucune donnée de navigateur', () => {

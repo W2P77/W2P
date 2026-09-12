@@ -1,9 +1,11 @@
+import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 
 import { prisma } from '@/lib/donnees/prisma';
 import { nouveauClickId } from '@/lib/tracking/click-id';
 import { buildAffiliateRedirectUrl, resolveCasinoPlayUrl } from '@/lib/tracking/url-partenaire';
 import { enregistrerClic } from '@/lib/tracking/clics';
+import { lireVisiteur } from '@/lib/tracking/visiteur';
 import { notifierClicDiscord } from '@/lib/discord/notif-clic';
 import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
 import { offreTraduite } from '@/lib/traduire-donnees';
@@ -48,6 +50,13 @@ export default async function PageDeSortie({
   const demandee = typeof requete.l === 'string' ? requete.l : '';
   const langue = estUneLangue(demandee) ? demandee : LANGUE_DEFAUT;
 
+  /*
+   * Ce que la requête sait du visiteur : pays, IP, referer, canal d'arrivée.
+   * Ces quatre champs partaient à `null` — `ClickLog` les prévoit, BetsRank
+   * les remplit, et sans eux ni la géo ni l'antifraude n'ont de matière.
+   */
+  const visiteur = lireVisiteur(await headers());
+
   const clickId = nouveauClickId();
   const playUrl = resolveCasinoPlayUrl({ playUrl: casino.playUrl, playUrlByCountry: undefined }, null);
 
@@ -59,10 +68,23 @@ export default async function PageDeSortie({
     casinoSlug: casino.slug,
     casinoNom: casino.nom,
     jeu,
-    pays: null,
-    referer: null,
+    pays: visiteur.pays,
+    referer: visiteur.referer,
+    ip: visiteur.ip,
+    userAgent: visiteur.userAgent,
+    origine: visiteur.origine,
   }).catch(() => {});
-  await notifierClicDiscord({ casinoNom: casino.nom, casinoSlug: casino.slug, clickId, jeu }).catch(() => {});
+  await notifierClicDiscord({
+    casinoNom: casino.nom,
+    casinoSlug: casino.slug,
+    clickId,
+    jeu,
+    pays: visiteur.pays,
+    ip: visiteur.ip,
+    ipFiable: visiteur.estFiable,
+    referer: visiteur.referer,
+    origine: visiteur.origine,
+  }).catch(() => {});
 
   const cible = buildAffiliateRedirectUrl(playUrl, clickId);
   if (!cible) notFound();

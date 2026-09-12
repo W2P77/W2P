@@ -2,6 +2,35 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Le clic sait enfin d'où vient le visiteur
+
+La notification where2spin affichait trois champs là où celle de BetsRank en
+donne dix. Mais le manque n'était pas cosmétique : `ip`, `userAgent`,
+`country` et `referer` partaient à `null` **dans Redis aussi**. Quatre champs
+que `ClickLog` prévoit et que BetsRank remplit — sans eux, pas de géo, pas de
+déduplication, aucun score d'antifraude possible sur les clics where2spin.
+
+`src/lib/tracking/visiteur.ts` lit la requête une fois et sert les deux
+chemins.
+
+**L'IP est celle du visiteur, et on peut l'affirmer.** Une IP prise au mauvais
+endroit est celle d'un intermédiaire, et tout code qui attribue dessus crédite
+n'importe qui. On lit donc `x-vercel-forwarded-for`, posé par l'edge et non
+falsifiable par le client ; `x-forwarded-for` ne sert qu'en repli, et on en
+prend la **première** adresse — la seule qui soit celle du client. Le drapeau
+`estFiable` dit laquelle a servi, et la notification affiche « non vérifiée »
+plutôt que de taire l'IP ou de lui donner le crédit d'une donnée sûre.
+
+**`source` et `site` ne disent pas la même chose.** `source` porte le canal
+(`web` / `discord`, comme chez BetsRank), `site` porte le site (`w2p`). Les
+confondre afficherait « Source URL : where2spin » dans le dashboard, à la
+place de l'information que la colonne existe pour porter. La détection Discord
+reprend le test de BetsRank : user-agent de l'application, ou referer
+`discord.com`.
+
+Enfin, `XX` — le code que Vercel envoie quand il ignore le pays — est traité
+comme une absence. L'afficher comme un pays serait inventer une donnée.
+
 ## 2026-09-12 — Les clics arrivent enfin dans Redis
 
 Le projet Vercel `w2-p` n'avait que **deux** variables en production :

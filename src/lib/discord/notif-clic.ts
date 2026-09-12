@@ -87,10 +87,29 @@ export interface ClicANotifier {
   clickId: string;
   jeu?: string | null;
   pays?: string | null;
+  ip?: string | null;
+  /** Faux quand l'IP vient d'un en-tête que le client peut falsifier. */
+  ipFiable?: boolean;
+  referer?: string | null;
+  origine?: string | null;
+}
+
+/** Le drapeau du pays, à partir de son code ISO-2. */
+function drapeau(code: string): string {
+  if (!/^[A-Z]{2}$/.test(code)) return '';
+  return String.fromCodePoint(...[...code].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65));
 }
 
 /** Le message, identique quel que soit le chemin d'envoi. */
 function corpsDuMessage(clic: ClicANotifier) {
+  const viaDiscord = clic.origine === 'discord';
+  /*
+   * Une IP falsifiable est affichée comme telle plutôt que tue : la masquer
+   * ferait croire qu'on n'en a pas, l'afficher nue lui donnerait le crédit
+   * d'une donnée sûre.
+   */
+  const ip = clic.ip ? (clic.ipFiable ? clic.ip : `${clic.ip} (non vérifiée)`) : null;
+
   return {
     embeds: [
       {
@@ -98,8 +117,15 @@ function corpsDuMessage(clic: ClicANotifier) {
         fields: [
           { name: 'Site', value: '🔷 where2spin', inline: true },
           { name: 'Casino', value: `**${clic.casinoNom}**`, inline: true },
+          { name: 'Canal interne', value: viaDiscord ? '🎮 Discord' : '🌐 Web', inline: true },
           ...(clic.jeu ? [{ name: 'Machine', value: clic.jeu, inline: true }] : []),
-          ...(clic.pays ? [{ name: 'Pays', value: clic.pays, inline: true }] : []),
+          ...(clic.pays
+            ? [{ name: 'Pays', value: `${drapeau(clic.pays)} ${clic.pays}`.trim(), inline: true }]
+            : []),
+          ...(ip ? [{ name: 'IP', value: `\`${ip}\``, inline: true }] : []),
+          ...(clic.referer
+            ? [{ name: 'Referer', value: `\`${clic.referer.slice(0, 200)}\``, inline: false }]
+            : []),
           { name: 'Click ID', value: `\`${clic.clickId}\``, inline: false },
         ],
         color: 0x2fd8f5, // cyan néon : la couleur du site, pas celle de BetsRank

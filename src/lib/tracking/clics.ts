@@ -71,6 +71,10 @@ export interface ClicSortant {
   jeu?: string | null;
   pays?: string | null;
   referer?: string | null;
+  ip?: string | null;
+  userAgent?: string | null;
+  /** « web » ou « discord » — le pendant du champ `source` de BetsRank. */
+  origine?: string | null;
 }
 
 /** Le tableau du jour, quelle que soit la forme sous laquelle Redis le rend. */
@@ -99,10 +103,10 @@ export function entreeDeClic(c: ClicSortant, date = new Date()): ClicEnregistre 
     casinoId: c.casinoId,
     casinoSlug: c.casinoSlug,
     casinoName: c.casinoNom,
-    source: 'where2spin',
+    source: c.origine ?? 'web',
     campaign: c.jeu ?? 'direct',
-    ip: null,
-    userAgent: null,
+    ip: c.ip ?? null,
+    userAgent: c.userAgent ?? null,
     country: c.pays ?? null,
     referer: c.referer ?? null,
     site: 'w2p',
