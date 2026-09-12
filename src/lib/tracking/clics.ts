@@ -61,6 +61,23 @@ export interface ClicEnregistre {
   /** Redondant avec le préfixe du clickId, et c'est voulu : il permet de lire
    *  l'origine d'un clic sans avoir à analyser son identifiant. */
   site?: string;
+  /**
+   * L'IP du visiteur, **hors du champ `ip` de `ClickLog`**, et ce n'est pas un
+   * détail de nommage.
+   *
+   * Le postback, quand il retrouve un clic qui porte une `ip`, lève
+   * `ipIsVisitor` et s'en sert pour attribuer la conversion à un affilié via
+   * `getAffiliateByIp`. Or where2spin **n'a pas d'affiliés** : ce repli ne
+   * peut donc que se tromper. Il l'a fait dès le premier postback réel — un
+   * REG BonRush crédité à AFF7, simplement parce que l'IP du visiteur était
+   * associée à cet affilié par un clic BetsRank antérieur.
+   *
+   * On garde donc la donnée, utile pour la géo et l'antifraude côté
+   * where2spin, sous un nom que la chaîne d'attribution de BetsRank ne lit
+   * pas. Renommer suffit : il n'y a rien à corriger sur BCE, dont le
+   * déploiement est de toute façon figé.
+   */
+  ipVisiteur?: string | null;
 }
 
 export interface ClicSortant {
@@ -105,11 +122,14 @@ export function entreeDeClic(c: ClicSortant, date = new Date()): ClicEnregistre 
     casinoName: c.casinoNom,
     source: c.origine ?? 'web',
     campaign: c.jeu ?? 'direct',
-    ip: c.ip ?? null,
+    // Volontairement nul : voir la note sur `ipVisiteur`. Renseigner `ip`
+    // déclencherait l'attribution par IP, qui n'a aucun sens ici.
+    ip: null,
     userAgent: c.userAgent ?? null,
     country: c.pays ?? null,
     referer: c.referer ?? null,
     site: 'w2p',
+    ipVisiteur: c.ip ?? null,
   };
 }
 

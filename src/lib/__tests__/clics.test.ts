@@ -51,12 +51,18 @@ describe('le tableau du jour', () => {
 });
 
 describe('l’entrée écrite', () => {
-  it('porte exactement les champs de ClickLog', () => {
+  /*
+   * `site` et `ipVisiteur` s'ajoutent à `ClickLog` sans le contredire : BetsRank
+   * ignore les champs qu'il ne connaît pas, et `ipVisiteur` existe précisément
+   * pour porter l'IP hors du champ que l'attribution consulte.
+   */
+  it('porte les champs de ClickLog, plus les deux qui nous sont propres', () => {
     const e = entreeDeClic(CLIC, new Date('2026-09-12T10:00:00Z'));
     expect(Object.keys(e).sort()).toEqual(
       [
         'campaign', 'casinoId', 'casinoName', 'casinoSlug', 'country',
         'id', 'ip', 'referer', 'site', 'source', 'timestamp', 'userAgent',
+        'ipVisiteur',
       ].sort(),
     );
   });
@@ -94,10 +100,26 @@ describe('l’entrée écrite', () => {
       pays: 'FR',
       referer: 'https://where2spin.com/fr',
     });
-    expect(e.ip).toBe('88.173.241.10');
     expect(e.userAgent).toBe('Mozilla/5.0');
     expect(e.country).toBe('FR');
     expect(e.referer).toBe('https://where2spin.com/fr');
+  });
+
+  /*
+   * Le piège payé au premier postback réel : un REG BonRush credité à
+   * l'affilié AFF7. Le postback, trouvant une `ip` sur le clic, lève
+   * `ipIsVisitor` et attribue la conversion via `getAffiliateByIp`. Comme
+   * where2spin n'a pas d'affiliés, ce repli ne peut que se tromper — il a
+   * rendu un lead à un affilié dont l'IP traînait d'un clic BetsRank.
+   *
+   * L'IP reste donc collectée, sous un nom que la chaîne d'attribution ne lit
+   * pas. Ce test est la seule chose qui empêche de la remettre au mauvais
+   * endroit en croyant compléter la fiche.
+   */
+  it('ne met jamais l’IP dans le champ qui déclenche l’attribution', () => {
+    const e = entreeDeClic({ ...CLIC, ip: '88.173.241.10' });
+    expect(e.ip).toBeNull();
+    expect(e.ipVisiteur).toBe('88.173.241.10');
   });
 
   it('laisse à null ce que la requête ne dit pas, sans rien supposer', () => {

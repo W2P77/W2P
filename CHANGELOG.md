@@ -2,6 +2,33 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Premier postback réel : le préfixe survit, l'IP trahit
+
+**Le bon côté.** Un REG BonRush a fait l'aller-retour complet : clic →
+`sub1=w2p-…` → AlfaLeads → BCE → conversion. Le clickId est revenu **avec son
+préfixe intact**. Aucun système de rattrapage n'est nécessaire pour retrouver
+un clic where2spin depuis un postback.
+
+**Le mauvais.** La conversion a été attribuée à l'affilié **AFF7**. Le clic
+where2spin ne porte pas d'`affiliateId`, donc l'attribution est retombée sur
+son repli : `getAffiliateByIp` a rendu AFF7, dont l'IP du visiteur portait
+l'association depuis un clic BetsRank antérieur.
+
+Ce repli ne s'était jamais déclenché parce que les clics where2spin n'avaient
+pas d'IP — **c'est l'ajout de l'IP, une heure plus tôt, qui l'a rendu
+possible.** Une correction qui en ouvre une autre.
+
+**Le remède tient dans un nom.** Le postback ne lève `ipIsVisitor` que s'il
+trouve un champ `ip` sur le clic. L'IP est donc écrite sous `ipVisiteur` : la
+donnée reste disponible pour la géo et l'antifraude côté where2spin, et la
+chaîne d'attribution de BetsRank ne la voit pas. Rien à modifier sur BCE, dont
+le déploiement est figé de toute façon.
+
+Le fond du problème est que **where2spin n'a pas d'affiliés** : toute
+attribution par IP y est nécessairement fausse, jamais approximative. Un test
+interdit désormais de remettre l'IP dans le champ `ip` en croyant compléter la
+fiche.
+
 ## 2026-09-12 — Le clic sait enfin d'où vient le visiteur
 
 La notification where2spin affichait trois champs là où celle de BetsRank en
