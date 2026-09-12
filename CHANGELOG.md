@@ -2,6 +2,33 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — La démo remonte à sa place, et se joue sur la fiche
+
+Le bouton de démo vivait **après la liste des casinos** — c'est-à-dire après
+qu'on a demandé au visiteur de choisir où déposer. L'ordre suit maintenant
+celui d'une décision : ce que le jeu est (les captures), l'essayer (la démo),
+puis où y jouer pour de vrai (les casinos).
+
+**La démo se joue sur la fiche quand c'est possible.** Ni Pragmatic ni les
+studios ne posent de `X-Frame-Options` ou de `frame-ancestors` : le cadre est
+autorisé. Mais il n'est chargé **qu'au clic**, sur la jaquette du jeu — un jeu
+embarqué pèse plusieurs mégaoctets et part chercher le studio dès l'ouverture
+de la page, alors que la majorité des visiteurs vient lire un RTP.
+
+**Ce qu'on embarque, et ce qu'on n'embarque pas.** Chez Pragmatic, `demoUrl`
+est un lanceur (`openGame.do`) : il ouvre le jeu seul, comme dans le lobby
+d'un casino. Chez Hacksaw, BGaming ou Play'n GO, c'est la **page produit** du
+studio, menu et pied de page compris — l'embarquer donnerait un site dans le
+site. Le test est conservateur : dans le doute, on envoie vers le studio.
+
+**Au passage, deux défauts de données corrigés.** Douze lanceurs Pragmatic
+pointaient vers une démo en français, en indonésien ou en thaï : le lecteur de
+règles cherche des mots anglais et l'icône des règles à sa place habituelle,
+d'où l'échec silencieux de Mystery Mice. Remis en `lang=en&cur=USD`, ce qui a
+débloqué Cyber Pup Megaways et Himalayan Wild dans la foulée (96,09 % et
+96,51 %, ce dernier en écart avec la base). Restent Chicken Plus, dont la page
+produit renvoie un 404, et High Flyer, qui ne livre pas son identifiant de
+démo : leurs plafonds de 3 000 000x et 1 000 000x restent non vérifiés.
 ## 2026-09-12 — Chaque capture a son texte, dans les trois langues
 
 Sur Gates of Olympus, chaque capture porte une légende écrite ; ailleurs, la

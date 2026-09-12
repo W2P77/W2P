@@ -22,6 +22,9 @@ import type { Langue } from './langues';
  * exactement le garde-fou qu'on attend.
  */
 const EN = {
+  demoTitre: 'Try it for free',
+  demoNote: "The studio's own free demo, played here — no account, no money, the same maths as the real game.",
+  demoChezLeStudio: 'Open the demo on {studio}’s site',
   capturesIntro: "Captured in the studio's own free demo{date}. Nothing below is taken from a press release or another site — it is what the game shows when you open it.",
   sortieVers: 'Heading to {casino}',
   sortieDans: 'Automatic redirect in {n}s…',
@@ -129,6 +132,9 @@ const EN = {
 export type CleTexte = keyof typeof EN;
 
 const FR: Record<CleTexte, string> = {
+  demoTitre: 'Essayer gratuitement',
+  demoNote: 'La démo gratuite du studio, jouée ici — sans compte, sans argent, avec les mêmes maths que le jeu réel.',
+  demoChezLeStudio: 'Ouvrir la démo sur le site de {studio}',
   capturesIntro: "Capturé dans la démo gratuite du studio{date}. Rien ici ne vient d'un communiqué ni d'un autre site : c'est ce que le jeu affiche quand on l'ouvre.",
   sortieVers: 'Direction {casino}',
   sortieDans: 'Redirection automatique dans {n} s…',
@@ -223,6 +229,9 @@ const FR: Record<CleTexte, string> = {
 };
 
 const DE: Record<CleTexte, string> = {
+  demoTitre: 'Kostenlos ausprobieren',
+  demoNote: 'Die kostenlose Demo des Studios, hier gespielt — ohne Konto, ohne Geld, mit derselben Mathematik wie im echten Spiel.',
+  demoChezLeStudio: 'Die Demo auf der Seite von {studio} öffnen',
   capturesIntro: 'Aufgenommen in der kostenlosen Demo des Studios{date}. Nichts davon stammt aus einer Pressemitteilung oder von einer anderen Seite — es ist das, was das Spiel beim Öffnen zeigt.',
   sortieVers: 'Weiter zu {casino}',
   sortieDans: 'Automatische Weiterleitung in {n} s…',

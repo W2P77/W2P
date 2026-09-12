@@ -8,6 +8,7 @@ import { Tirets, Equerre } from '@/components/DecorNeon';
 import { jeuParSlug, memeStudio, casinosPourStudio } from '@/lib/donnees/catalogue';
 import { OuJouer } from '@/components/OuJouer';
 import { CapturesJeu } from '@/components/CapturesJeu';
+import { Demo } from '@/components/Demo';
 import { BoutonEnregistrer } from '@/components/BoutonEnregistrer';
 import { baliseJeu } from '@/lib/donnees-structurees';
 import { metadonneesDePage } from '@/lib/metadonnees';
@@ -230,18 +231,19 @@ export default async function PageJeu({
               faits={{ rtp, gainMax: jeu.gainMaxMultiple, volatilite: jeu.volatilite }}
             />
 
-            <OuJouer jeu={jeu.nom} studio={jeu.studio.nom} casinos={casinos} />
+            {/*
+              * L'ordre suit celui d'une décision : ce que le jeu est, l'essayer,
+              * puis où y jouer. Le bouton de démo vivait après la liste des
+              * casinos — donc après qu'on a demandé de choisir.
+              */}
+            <Demo
+              url={jeu.demoUrl}
+              nom={jeu.nom}
+              visuelUrl={jeu.visuelUrl}
+              studio={jeu.studio.nom}
+            />
 
-            {jeu.demoUrl && (
-              <a
-                href={jeu.demoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="tube tube-cyan mt-5 inline-block"
-              >
-                {t.jouerDemo}
-              </a>
-            )}
+            <OuJouer jeu={jeu.nom} studio={jeu.studio.nom} casinos={casinos} />
           </div>
 
           {/* ── Les chiffres, avec leur provenance ─────────────────────── */}
