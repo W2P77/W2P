@@ -51,12 +51,23 @@ async function contenuDeLaBase() {
        *
        * Le critère est celui de `estPublieable()`, exprimé ici en requête :
        * les deux doivent rester d'accord, sinon le sitemap promet une page
-       * que son `robots` refuse.
+       * que son `robots` refuse. Ils ne l'étaient plus — la règle exige
+       * désormais **une capture**, et le sitemap proposait encore les 5 831
+       * fiches à simple RTP, dont 3 901 sans la moindre image.
+       *
+       * La condition passe par du SQL parce que Prisma ne sait pas filtrer
+       * sur la longueur d'un tableau `jsonb` : `captures: { not: null }`
+       * laisserait passer un tableau vide, qui est précisément le cas à
+       * exclure.
        */
-      prisma.jeu.findMany({
-        where: { rtpStudio: { not: null } },
-        select: { slug: true, majLe: true, studio: { select: { slug: true } } },
-      }),
+      prisma.$queryRaw<Array<{ slug: string; majLe: Date; studioSlug: string }>>`
+        SELECT j.slug, j.maj_le AS "majLe", s.slug AS "studioSlug"
+        FROM jeux j
+        JOIN studios s ON s.id = j.studio_id
+        WHERE j.rtp_studio IS NOT NULL
+          AND j.captures IS NOT NULL
+          AND jsonb_array_length(j.captures) > 0
+      `,
       prisma.studio.findMany({ select: { slug: true, majLe: true } }),
     ]);
   } catch (erreur) {
@@ -121,7 +132,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }),
     ),
     ...jeux.flatMap((j) =>
-      pourChaqueLangue(`/slot/${j.studio.slug}/${j.slug}`, {
+      pourChaqueLangue(`/slot/${j.studioSlug}/${j.slug}`, {
         lastModified: j.majLe,
         changeFrequency: 'monthly',
         priority: 0.6,

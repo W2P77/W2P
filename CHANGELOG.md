@@ -2,6 +2,45 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — On ne publie plus que les fiches finies
+
+Le seuil de publication était « un RTP présent ». Il laissait passer **5 831**
+pages, dont **3 901 sans la moindre image** — ni jaquette ni capture. Une fiche
+qui annonce un taux sans rien montrer du jeu n'est pas une fiche, et les
+publier par milliers dessert précisément les quelques centaines qui sont
+complètes.
+
+Le seuil exige désormais **une capture**. Il reste **769 pages**.
+
+**Pourquoi une seule condition suffit.** La capture entraîne tout le reste : le
+pipeline ouvre la démo officielle, lit le panneau de règles et en ramène du
+même coup le RTP, la volatilité, le plafond et les mécaniques. Entre « au moins
+une capture » et « capture + volatilité + plafond + mécaniques + démo », il n'y
+a que **29 fiches** d'écart. Cinq conditions n'ajouteraient que de la
+complexité. Et ce seuil-là ne se pose pas à la main : une fiche devient
+publiable le jour où le pipeline la capture, sans que personne y repasse.
+
+**Ce que « non publiable » ne veut pas dire.** La page reste consultable et le
+catalogue continue de la lister : on ne cache pas un jeu au public, on
+s'abstient de le proposer aux moteurs tant qu'il n'a rien à leur montrer.
+C'est `noindex, follow` — les liens gardent leur valeur.
+
+**Le sitemap ne suivait plus.** Son propre commentaire prévenait que les deux
+critères devaient rester d'accord, « sinon le sitemap promet une page que son
+`robots` refuse » — c'est exactement ce qui arrivait. Il applique maintenant la
+même règle, en SQL : Prisma ne sait pas filtrer sur la longueur d'un tableau
+`jsonb`, et `captures: { not: null }` laisserait passer un tableau vide, qui est
+précisément le cas à exclure.
+
+**La vitrine de l'accueil suit la même règle.** Une carte d'accueil est une
+promesse : mettre en avant un jeu dont la page n'est pas proposée aux moteurs,
+c'est envoyer le visiteur sur la seule page qu'on juge nous-mêmes incomplète.
+
+⚠️ **Effet de bord à traiter** : sur les 9 vedettes écrites à la main, **une
+seule passe le filtre** (Gates of Olympus). Sweet Bonanza, Sugar Rush, Big Bass
+Bonanza, Book of Dead et les autres n'ont aucune capture — ce sont pourtant les
+titres qui font cliquer. Les capturer est prioritaire.
+
 ## 2026-09-12 — Premier postback réel : le préfixe survit, l'IP trahit
 
 **Le bon côté.** Un REG BonRush a fait l'aller-retour complet : clic →

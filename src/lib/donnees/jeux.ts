@@ -43,20 +43,48 @@ const VEDETTES = [
   'madame-destiny-megaways',
 ];
 
+/**
+ * Les slugs des fiches réellement finies.
+ *
+ * Le critère est celui de `estPublieable()` — un RTP **et** au moins une
+ * capture. Il passe par du SQL parce que Prisma ne sait pas filtrer sur la
+ * longueur d'un tableau `jsonb` : `captures: { not: null }` laisserait passer
+ * un tableau vide, qui est précisément le cas à exclure.
+ */
+async function slugsPubliables(): Promise<string[]> {
+  const lignes = await prisma.$queryRaw<Array<{ slug: string }>>`
+    SELECT slug FROM jeux
+    WHERE rtp_studio IS NOT NULL
+      AND captures IS NOT NULL
+      AND jsonb_array_length(captures) > 0
+  `;
+  return lignes.map((l) => l.slug);
+}
+
 export async function jeuxEnAvant(limite = 8) {
   /*
-   * Seulement les jeux qui ont une jaquette.
+   * ── Ce que la vitrine a le droit de montrer ─────────────────────────────
    *
-   * Deux tiers du catalogue n'en ont pas, et le repli — nom composé sur fond
-   * dégradé — est fait pour une grille de recherche, pas pour une vitrine.
-   * Sur l'accueil, six cartes de texte sur huit donnent l'impression d'un
-   * catalogue vide alors qu'il compte 1 951 jeux.
+   * Deux conditions, et elles ne disent pas la même chose.
+   *
+   * **Une jaquette**, parce que le repli — nom composé sur fond dégradé — est
+   * fait pour une grille de recherche, pas pour une vitrine : six cartes de
+   * texte sur huit donnent l'impression d'un catalogue vide.
+   *
+   * **Une fiche finie**, parce qu'une carte d'accueil est une promesse. Mettre
+   * en avant un jeu dont la page n'est même pas proposée aux moteurs, c'est
+   * envoyer le visiteur sur la seule page qu'on juge nous-mêmes incomplète.
+   * Le filtre est donc exactement celui de la publication : ce qui entre dans
+   * le sitemap peut entrer dans la vitrine, rien d'autre.
    */
-  const tous = await prisma.jeu.findMany({
-    where: { visuelUrl: { not: null } },
-    orderBy: [{ rtpConfiance: 'asc' }, { nom: 'asc' }],
-    select: CHAMPS_VIGNETTE,
-  });
+  const publiables = new Set(await slugsPubliables());
+  const tous = (
+    await prisma.jeu.findMany({
+      where: { visuelUrl: { not: null } },
+      orderBy: [{ rtpConfiance: 'asc' }, { nom: 'asc' }],
+      select: CHAMPS_VIGNETTE,
+    })
+  ).filter((j) => publiables.has(j.slug));
 
   const parSlug = new Map(tous.map((j) => [j.slug, j]));
   const vedettes = VEDETTES.map((slug) => parSlug.get(slug)).filter((j) => j != null);
