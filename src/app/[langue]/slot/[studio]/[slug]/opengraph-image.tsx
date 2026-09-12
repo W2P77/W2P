@@ -1,8 +1,6 @@
 import { ImageResponse } from 'next/og';
-import { readFileSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
-
 import { jeuParSlug } from '@/lib/donnees/catalogue';
+import { SITE_URL } from '@/lib/site';
 
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
@@ -46,22 +44,36 @@ export const alt = 'where2spin';
  */
 async function fondBase64(chemin: string | null): Promise<string | null> {
   if (!chemin) return null;
-  const fichier = join(process.cwd(), 'public', chemin);
-  if (!existsSync(fichier)) return null;
 
-  const octets = readFileSync(fichier);
-  if (chemin.endsWith('.png')) return `data:image/png;base64,${octets.toString('base64')}`;
-  if (chemin.endsWith('.jpg') || chemin.endsWith('.jpeg')) {
-    return `data:image/jpeg;base64,${octets.toString('base64')}`;
-  }
-
-  // Une conversion ratée ne doit pas casser la carte : on retombe sur le
-  // mot-marque seul, qui est le repli déjà prévu plus bas.
+  /*
+   * L'image est **téléchargée**, pas lue sur le disque.
+   *
+   * Dans une fonction serverless, `public/` n'existe pas : ces fichiers sont
+   * servis par le CDN et ne sont pas embarqués dans le bundle. `existsSync`
+   * y renvoyait donc toujours `false`, et la carte sortait sans jaquette — en
+   * local tout marchait, ce qui a masqué le défaut jusqu'à ce qu'on regarde
+   * l'image servie en production.
+   */
   try {
+    const reponse = await fetch(new URL(chemin, SITE_URL), { cache: 'force-cache' });
+    if (!reponse.ok) return null;
+    const octets = Buffer.from(await reponse.arrayBuffer());
+
+    if (chemin.endsWith('.png')) return `data:image/png;base64,${octets.toString('base64')}`;
+    if (chemin.endsWith('.jpg') || chemin.endsWith('.jpeg')) {
+      return `data:image/jpeg;base64,${octets.toString('base64')}`;
+    }
+
+    /*
+     * Satori ne décode que le PNG, le JPEG et le SVG — **pas le WebP**, et il
+     * ne le signale pas. Nos 1 855 jaquettes étant toutes en `.webp`, il faut
+     * convertir avant de les lui passer.
+     */
     const sharp = (await import('sharp')).default;
-    const png = await sharp(octets).png().toBuffer();
-    return `data:image/png;base64,${png.toString('base64')}`;
+    return `data:image/png;base64,${(await sharp(octets).png().toBuffer()).toString('base64')}`;
   } catch {
+    // Une image indisponible ne doit pas casser la carte : on retombe sur le
+    // mot-marque seul, le repli déjà prévu plus bas.
     return null;
   }
 }

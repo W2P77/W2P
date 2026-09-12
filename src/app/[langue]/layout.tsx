@@ -1,6 +1,3 @@
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
-
 import type { Metadata } from 'next';
 
 import { BANNIERE_OG } from '@/lib/metadonnees';
@@ -68,9 +65,24 @@ const corps = Barlow({
  * La version de l'URL vit dans `@/lib/metadonnees`, avec le repli qu'utilisent
  * les pages : deux endroits où l'écrire, c'est un endroit de trop.
  */
-const OG = existsSync(join(process.cwd(), 'public', 'images', 'og.jpg'))
-  ? BANNIERE_OG
-  : undefined;
+/*
+ * ── Pourquoi on ne vérifie plus l'existence du fichier ────────────────────
+ *
+ * Le test était `existsSync('public/images/og.jpg')`, posé pour ne pas
+ * déclarer une `og:image` pointant vers une 404 — les réseaux sociaux mettent
+ * l'échec en cache longtemps. L'intention était bonne, le test faux : dans une
+ * fonction serverless, **`public/` n'existe pas sur le disque**. Ces fichiers
+ * sont servis par le CDN et ne sont pas embarqués dans le bundle, donc
+ * `existsSync` y renvoyait toujours `false`.
+ *
+ * Résultat : le site n'a **jamais** déclaré d'`og:image` en production. Un lien
+ * partagé sortait en carte de texte nu. En local le fichier existe, le test
+ * passait, et rien ne signalait le problème.
+ *
+ * Le fichier est suivi par git et répond en 200 : la garantie qu'il vaut mieux
+ * avoir est celle du dépôt, pas un test au moment du rendu.
+ */
+const OG = BANNIERE_OG;
 
 const OG_URL = OG;
 
