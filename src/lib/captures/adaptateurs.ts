@@ -268,6 +268,7 @@ export const PRAGMATIC: Adaptateur = {
 };
 
 import { BGAMING } from './adaptateur-bgaming';
+import { PLAYNGO } from './adaptateur-playngo';
 import { HACKSAW } from './adaptateur-hacksaw';
 
 /*
@@ -278,4 +279,11 @@ export const ADAPTATEURS: Record<string, Adaptateur> = {
   'pragmatic-play': PRAGMATIC,
   'hacksaw-gaming': HACKSAW,
   bgaming: BGAMING,
+  /*
+   * Ecrit, documente, et reste debranche : la table est le seul point ou les
+   * studios se croisent, et cette ligne manquait. 180 fiches Play'n GO — celles
+   * qui ont une demo et pas de capture — etaient inaccessibles au pipeline pour
+   * cette seule raison.
+   */
+  'playn-go': PLAYNGO,
 };

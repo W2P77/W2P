@@ -2,6 +2,30 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — L'adaptateur Play'n GO était écrit, jamais branché
+
+369 lignes, documentées jusqu'au détail de la surcouche « ? » à capturer en
+premier — et **absent de la table `ADAPTATEURS`**. Son propre en-tête l'avait
+prévu : « le branchement s'y fait en une ligne, quand ce fichier est prêt ».
+Il l'était. La ligne manquait.
+
+Conséquence : les **180 fiches Play'n GO** qui ont une démo et pas de capture
+étaient hors d'atteinte du pipeline. Elles ont un RTP, il ne leur manquait que
+les images — donc la seule chose qui les séparait de la publication était une
+entrée dans un objet.
+
+Vérifié à blanc avant de lancer : deux jeux sur trois capturés, le troisième
+sur une URL de démo qui ne résout plus. Le « RTP non lu » n'est pas un échec
+mais le comportement documenté de cet adaptateur — Play'n GO ne publie aucun
+pourcentage dans ses démos, et ces fiches tiennent déjà le leur d'ailleurs.
+
+**Ce que cet épisode dit du catalogue.** 5 057 fiches ont un RTP sans capture,
+et seules 211 étaient capturables : le facteur limitant n'est pas le nombre de
+jeux mais le nombre d'adaptateurs. Chacun en débloque plusieurs centaines —
+Red Tiger 354, Wazdan 260, NetEnt 234, Evoplay 207. Sauf que ces studios-là
+n'ont presque aucune `demoUrl` en base (4 à 26 sur des centaines) : il faudra
+les trouver avant de pouvoir capturer quoi que ce soit.
+
 ## 2026-09-12 — La carte de partage porte enfin la marque
 
 Deux défauts, tous deux visibles au premier coup d'œil sur un lien partagé.
