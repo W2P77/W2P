@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/donnees/prisma';
+import { filtrePubliable } from '@/lib/donnees/publiables';
 
 /**
  * Les jeux d'un studio, à la demande.
@@ -12,7 +13,7 @@ export async function GET(_req: Request, contexte: { params: Promise<unknown> })
   const { slug } = (await contexte.params) as { slug: string };
 
   const jeux = await prisma.jeu.findMany({
-    where: { studio: { slug } },
+    where: { studio: { slug }, ...(await filtrePubliable()) },
     orderBy: [{ rtpConfiance: 'asc' }, { nom: 'asc' }],
     select: {
       slug: true, nom: true, rtpStudio: true, rtpConfiance: true,

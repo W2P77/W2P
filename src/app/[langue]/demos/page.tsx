@@ -9,6 +9,7 @@ import { PiedDePage } from '@/components/PiedDePage';
 import { CarteJeu } from '@/components/CarteJeu';
 import { Tirets } from '@/components/DecorNeon';
 import { prisma } from '@/lib/donnees/prisma';
+import { filtrePubliable } from '@/lib/donnees/publiables';
 
 export const revalidate = 600;
 
@@ -43,7 +44,7 @@ export default async function Demos({
 
   const [jeux, total] = await Promise.all([
     prisma.jeu.findMany({
-      where: { demoUrl: { not: null } },
+      where: { demoUrl: { not: null }, ...(await filtrePubliable()) },
       orderBy: [{ rtpConfiance: 'asc' }, { nom: 'asc' }],
       skip: (page - 1) * parPage,
       take: parPage,
@@ -53,7 +54,7 @@ export default async function Demos({
         studio: { select: { nom: true, slug: true } },
       },
     }),
-    prisma.jeu.count({ where: { demoUrl: { not: null } } }),
+    prisma.jeu.count({ where: { demoUrl: { not: null }, ...(await filtrePubliable()) } }),
   ]);
 
   const pages = Math.max(1, Math.ceil(total / parPage));

@@ -1,4 +1,5 @@
 import { prisma } from './prisma';
+import { filtrePubliable } from './publiables';
 import type { Prisma } from '@/generated/prisma/client';
 
 /**
@@ -56,7 +57,9 @@ export function construireOu(f: FiltresCatalogue): Prisma.JeuWhereInput {
 }
 
 export async function chercherJeux(f: FiltresCatalogue) {
-  const ou = construireOu(f);
+  // Le catalogue ne propose que des fiches finies : voir `publiables.ts`.
+  const filtres = construireOu(f);
+  const ou = { AND: [filtres, await filtrePubliable()] };
   const page = Math.max(1, f.page ?? 1);
 
   const [jeux, total] = await Promise.all([
@@ -77,10 +80,23 @@ export async function chercherJeux(f: FiltresCatalogue) {
   return { jeux, total, page, pages: Math.max(1, Math.ceil(total / PAR_PAGE)) };
 }
 
-/** Les studios, avec le nombre de jeux — sert au filtre et à la grille. */
+/**
+ * Les studios, avec le nombre de jeux — sert au filtre et à la grille.
+ *
+ * Le compte ne porte que sur les fiches **visibles**. Un studio annonçant
+ * 564 jeux dont deux seulement s'ouvrent enverrait le visiteur dans le vide,
+ * et un studio dont aucune fiche n'est finie disparaît de la liste plutôt que
+ * d'y figurer à zéro.
+ */
 export async function studiosDuCatalogue() {
+  const visible = await filtrePubliable();
   const studios = await prisma.studio.findMany({
-    select: { slug: true, nom: true, logoUrl: true, _count: { select: { jeux: true } } },
+    select: {
+      slug: true,
+      nom: true,
+      logoUrl: true,
+      _count: { select: { jeux: { where: visible } } },
+    },
     orderBy: { nom: 'asc' },
   });
   // Les plus fournis d'abord : c'est ce que le visiteur vient chercher.
@@ -99,7 +115,13 @@ export async function jeuParSlug(slug: string) {
 /** Quelques jeux du même studio, pour ne pas laisser une fiche sans suite. */
 export async function memeStudio(studioId: string, sauf: string, limite = 6) {
   return prisma.jeu.findMany({
-    where: { studioId, slug: { not: sauf }, visuelUrl: { not: null } },
+    where: {
+      studioId,
+      visuelUrl: { not: null },
+      // Deux conditions sur `slug` : l'exclusion du jeu courant et la liste
+      // des fiches finies. Un objet ne peut porter la clé qu'une fois.
+      AND: [{ slug: { not: sauf } }, await filtrePubliable()],
+    },
     take: limite,
     orderBy: { nom: 'asc' },
     select: {

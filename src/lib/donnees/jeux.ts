@@ -1,4 +1,5 @@
 import { prisma } from './prisma';
+import { filtrePubliable } from './publiables';
 
 const CHAMPS_VIGNETTE = {
   slug: true,
@@ -93,11 +94,19 @@ export async function jeuxEnAvant(limite = 8) {
   return [...varies, ...tous.filter((j) => !dejaLa.has(j.slug))].slice(0, limite) as typeof tous;
 }
 
+/**
+ * Les chiffres affichés sous la vitrine.
+ *
+ * Ils comptent ce que le visiteur peut **ouvrir**, pas ce que la base
+ * contient. Annoncer 11 682 jeux pour un catalogue qui en propose 769 serait
+ * un chiffre exact et une promesse fausse — et c'est la promesse qu'il lit.
+ */
 export async function compterCatalogue() {
+  const visible = await filtrePubliable();
   const [jeux, studios, sourcés] = await Promise.all([
-    prisma.jeu.count(),
-    prisma.studio.count(),
-    prisma.jeu.count({ where: { rtpConfiance: 'STUDIO' } }),
+    prisma.jeu.count({ where: visible }),
+    prisma.studio.count({ where: { jeux: { some: visible } } }),
+    prisma.jeu.count({ where: { ...visible, rtpConfiance: 'STUDIO' } }),
   ]);
   return { jeux, studios, sourcés };
 }

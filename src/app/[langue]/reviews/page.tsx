@@ -9,6 +9,7 @@ import { CarteJeu } from '@/components/CarteJeu';
 import { Tirets } from '@/components/DecorNeon';
 import { Lien } from '@/components/Lien';
 import { prisma } from '@/lib/donnees/prisma';
+import { filtrePubliable } from '@/lib/donnees/publiables';
 
 export const revalidate = 600;
 
@@ -63,7 +64,7 @@ export default async function Reviews({
 
   const [jeux, verifies, recoupes, total] = await Promise.all([
     prisma.jeu.findMany({
-      where: { rtpConfiance: 'STUDIO' },
+      where: { rtpConfiance: 'STUDIO', ...(await filtrePubliable()) },
       orderBy: { nom: 'asc' },
       skip: (page - 1) * parPage,
       take: parPage,
@@ -73,7 +74,7 @@ export default async function Reviews({
         rtpSource: true, studio: { select: { nom: true, slug: true } },
       },
     }),
-    prisma.jeu.count({ where: { rtpConfiance: 'STUDIO' } }),
+    prisma.jeu.count({ where: { rtpConfiance: 'STUDIO', ...(await filtrePubliable()) } }),
     prisma.jeu.count({ where: { rtpConfiance: 'RECOUPE' } }),
     prisma.jeu.count(),
   ]);

@@ -2,6 +2,34 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Les fiches non finies sortent de la navigation
+
+Le seuil de publication ne posait qu'un `noindex` : Google ne voyait plus les
+fiches incomplètes, mais le catalogue, la recherche, les démos, les nouveautés
+et les pages de studio continuaient de les proposer. Une fiche sans image
+restait à un clic, et les compteurs annonçaient 11 682 jeux pour un catalogue
+qui n'en montrait que 769 d'ouvrables.
+
+Toutes les listes appliquent maintenant le même filtre, et **les compteurs
+aussi** : la home annonce 769 jeux, une page de studio son nombre réel de
+fiches ouvrables, et un studio dont aucune fiche n'est finie disparaît de la
+grille plutôt que d'y figurer à zéro.
+
+**Ce que « pas visible » ne veut pas dire.** L'URL continue de répondre. Un
+lien déjà partagé, un favori enregistré, un résultat encore dans Google mènent
+à une page qui s'affiche — en `noindex`. On retire ce qu'on met en avant, on ne
+casse pas ce qui existe.
+
+**Deux détails d'implémentation qui comptent.** Prisma ne sait pas filtrer sur
+la longueur d'un tableau `jsonb` : la liste des slugs visibles est calculée en
+SQL puis passée en `slug: { in: … }`. Et la mémoïsation est maison plutôt que
+le `cache()` de React — ce dernier n'existe qu'en contexte serveur et rendait
+le module impossible à charger dans un test. Elle dure dix secondes, assez pour
+dédupliquer les trois requêtes d'un même rendu, assez peu pour qu'une fiche
+fraîchement capturée apparaisse sans redéploiement. Une requête ratée n'est pas
+mise en cache : sans ça, une coupure d'une seconde viderait le catalogue pour
+dix.
+
 ## 2026-09-12 — Les cartes de partage ne montraient jamais le jeu
 
 Partager une fiche donnait une carte en texte seul : le nom, le RTP, le

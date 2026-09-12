@@ -10,6 +10,7 @@ import { PiedDePage } from '@/components/PiedDePage';
 import { CarteJeu } from '@/components/CarteJeu';
 import { Tirets } from '@/components/DecorNeon';
 import { prisma } from '@/lib/donnees/prisma';
+import { filtrePubliable } from '@/lib/donnees/publiables';
 
 export const revalidate = 3600;
 
@@ -24,10 +25,13 @@ export const revalidate = 3600;
 const PAR_PAGE = 36;
 
 async function studioParSlug(slug: string, page: number) {
+  // La page d'un studio ne liste que ses fiches finies : voir `publiables.ts`.
+  const visible = await filtrePubliable();
   return prisma.studio.findUnique({
     where: { slug },
     include: {
       jeux: {
+        where: visible,
         orderBy: [{ rtpConfiance: 'asc' }, { nom: 'asc' }],
         skip: (page - 1) * PAR_PAGE,
         take: PAR_PAGE,
@@ -37,7 +41,7 @@ async function studioParSlug(slug: string, page: number) {
           studio: { select: { nom: true, slug: true } },
         },
       },
-      _count: { select: { jeux: true } },
+      _count: { select: { jeux: { where: visible } } },
     },
   });
 }

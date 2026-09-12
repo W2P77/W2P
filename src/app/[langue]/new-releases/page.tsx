@@ -8,6 +8,7 @@ import { PiedDePage } from '@/components/PiedDePage';
 import { CarteJeu } from '@/components/CarteJeu';
 import { Tirets } from '@/components/DecorNeon';
 import { prisma } from '@/lib/donnees/prisma';
+import { filtrePubliable } from '@/lib/donnees/publiables';
 
 // Une heure : c'est la page dont la fraîcheur est l'argument.
 export const revalidate = 3600;
@@ -46,7 +47,7 @@ export default async function Nouveautes({
   const { langue: brutL } = await params;
   const t = textes(estUneLangue(brutL) ? brutL : LANGUE_DEFAUT);
   const jeux = await prisma.jeu.findMany({
-    where: { sortieLe: { not: null } },
+    where: { sortieLe: { not: null }, ...(await filtrePubliable()) },
     orderBy: { sortieLe: 'desc' },
     take: 60,
     select: CHAMPS,
