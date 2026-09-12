@@ -2,6 +2,43 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Aucun clic where2spin n'était enregistré
+
+Le dashboard BetsRank n'affichait aucun clic portant un clickId `w2p-`. Ce
+n'était pas un défaut d'affichage : **il n'y avait rien à afficher.** La clé du
+jour contenait 50 clics, zéro venant de where2spin.
+
+**La cause.** `enregistrerClic` faisait un `lpush` sur `bce:clicks:<jour>` en
+supposant une liste Redis. La clé est une **string** : BetsRank y stocke le
+tableau JSON entier, lu par `get` et réécrit par `set`
+(`app/api/go/logger.ts`). Chaque écriture renvoyait donc `WRONGTYPE`, et
+l'appelant l'avalait — `enregistrerClic(...).catch(() => {})`, écrit
+volontairement pour qu'un incident de journalisation ne retienne jamais le
+visiteur. La notification Discord, elle, partait normalement : le flux avait
+toutes les apparences du bon fonctionnement.
+
+**Ce que ça coûtait.** Un postback de conversion arrive avec un clickId
+`w2p-…`, `getClickById` ne trouve pas le clic, et l'attribution du FTD part à
+l'admin. Ce n'est pas une statistique manquante, c'est le métier.
+
+**Deux précautions reprises de BetsRank, et une écartée.**
+
+· **On n'écrit que si la lecture a abouti.** Écrire après une lecture ratée
+  remplacerait le tableau du jour par un tableau d'un seul élément : un timeout
+  Upstash effacerait tous les clics de la journée, des deux sites.
+
+· **`casinoId` est rempli pour de bon.** Les ids de `Casino` sont ceux de
+  BetsRank (Vave = 117 des deux côtés) : c'est la clé du CPA, la laisser à zéro
+  aurait rendu le clic inexploitable pour le revenu.
+
+· **Aucune expiration posée**, contrairement à la version précédente. La clé
+  n'en a pas côté BetsRank (`ttl = -1`) ; un `expire` depuis ici en imposerait
+  une à une clé partagée et ferait disparaître des clics BetsRank aujourd'hui
+  permanents.
+
+Vérifié en écriture réelle : 50 → 51 clics, les 50 de BetsRank intacts, `ttl`
+inchangé. Dix tests fixent le format avec `ClickLog`.
+
 ## 2026-09-12 — La page des avis rendait 4 863 fiches d'un seul tenant
 
 **19,3 Mo de HTML par langue.** Vercel refuse de déployer une page ISR au-delà

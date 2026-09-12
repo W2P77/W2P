@@ -53,7 +53,15 @@ export default async function PageDeSortie({
 
   // Un enregistrement raté ne doit pas retenir le visiteur : on perd la trace,
   // pas le lead. La notification Discord est du même ordre — jamais bloquante.
-  await enregistrerClic({ clickId, casinoSlug: casino.slug, jeu, pays: null, referer: null }).catch(() => {});
+  await enregistrerClic({
+    clickId,
+    casinoId: casino.id,
+    casinoSlug: casino.slug,
+    casinoNom: casino.nom,
+    jeu,
+    pays: null,
+    referer: null,
+  }).catch(() => {});
   await notifierClicDiscord({ casinoNom: casino.nom, casinoSlug: casino.slug, clickId, jeu }).catch(() => {});
 
   const cible = buildAffiliateRedirectUrl(playUrl, clickId);
