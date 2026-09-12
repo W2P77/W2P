@@ -2,6 +2,34 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Red Tiger : 348 démos retrouvées
+
+355 jeux en base, **26 avec une `demoUrl`**. Sans démo, pas de capture ; sans
+capture, pas de fiche publiable — le studio entier était hors d'atteinte.
+
+**Le piège que la reconnaissance a évité.** La fiche produit Red Tiger ne porte
+ni iframe ni lien : le bouton « Demo » pousse une route côté client,
+`/demo/<tableId>`, et le `tableId` n'est lisible que dans le `__NEXT_DATA__` de
+la page. Surtout : **`redtiger.com/demo/<n'importe quoi>` répond 200**, à
+l'octet près, même avec un identifiant inventé. La route est une coquille SSG.
+Un code HTTP ne prouve donc rien ici, et vérifier une URL construite aurait
+validé n'importe quoi. Le script ne fabrique jamais une adresse sans avoir lu
+le `tableId` dans la page du jeu.
+
+**Deux garde-fous qui ont servi.** Le nom lu dans la page est confronté à celui
+de la base : un slug qui mènerait à un autre jeu est un échec, pas une écriture
+silencieuse. Et Red Tiger publie ses fiches **avant** d'ouvrir les démos — six
+jeux annoncent une date future (Stormfire le 23/09, Santa's Rage le 25/11).
+Écrire leur URL donnerait un bouton répondant « Demo is not available yet » :
+ils sont laissés de côté et retomberont d'eux-mêmes au prochain passage.
+
+**348 URLs écrites sur 355.** Reste un écart de nom non tranché — la page de
+`pirates-plenty-the-sunken-treasure` annonce « Pirates Plenty ». C'est
+vraisemblablement le même jeu au titre raccourci, mais contourner le garde-fou
+pour une fiche ne vaut pas le risque de lier la mauvaise.
+
+Le studio attend maintenant son adaptateur de capture.
+
 ## 2026-09-12 — L'adaptateur Play'n GO était écrit, jamais branché
 
 369 lignes, documentées jusqu'au détail de la surcouche « ? » à capturer en
