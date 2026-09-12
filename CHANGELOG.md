@@ -2,6 +2,36 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Push Gaming : le blocage n'était pas celui qu'on croyait
+
+**Correction d'une entrée de ce carnet.** Il y est écrit que le lanceur Push
+Gaming refuse un token rejoué. C'est faux, et voici ce qui le prouve : un token
+**fraîchement émis**, décodé de l'enveloppe et appelé pour la première fois,
+répond `403` en **45 ms** au POP CDG55 — la requête n'atteint jamais l'origine.
+Et la **racine** `player.eu.demo.pushgaming.com/` rend le même 403.
+
+La vraie cause est le **géo-blocage** : la distribution CloudFront refuse les
+IP françaises, corps AWS à l'appui — « *configured to block access from your
+country* ». Aucune porte de côté : les ~60 sous-domaines déclarés en
+transparence des certificats ont été passés en revue, aucun autre hôte de démo
+ne résout, et les 84 enveloppes pointent toutes sur cet hôte unique.
+
+**L'adaptateur est branché quand même**, et ce n'est pas contradictoire. Le
+403 vit **dans l'iframe** : `page.content()` du cadre principal ne le contient
+pas. Sans adaptateur, le runner capturerait une page blanche en « jeu de base »,
+rendrait « icône des règles introuvable » — le diagnostic d'un adaptateur mal
+réglé — et rechargerait les 82 fiches à **chaque** campagne. Il nomme donc le
+blocage au lieu de le déguiser en panne : « démo géo-bloquée : CloudFront 403 ».
+
+Aucune coordonnée, aucun délai de jeu n'a été inventé : rien ne s'affiche, donc
+rien n'a été observé. Les inventer aurait produit des captures de décor
+publiées sous la légende « Game rules ».
+
+**Ce que ça coûte de débloquer** : pas du code, une **sortie réseau hors de
+France**. Le `country=GB` du lanceur suggère que le Royaume-Uni passe. Une fois
+la sortie disponible, la reconnaissance et la séquence de clics tiennent en une
+séance — l'en-tête du fichier liste dans l'ordre ce qu'il restera à trouver.
+
 ## 2026-09-12 — Onze doublons fusionnés puis supprimés
 
 Les onze paires que `resoudre-doublons.ts` refusait de supprimer sont

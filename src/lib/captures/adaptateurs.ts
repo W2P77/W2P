@@ -269,6 +269,7 @@ export const PRAGMATIC: Adaptateur = {
 
 import { BGAMING } from './adaptateur-bgaming';
 import { PLAYNGO } from './adaptateur-playngo';
+import { PUSH_GAMING } from './adaptateur-push-gaming';
 import { HACKSAW } from './adaptateur-hacksaw';
 
 /*
@@ -286,4 +287,13 @@ export const ADAPTATEURS: Record<string, Adaptateur> = {
    * cette seule raison.
    */
   'playn-go': PLAYNGO,
+  /*
+   * Push Gaming est branche alors qu'il ne debloque rien : son lanceur est
+   * geo-bloque depuis la France. L'interet est ailleurs — sans lui, le runner
+   * capturerait une page blanche en « jeu de base » puis rendrait « icone des
+   * regles introuvable », le diagnostic d'un adaptateur mal regle, et
+   * rechargerait les 82 fiches a chaque campagne. Il nomme le blocage au lieu
+   * de le deguiser en panne.
+   */
+  'push-gaming': PUSH_GAMING,
 };
