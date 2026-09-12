@@ -7,6 +7,7 @@ import { EnTete } from '@/components/EnTete';
 import { PiedDePage } from '@/components/PiedDePage';
 import { CarteJeu } from '@/components/CarteJeu';
 import { Tirets } from '@/components/DecorNeon';
+import { Lien } from '@/components/Lien';
 import { prisma } from '@/lib/donnees/prisma';
 
 export const revalidate = 600;
@@ -37,27 +38,47 @@ export async function generateMetadata({
  * source du studio, et lesquelles restent invérifiées.
  *
  * La page dit donc ce qu'elle est. Les avis rédigés viendront s'y ajouter.
+ *
+ * ── Pourquoi elle est paginée ─────────────────────────────────────────────
+ *
+ * Elle rendait les **4 863** fiches vérifiées d'un seul tenant : 19,3 Mo de
+ * HTML par langue. Vercel refuse de déployer une page ISR au-delà de 19,07 Mo
+ * (`FALLBACK_BODY_TOO_LARGE`) — le build réussissait, le déploiement échouait,
+ * et la production restait figée sur la version précédente sans que rien ne le
+ * signale. Même sans cette limite, une page de 19 Mo n'est lisible ni par un
+ * visiteur ni par un robot.
  */
 export default async function Reviews({
   params,
+  searchParams,
 }: {
   params: Promise<{ langue: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
   const { langue: brutL } = await params;
   const t = textes(estUneLangue(brutL) ? brutL : LANGUE_DEFAUT);
-  const [verifies, recoupes, total] = await Promise.all([
+  const { page: pageBrute } = await searchParams;
+  const page = Math.max(1, Number(pageBrute ?? 1));
+  const parPage = 24;
+
+  const [jeux, verifies, recoupes, total] = await Promise.all([
     prisma.jeu.findMany({
       where: { rtpConfiance: 'STUDIO' },
       orderBy: { nom: 'asc' },
+      skip: (page - 1) * parPage,
+      take: parPage,
       select: {
         slug: true, nom: true, rtpStudio: true, rtpConfiance: true,
         volatilite: true, gainMaxMultiple: true, visuelUrl: true,
         rtpSource: true, studio: { select: { nom: true, slug: true } },
       },
     }),
+    prisma.jeu.count({ where: { rtpConfiance: 'STUDIO' } }),
     prisma.jeu.count({ where: { rtpConfiance: 'RECOUPE' } }),
     prisma.jeu.count(),
   ]);
+
+  const pages = Math.max(1, Math.ceil(verifies / parPage));
 
   return (
     <div className="min-h-screen bg-fond">
@@ -71,17 +92,41 @@ export default async function Reviews({
         </div>
         <p className="mb-6 max-w-2xl text-[13px] leading-relaxed text-texte-doux">
           {remplir(t.avisIntro, {
-            verifies: String(verifies.length),
+            verifies: String(verifies),
             recoupes: String(recoupes),
             total: String(total),
           })}
         </p>
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          {verifies.map((j, i) => (
+          {jeux.map((j, i) => (
             <CarteJeu key={j.slug} jeu={j} index={i} />
           ))}
         </div>
+
+        {pages > 1 && (
+          <nav className="mt-8 flex items-center justify-center gap-3" aria-label={t.pagination}>
+            {page > 1 && (
+              <Lien
+                href={`/reviews?page=${page - 1}`}
+                className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan"
+              >
+                {t.precedent}
+              </Lien>
+            )}
+            <span className="font-mono text-[12px] text-texte-faible">
+              {page} / {pages}
+            </span>
+            {page < pages && (
+              <Lien
+                href={`/reviews?page=${page + 1}`}
+                className="rounded-lg border border-fond-bordure px-4 py-2 text-[12px] hover:border-neon-cyan"
+              >
+                {t.suivant}
+              </Lien>
+            )}
+          </nav>
+        )}
       </main>
       <PiedDePage />
     </div>

@@ -2,6 +2,25 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — La page des avis rendait 4 863 fiches d'un seul tenant
+
+**19,3 Mo de HTML par langue.** Vercel refuse de déployer une page ISR au-delà
+de 19,07 Mo (`FALLBACK_BODY_TOO_LARGE`) : le build réussissait, le déploiement
+échouait à la dernière étape. Paginée à 24 par page comme le catalogue et les
+démos, la plus grosse page pré-rendue passe de **19,3 Mo à 0,24 Mo** — et c'est
+désormais `/new-releases`, pas `/reviews`.
+
+Le compte affiché dans l'intro reste le total vérifié (4 863), pas la tranche :
+c'est le chiffre qui dit le travail fait, il n'a pas à suivre la pagination.
+
+**Le piège derrière le piège.** Un déploiement raté ne met rien hors ligne :
+Vercel conserve le dernier build réussi, le site répond 200, et on croit avoir
+déployé. Sept commits de la journée étaient restés au sol de cette façon — le
+premier avait oublié `src/app/go/layout.tsx` dans son commit (le fichier
+existait sur le poste, `npm run dev` marchait, le build distant non). Depuis,
+la règle : après un push, vérifier qu'un **contenu qui n'existait pas avant**
+est bien servi, jamais un simple code 200.
+
 ## 2026-09-12 — La notif de clic passe par un webhook, pas par le bot
 
 Brancher where2spin sur le bot Discord de BetsRank demandait son jeton. Il
