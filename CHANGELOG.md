@@ -2,6 +2,25 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Un 502 de Supabase tuait une campagne entière
+
+La campagne Wazdan est morte **à la quatorzième fiche sur 261** : un `502 Bad
+Gateway` du stockage, une seconde de panne, et les treize captures déjà faites
+sont parties avec. Une capture coûte une minute de navigateur — c'est le prix
+fort pour un hoquet réseau. Trois campagnes téléversaient en parallèle ; le
+stockage a simplement lâché.
+
+`televerser` réessaie maintenant, avec des reculs de 1, 4 puis 12 secondes.
+**Mais seulement ce qui peut réussir au coup suivant** : 5xx, 408, 429, ou une
+coupure réseau. Un 401 ou un 403 sont des refus d'identité — les rejouer ne les
+rendrait pas vrais, ça ne ferait que retarder le diagnostic de trois reculs.
+
+Cinq tests fixent le contrat. L'un d'eux a d'abord échoué pour une raison qui
+mérite d'être notée : le corps d'une `Response` ne se lit **qu'une fois**, et
+réutiliser le même objet dans une boucle de réessais faisait échouer le second
+`.text()`. Le test mesurait alors sa propre erreur au lieu de celle du code.
+Les réponses simulées sont donc des fabriques, pas des objets.
+
 ## 2026-09-12 — Wazdan : le lanceur ne sert pas le jeu à tout le monde
 
 261 fiches débloquées, et deux pièges dont un aurait faussé presque tout le lot.

@@ -40,21 +40,55 @@ export function urlPublique(chemin: string): string {
  * remplacer l'ancienne, pas échouer — sinon une correction demanderait une
  * suppression manuelle et on finirait par ne plus corriger.
  */
+/**
+ * Un refus passager ne doit pas coûter une campagne entière.
+ *
+ * Une campagne de 261 jeux est morte à la quatorzième sur un **502 Bad
+ * Gateway** de Supabase — trois campagnes téléversaient en parallèle et le
+ * stockage a lâché une seconde. Les treize jeux capturés avant étaient perdus
+ * avec le reste, et une capture coûte une minute de navigateur : c'est le prix
+ * fort pour un hoquet réseau.
+ *
+ * On ne réessaie que ce qui peut réussir au coup suivant — 5xx, 408, 429, ou
+ * une coupure. Un 401 ou un 403 sont des refus définitifs : les rejouer trois
+ * fois ne ferait que retarder le diagnostic.
+ */
+const REESSAYABLE = (statut: number) => statut >= 500 || statut === 408 || statut === 429;
+const RECULS_MS = [1_000, 4_000, 12_000];
+
 export async function televerser(cheminLocal: string, cheminDistant: string): Promise<string> {
   const { url, cle } = config();
   const corps = readFileSync(cheminLocal);
-  const reponse = await fetch(`${url}/storage/v1/object/${BUCKET}/${cheminDistant}`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${cle}`,
-      apikey: cle,
-      'Content-Type': 'image/webp',
-      'x-upsert': 'true',
-    },
-    body: corps,
-  });
-  if (!reponse.ok) {
-    throw new Error(`Téléversement refusé (${reponse.status}) : ${await reponse.text()}`);
+
+  let dernierEchec = '';
+  for (let essai = 0; essai <= RECULS_MS.length; essai++) {
+    if (essai > 0) await new Promise((r) => setTimeout(r, RECULS_MS[essai - 1]));
+    try {
+      const reponse = await fetch(`${url}/storage/v1/object/${BUCKET}/${cheminDistant}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${cle}`,
+          apikey: cle,
+          'Content-Type': 'image/webp',
+          'x-upsert': 'true',
+        },
+        body: corps,
+      });
+      if (reponse.ok) return urlPublique(cheminDistant);
+
+      const detail = (await reponse.text()).slice(0, 200);
+      if (!REESSAYABLE(reponse.status)) {
+        throw new Error(`Téléversement refusé (${reponse.status}) : ${detail}`);
+      }
+      dernierEchec = `${reponse.status} : ${detail}`;
+    } catch (erreur) {
+      // Une erreur réseau (socket coupée, DNS) mérite le même traitement qu'un
+      // 5xx ; un refus définitif remonte tel quel et sort de la boucle.
+      if (erreur instanceof Error && erreur.message.startsWith('Téléversement refusé')) throw erreur;
+      dernierEchec = erreur instanceof Error ? erreur.message.slice(0, 200) : 'erreur réseau';
+    }
   }
-  return urlPublique(cheminDistant);
+  throw new Error(
+    `Téléversement abandonné après ${RECULS_MS.length + 1} essais — ${dernierEchec}`,
+  );
 }
