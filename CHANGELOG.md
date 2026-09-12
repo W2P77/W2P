@@ -2,6 +2,32 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Les cartes de partage ne montraient jamais le jeu
+
+Partager une fiche donnait une carte en texte seul : le nom, le RTP, le
+mot-marque, et un grand fond noir là où le jeu aurait dû être. Sur **toutes**
+les fiches, depuis toujours.
+
+**La cause.** Satori — le moteur derrière `ImageResponse` — ne décode que le
+PNG, le JPEG et le SVG. **Il ne lit pas le WebP.** Et il ne le signale pas :
+pas d'erreur, pas d'avertissement, juste une image absente. Nos 1 855 jaquettes
+étant toutes en `.webp`, aucune n'a jamais atteint une carte de partage.
+
+Le code avait pourtant l'air correct — il lisait le fichier, l'encodait en
+base64, le passait en `src`. Il n'y avait rien à déboguer : il fallait savoir
+ce que Satori sait lire. C'est le genre de panne qu'aucun test unitaire
+n'attrape et qu'on ne voit qu'en regardant l'image produite.
+
+**Le remède.** La jaquette est convertie en PNG à la volée avec `sharp`,
+ajouté aux dépendances. La conversion est faite ici et pas en amont parce que
+le `.webp` reste le bon format pour le site : c'est l'OG qui a une contrainte
+particulière, pas le catalogue.
+
+Une conversion qui échoue retombe sur le mot-marque seul, le repli déjà prévu.
+Vérifié sur quatre fiches : Pragmatic, Hacksaw et BGaming montrent leur
+jaquette (430 à 600 Ko), et une fiche sans artwork rend toujours sa carte
+sobre (109 Ko).
+
 ## 2026-09-12 — Le badge de preuve disparaît, le fait reste
 
 Quatre niveaux de preuve, une pastille sur chaque jaquette, un filtre dédié et

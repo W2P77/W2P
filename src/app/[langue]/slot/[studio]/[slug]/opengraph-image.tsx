@@ -29,12 +29,41 @@ export const alt = 'where2spin';
  * Une fiche sans artwork tombe sur le mot-marque seul : mieux vaut une carte
  * sobre qu'une carte cassée.
  */
-function fondBase64(chemin: string | null): string | null {
+/**
+ * La jaquette, convertie en PNG.
+ *
+ * ── Pourquoi une conversion, et pas le fichier tel quel ───────────────────
+ *
+ * Satori — le moteur derrière `ImageResponse` — ne décode que le PNG, le JPEG
+ * et le SVG. **Il ne lit pas le WebP**, et il ne le signale pas : il rend la
+ * carte sans l'image, sans erreur ni avertissement. Nos 1 855 jaquettes étant
+ * toutes en `.webp`, *toutes* les cartes de partage sortaient en texte seul —
+ * nom du jeu, RTP, mot-marque, et un grand fond noir à la place du jeu.
+ *
+ * La conversion se fait ici plutôt qu'en amont parce que le `.webp` reste le
+ * bon format pour le site lui-même : c'est l'OG qui a une contrainte
+ * particulière, pas le catalogue.
+ */
+async function fondBase64(chemin: string | null): Promise<string | null> {
   if (!chemin) return null;
   const fichier = join(process.cwd(), 'public', chemin);
   if (!existsSync(fichier)) return null;
-  const ext = chemin.endsWith('.png') ? 'png' : chemin.endsWith('.jpg') ? 'jpeg' : 'webp';
-  return `data:image/${ext};base64,${readFileSync(fichier).toString('base64')}`;
+
+  const octets = readFileSync(fichier);
+  if (chemin.endsWith('.png')) return `data:image/png;base64,${octets.toString('base64')}`;
+  if (chemin.endsWith('.jpg') || chemin.endsWith('.jpeg')) {
+    return `data:image/jpeg;base64,${octets.toString('base64')}`;
+  }
+
+  // Une conversion ratée ne doit pas casser la carte : on retombe sur le
+  // mot-marque seul, qui est le repli déjà prévu plus bas.
+  try {
+    const sharp = (await import('sharp')).default;
+    const png = await sharp(octets).png().toBuffer();
+    return `data:image/png;base64,${png.toString('base64')}`;
+  } catch {
+    return null;
+  }
 }
 
 export default async function Image({
@@ -45,7 +74,7 @@ export default async function Image({
   const { slug } = await params;
   const jeu = await jeuParSlug(slug);
 
-  const visuel = fondBase64(jeu?.visuelUrl ?? null);
+  const visuel = await fondBase64(jeu?.visuelUrl ?? null);
   const rtp = jeu?.rtpStudio ? `${Number(jeu.rtpStudio).toFixed(2)}% RTP` : null;
 
   return new ImageResponse(
@@ -74,7 +103,6 @@ export default async function Image({
           }}
         />
         {visuel ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={visuel}
             alt=""
