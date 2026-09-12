@@ -2,6 +2,26 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — La notif de clic passe par un webhook, pas par le bot
+
+Brancher where2spin sur le bot Discord de BetsRank demandait son jeton. Il
+n'est lisible **nulle part** : Vercel marque la variable « Sensitive » (écriture
+seule), le portail Discord ne l'affiche qu'à la création, et le `.env.local`
+du poste a été écrasé par un `env pull` — 48 de ses 64 variables valent
+littéralement `[SENSITIVE]`. Le seul moyen d'en obtenir un serait de le
+régénérer, ce qui **invaliderait celui de BetsRank** et ferait tomber l'autre
+bot le temps de le remettre partout.
+
+Un webhook de salon n'a aucun de ces défauts : il se crée dans les réglages du
+salon, son URL est le seul secret, il se révoque seul, et il ne demande ni
+jeton de bot ni identifiant de serveur. `DISCORD_WEBHOOK_CLICS` est donc le
+chemin par défaut ; le bot reste en repli, pour ne rien casser là où il est
+déjà configuré. Quatre tests couvrent le nouveau chemin, dont la bascule vers
+le bot quand le webhook échoue.
+
+Accessoirement : **rien dans where2spin n'appelle Telegram.** Ce bot-là est
+entièrement côté BetsRank, il n'y a aucune variable à poser ici.
+
 ## 2026-09-12 — La fiche de jeu se déclare enfin sur son sujet
 
 Une fiche affichait **679 mots**, dont la moitié en étiquettes et en noms de
