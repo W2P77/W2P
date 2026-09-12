@@ -2,6 +2,50 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — La fiche de jeu se déclare enfin sur son sujet
+
+Une fiche affichait **679 mots**, dont la moitié en étiquettes et en noms de
+casinos. Sur « gates of olympus rtp », une page qui ne développe rien n'a
+aucune raison de passer devant celles qui développent.
+
+**Le défaut le plus coûteux n'était pas la longueur.** Le `h1` portait « Où
+jouer Gates of Olympus » — la même phrase que le `h2` du bloc des casinos,
+trente lignes plus bas. La page se déclarait sur une intention d'achat au lieu
+de se déclarer sur son sujet, et dupliquait son propre titre. Le `h1` porte
+maintenant le nom du jeu, c'est-à-dire ce que le visiteur a tapé.
+
+**Un texte dérivé, pas rédigé.** `src/lib/analyse-jeu.ts` construit cinq
+sections et une FAQ à partir des champs de la base : RTP et sa provenance,
+paliers opérateur, RTP d'achat de bonus, volatilité, plafond, construction du
+jeu, et ce qu'on a vérifié soi-même. **Un fait absent ne produit pas de
+phrase** — pas de formule de remplissage, pas de superlatif. C'est ce qui fait
+la valeur du texte : il dit ce que les autres ne savent pas dire, parce qu'ils
+n'ont pas relevé le chiffre dans la démo. Résultat mesuré sur les 5 831 fiches
+indexables : **+243 mots en moyenne**, aucune sous 100.
+
+**La FAQ est déclarée en `FAQPage`.** Une question n'est posée que si le fait
+existe : une FAQ qui répond « nous ne savons pas » à une question qu'elle a
+elle-même posée est une mauvaise réponse offerte à Google.
+
+**Trois phrases fausses attrapées à la relecture, pas en production.**
+
+· « 25 000x **la mise totale** » sur Lightning Blackjack. Le chiffre est juste,
+  la phrase est fausse : une cote de table porte sur une case de mise, pas sur
+  le tapis. Les tables live sont maintenant reconnues à ce que la base en dit
+  (grille « Live Studio », mécanique « Dealer HD 24/7 ») et n'affichent plus ni
+  plafond ni grille — un faux positif vaut mieux qu'une phrase fausse.
+
+· « Pay Anywhere (8+ symbols) **lignes de paiement** ». `lignesPaiement` n'est
+  pas toujours un nombre ; le traiter comme un compte produisait une phrase qui
+  ne veut rien dire sur une part entière du catalogue.
+
+· « eine **hoche** Volatilität ». L'allemand fléchit l'adjectif : coller un `e`
+  au radical donnait cette forme sur toutes les fiches allemandes à volatilité
+  haute.
+
+**Au passage**, ` · released 2021` était écrit en anglais en dur sous le titre,
+dans les trois langues.
+
 ## 2026-09-12 — Le site parle vraiment trois langues
 
 Une passe complète sur l'interface : la version française lisait l'anglais sur

@@ -212,6 +212,9 @@ const EN = {
   etiquetteSource: 'Source: {hote}',
   jeuEnregistre: '★ Saved',
   enregistrerJeu: '☆ Save this game',
+  analyseTitre: 'Everything we know about this game',
+  faqTitre: 'Frequently asked questions',
+  sortiEn: 'released {annee}',
 } as const;
 
 export type CleTexte = keyof typeof EN;
@@ -396,6 +399,9 @@ const FR: Record<CleTexte, string> = {
   etiquetteSource: 'Source : {hote}',
   jeuEnregistre: '★ Enregistré',
   enregistrerJeu: '☆ Enregistrer ce jeu',
+  analyseTitre: 'Tout ce que nous savons de ce jeu',
+  faqTitre: 'Questions fréquentes',
+  sortiEn: 'sorti en {annee}',
 };
 
 const DE: Record<CleTexte, string> = {
@@ -578,6 +584,9 @@ const DE: Record<CleTexte, string> = {
   etiquetteSource: 'Quelle: {hote}',
   jeuEnregistre: '★ Gespeichert',
   enregistrerJeu: '☆ Spiel speichern',
+  analyseTitre: 'Alles, was wir über dieses Spiel wissen',
+  faqTitre: 'Häufige Fragen',
+  sortiEn: 'erschienen {annee}',
 };
 
 const TOUT: Record<Langue, Record<CleTexte, string>> = { en: EN, fr: FR, de: DE };

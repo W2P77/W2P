@@ -18,6 +18,8 @@ import { Lien } from '@/components/Lien';
 import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
 import { remplir, textes } from '@/i18n/textes';
 import { mecaniqueTraduite } from '@/lib/traduire-donnees';
+import { baliseFaq, estUneTableLive, questionsFrequentes, type FaitsDuJeu } from '@/lib/analyse-jeu';
+import { AnalyseJeu } from '@/components/AnalyseJeu';
 
 export const revalidate = 3600;
 
@@ -142,6 +144,34 @@ export default async function PageJeu({
   const rtp = jeu.rtpStudio == null ? null : Number(jeu.rtpStudio);
   const paliers = jeu.rtpPaliers.map((p) => Number(p));
 
+  /*
+   * Les faits passés au texte d'analyse : uniquement ce que la base contient.
+   * Un champ nul ne produit pas de phrase — voir `src/lib/analyse-jeu.ts`.
+   */
+  const captures = (jeu.captures as unknown[] | null) ?? [];
+  const faits: FaitsDuJeu = {
+    nom: jeu.nom,
+    studio: jeu.studio.nom,
+    rtp,
+    paliers,
+    rtpAchatBonus: jeu.rtpAchatBonus == null ? null : Number(jeu.rtpAchatBonus),
+    rtpSource: jeu.rtpSource,
+    rtpConfiance: jeu.rtpConfiance,
+    volatilite: jeu.volatilite,
+    gainMax: jeu.gainMaxMultiple,
+    grille: jeu.grille,
+    lignes: jeu.lignesPaiement,
+    mecaniques: jeu.mecaniques.map((m) => mecaniqueTraduite(m, langue)),
+    achatBonus: jeu.achatBonus,
+    sortieLe: jeu.sortieLe,
+    capturesLe: jeu.capturesLe,
+    nbCaptures: captures.length,
+    nbCasinos: casinos.length,
+    demo: Boolean(jeu.demoUrl),
+    estLive: estUneTableLive(jeu.grille, jeu.mecaniques),
+  };
+  const faq = baliseFaq(questionsFrequentes(faits, langue));
+
   return (
     <div className="min-h-screen bg-fond">
       <script
@@ -161,6 +191,12 @@ export default async function PageJeu({
           ),
         }}
       />
+      {faq && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
+        />
+      )}
       <EnTete />
 
       <main className="mx-auto max-w-[1200px] px-6 py-8">
@@ -185,13 +221,22 @@ export default async function PageJeu({
          */}
         <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
           <div className="min-w-0">
+            {/*
+             * Le h1 portait « Où jouer {jeu} » — la même phrase que le h2 du
+             * bloc des casinos, trente lignes plus bas. La page se déclarait
+             * donc sur une intention d'achat au lieu de se déclarer sur son
+             * sujet, et dupliquait son propre titre. Le nom du jeu est ce que
+             * le visiteur a tapé.
+             */}
             <h1 className="font-titre text-[30px] font-black uppercase leading-[0.95] tracking-tight text-white sm:text-[40px]">
-              {t.ouJouer} {jeu.nom}
+              {jeu.nom}
             </h1>
             <div className="mt-2 flex flex-wrap items-center gap-3">
               <p className="text-[14px] text-texte-doux">
                 {jeu.studio.nom}
-                {jeu.sortieLe ? ` · released ${new Date(jeu.sortieLe).getFullYear()}` : ''}
+                {jeu.sortieLe
+                  ? ` · ${remplir(t.sortiEn, { annee: String(new Date(jeu.sortieLe).getFullYear()) })}`
+                  : ''}
               </p>
               <BoutonEnregistrer
                 jeu={{
@@ -248,6 +293,8 @@ export default async function PageJeu({
             />
 
             <OuJouer jeu={jeu.nom} studio={jeu.studio.nom} casinos={casinos} />
+
+            <AnalyseJeu faits={faits} langue={langue} />
           </div>
 
           {/* ── Les chiffres, avec leur provenance ─────────────────────── */}
