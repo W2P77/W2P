@@ -2,6 +2,31 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Un clic perdu le dit maintenant dans les logs
+
+Entrée écrite après coup pour le commit `b14bfd6`, poussé sans elle — la règle
+du carnet est une entrée dans le **même** commit.
+
+L'appelant enveloppe `enregistrerClic` dans un `.catch(() => {})` : un incident
+de journalisation ne doit jamais retenir un visiteur en partance chez un
+partenaire. Mais « ne pas bloquer » n'est pas « ne rien dire ». Le `lpush` sur
+une clé du mauvais type a échoué pendant toute la mise en place sans laisser la
+moindre trace, et la panne n'a été trouvée qu'en lisant Redis à la main.
+
+Chaque abandon écrit donc une ligne dans les logs Vercel, avec sa raison :
+variables Upstash absentes, lecture impossible, écriture impossible.
+
+**Ce que ça a immédiatement révélé.** Un clic réel déclenché sur la production
+partait bien sur Discord mais n'arrivait pas dans Redis, alors que le même
+appel depuis le poste l'écrivait sans problème. La différence tient aux
+variables : `UPSTASH_REDIS_REST_URL` et `UPSTASH_REDIS_REST_TOKEN` sont dans le
+`.env.local` et **absentes du projet Vercel where2spin**. `redis` y vaut donc
+`null`, et la fonction renonçait avant même d'essayer.
+
+À retenir pour les deux sites : la notification Discord et l'enregistrement du
+clic empruntent deux chemins indépendants. Voir l'une arriver ne prouve rien
+sur l'autre — c'est exactement ce qui a masqué la panne.
+
 ## 2026-09-12 — Aucun clic where2spin n'était enregistré
 
 Le dashboard BetsRank n'affichait aucun clic portant un clickId `w2p-`. Ce
