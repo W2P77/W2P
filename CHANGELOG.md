@@ -2,6 +2,44 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Dix doublons supprimés, onze refusés, et un jeu sauvé
+
+`scripts/resoudre-doublons.ts` sépare trois questions qu'on confondait :
+**est-ce le même jeu**, **laquelle garder**, et **la gardée perd-elle quelque
+chose**. La troisième est celle qui protège : toute perte de champ, de preuve
+ou de traduction vaut refus.
+
+Détection par quatre signaux croisés sur 11 679 fiches — identifiant du
+lanceur, nom normalisé, slug sans suffixe d'import (`-slot`, `-netent`, `-btg`),
+variante chiffrée. **102 amas**, dont neuf écartés comme défauts de données :
+un signal qui réunit plus de trois fiches désigne une série, pas un doublon
+(`cygnus-2/3/6`, `fire-hot-20/40/100`).
+
+**Dix suppressions sans perte** — `wolf-gold-slot`, `sweet-bonanza-slot`,
+`the-dog-house-megaways-slot`, `luxor-of-cleopatra-2`… Chaque arbitrage est
+prouvé pièce par pièce : page produit du studio d'abord, puis captures, preuves
+et traductions.
+
+**Onze refus qui valent plus que les dix suppressions.** Le motif est
+systématique : le studio reconnaît un slug, mais c'est **l'autre** qui porte le
+RTP, les captures et les preuves. `cursed-crypt-hacksaw` a neuf captures, deux
+preuves et un RTP sourcé ; `cursed-crypt` est vide mais c'est le slug officiel.
+Recopier le contenu vers la fiche officielle avant de supprimer, c'est onze
+doublons résolus **et** onze fiches enrichies.
+
+**Le piège évité.** `pirate-gold-slot` et `pirates-riches-slot-23-may-2019`
+partagent `gameSymbol=vs40pirate` — mais Pragmatic publie **deux pages produit
+distinctes**. Ce sont deux jeux, et l'un portait la démo de l'autre. La
+première version du script proposait de supprimer « Pirate's Riches », un jeu
+réel. C'est exactement ce que CLAUDE.md met en garde : deux slugs qui se
+ressemblent ne sont pas forcément le même jeu. Sa `demoUrl` est vidée plutôt
+que de laisser un bouton ouvrir le mauvais titre.
+
+**À prévoir avant d'aller plus loin** : aucune redirection n'existe côté site,
+donc chaque slug supprimé devient un 404. Les dix d'aujourd'hui étaient vides
+et jamais proposés à l'indexation, mais `the-dog-house` et `fruit-party` — dans
+les refus — ont du contenu.
+
 ## 2026-09-12 — Wazdan, Nolimit City et Push Gaming : 480 démos
 
 Trois studios entièrement invisibles — 498 fiches, 224 démos entre elles.
