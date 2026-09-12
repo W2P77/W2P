@@ -109,15 +109,32 @@ export function entreeDeClic(c: ClicSortant, date = new Date()): ClicEnregistre 
   };
 }
 
+/*
+ * ── Pourquoi cette fonction parle, alors qu'elle ne lève jamais ───────────
+ *
+ * Elle ne doit pas retenir le visiteur : son appelant l'enveloppe donc dans un
+ * `.catch(() => {})`. Mais « ne pas bloquer » n'est pas « ne rien dire ». Un
+ * `lpush` sur une clé du mauvais type a échoué pendant toute la mise en place
+ * sans laisser la moindre trace, et la panne n'a été découverte qu'en lisant
+ * Redis à la main. Chaque abandon écrit donc maintenant une ligne dans les
+ * logs Vercel, avec sa raison.
+ */
 export async function enregistrerClic(c: ClicSortant): Promise<boolean> {
-  if (!redis) return false;
+  if (!redis) {
+    console.error(
+      `[clics] UPSTASH_REDIS_REST_URL/TOKEN absents — clic ${c.clickId} perdu. ` +
+        `Sans lui, le postback de conversion ne retrouvera pas ce lead.`,
+    );
+    return false;
+  }
   const cle = cleDuJour();
 
   let clics: ClicEnregistre[];
   try {
     clics = lireClics(await redis.get(cle));
-  } catch {
+  } catch (erreur) {
     // Lecture ratée : on abandonne l'écriture plutôt que d'écraser la journée.
+    console.error(`[clics] lecture de ${cle} impossible, ecriture abandonnee — clic ${c.clickId} perdu :`, erreur);
     return false;
   }
 
@@ -125,7 +142,8 @@ export async function enregistrerClic(c: ClicSortant): Promise<boolean> {
   try {
     await redis.set(cle, JSON.stringify(clics));
     return true;
-  } catch {
+  } catch (erreur) {
+    console.error(`[clics] ecriture de ${cle} impossible — clic ${c.clickId} perdu :`, erreur);
     return false;
   }
 }
