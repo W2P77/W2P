@@ -2,6 +2,46 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Wazdan, Nolimit City et Push Gaming : 480 démos
+
+Trois studios entièrement invisibles — 498 fiches, 224 démos entre elles.
+**480 adresses écrites** : Wazdan 261 sur 262, Push Gaming 82 sur 85, Nolimit
+City 137 sur 151. Aucun des trois n'était à abandonner.
+
+**Chacun se lit autrement, et c'est tout l'intérêt de la reconnaissance.**
+
+· **Wazdan publie son propre catalogue** (`wazdan.com/gamesapi`, 1 200 entrées
+  dont 265 jeux), chacun avec un `gameDemo` **déjà construit par le studio**.
+  Une requête au lieu de 262, et surtout aucune URL fabriquée par nous. Piège
+  du second recours : la fiche produit assigne `gameParams` à
+  `{"game_url":null}` avant de le réassigner — c'est la seconde affectation qui
+  compte.
+
+· **Nolimit City tourne sur la plateforme de Red Tiger et NetEnt** : `tableId`
+  dans le `__NEXT_DATA__`, démo en `/demo/{tableId}`. Et `/demo/CeJeuNexistePas`
+  y répond **200 à sept octets près** — ceux du tableId recopié. Le garde-fou
+  s'appliquait mot pour mot.
+
+· **Push Gaming ne met aucune démo sur sa fiche produit** : ni iframe, ni
+  bouton, ni le mot « demo ». L'adresse ne vit que dans le `data-url` du bouton
+  de la liste `/games/`. La page qu'elle ouvre pose une iframe dont le `src`
+  est un base64 — mais l'URL décodée porte un **token à usage unique qui répond
+  403 rejoué**. C'est donc la page enveloppe qu'on retient, pas le lanceur.
+
+**Deux doublons refusés par le garde-fou des lanceurs** :
+`san-quentin-2-death-row` rendait le même que `san-quentin-2`, et
+`xways-hoarder-2` le même que `x-ways-hoarder-2`. Sans lui, quatre fiches
+auraient publié deux paires de captures identiques sous quatre URLs indexables.
+
+**Les trois lanceurs sont embarquables** — aucun `x-frame-options`, aucun
+`frame-ancestors`. De quoi jouer sur la fiche, une fois les captures faites.
+
+**Ce qui reste, nommément.** Huit noms tronqués en base chez Nolimit City
+(`san-quentin` pour « San Quentin xWays® », `mental-2` pour « Mental II »…) :
+les corriger débloque huit fiches d'un coup. Quatre démos annoncées à une date
+future repasseront seules. Et `game-1` annonce « Fire In The Hole 4 » — le
+piège Victorious MAX, à ne pas écrire.
+
 ## 2026-09-12 — Trois fiches en double supprimées, et la boucle qui les recréait
 
 Les trois paires suspectes sont tranchées, et le verdict n'était pas celui
