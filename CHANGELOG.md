@@ -2,6 +2,48 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-12 — Wazdan : le lanceur ne sert pas le jeu à tout le monde
+
+261 fiches débloquées, et deux pièges dont un aurait faussé presque tout le lot.
+
+**Le lanceur trie sur l'`User-Agent`, en silence.** `gamelaunch.wazdan.com`
+répond **301 vers la fiche marketing** dès que l'UA n'est pas celui d'un vrai
+navigateur. Mesuré au même instant sur le même jeu : `Chrome/140` → le jeu,
+`HeadlessChrome/140` → la fiche, `curl/8.7.1` → la fiche. Le tri est serveur,
+avant tout JavaScript, et rien n'échoue : la page charge, `load` se produit.
+La première reconnaissance a photographié le site de Wazdan pendant quarante
+secondes en croyant filmer un jeu. L'adaptateur réécrit donc l'en-tête — et
+Wazdan n'exige **pas** de navigateur avec tête, seulement un UA qui ne dise pas
+« Headless ».
+
+**La volatilité qui n'en était pas une.** Le règlement se termine par une
+section générique « Volatility Levels™ » décrivant le *réglage* que le joueur
+peut changer : les trois modes y figurent sur **tous** les jeux.
+`extraireLesFaits` y lisait « high volatility » et rendait HAUTE — et le runner
+l'aurait écrite, la volatilité n'étant conditionnée qu'à l'absence de désaccord
+sur le RTP. **259 fiches sur 261** auraient été étiquetées « volatilité haute »
+sur la foi d'un paragraphe qui parle d'un bouton. L'adaptateur s'arrête de
+capturer avant cette section, dont il demande la position au DOM.
+
+**Deux autres observations qui ont coûté à trouver.** Espace ferme l'écran
+d'accueil — mais sur un jeu qui n'en a pas, Espace **lance un tour** : capture
+du jeu de base avec trois STOP affichés et solde entamé. D'où l'ordre inversé :
+on demande d'abord le panneau ; s'il s'ouvre, il n'y avait pas d'accueil. Et
+Échap sur le panneau « i » ne ferme pas, il ouvre **« Exit the game? »**, une
+boîte dans laquelle tout ce qui suit vient cliquer.
+
+**`lecture-regles.ts` apprend la formulation Wazdan.** Le studio écrit « Game
+average return to player: 96.15% » — jamais le sigle — et « The maximum win
+amount **is** 750x bet », sans le « limited to » de la formule Pragmatic. Les
+deux valeurs étaient à l'écran, lues sans faute par l'OCR, et jetées par
+l'interprétation. Ajout additif, vérifié : les 19 tests existants passent
+inchangés, trois nouveaux fixent les formulations.
+
+Vérifié sur trois jeux : 18, 13 et 15 captures, RTP **96,15 · 96,13 · 96,14**,
+volatilité `null`. `capturerLAchat` rend `false` sans rien tenter — le chariot
+existe mais la boîte s'ouvre dans le canvas, sans témoin DOM : un faux positif
+publierait le jeu de base sous la légende « Buying the feature » sur 261 fiches.
+
 ## 2026-09-12 — Hacksaw : 36 pages produit retirées, 36 jeux bien vivants
 
 Une campagne de captures venait d'échouer sur **36 jeux sur 39**, tous en

@@ -271,6 +271,8 @@ import { BGAMING } from './adaptateur-bgaming';
 import { PLAYNGO } from './adaptateur-playngo';
 import { PUSH_GAMING } from './adaptateur-push-gaming';
 import { HACKSAW } from './adaptateur-hacksaw';
+import { RED_TIGER } from './adaptateur-red-tiger';
+import { WAZDAN } from './adaptateur-wazdan';
 
 /*
  * La clé est le `slug` du studio en base, pas son nom : c'est elle que
@@ -296,4 +298,19 @@ export const ADAPTATEURS: Record<string, Adaptateur> = {
    * de le deguiser en panne.
    */
   'push-gaming': PUSH_GAMING,
+  /*
+   * Le lanceur Wazdan rend le jeu a un navigateur et la fiche marketing a tous
+   * les autres — un 301 silencieux, declenche par le seul mot « Headless » dans
+   * l'User-Agent. Sans la reecriture d'en-tete de l'adaptateur, les 261 fiches
+   * ne rapportaient que des captures du site du studio, sans la moindre erreur.
+   */
+  wazdan: WAZDAN,
+  /*
+   * Red Tiger et NetEnt tournent sur la meme plateforme Evolution : meme page
+   * hote, meme lanceur signe, meme application Vue, memes selecteurs. Un seul
+   * adaptateur, deux entrees — 348 + 221 fiches qui n'attendaient que cette
+   * ligne. Les separer serait dupliquer un fichier pour changer un domaine.
+   */
+  'red-tiger': RED_TIGER,
+  netent: RED_TIGER,
 };

@@ -334,7 +334,19 @@ export function extraireLesFaits(texte: string, pages: FaitsLus['pages'] = []): 
   const lire = (mot: string) =>
     new RegExp(`${mot}${APRES_LE_MOT}${jusquAuNombre}${CHIFFRE}`, 'i').exec(t)?.[1] ?? null;
 
-  let brutHaut = lire('theoretical') ?? lire('maximum');
+  /*
+   * Wazdan n'écrit jamais le sigle : « Game average return to player: 96.15% ».
+   * `lire` exige `RTP` après le mot-clé, donc il rendait `null` sur un panneau
+   * parfaitement lisible — Tesseract restitue la phrase au mot près, c'est
+   * l'interprétation qui jetait la valeur. Sans cette ligne, 261 fiches
+   * sortaient avec leurs images et aucun chiffre en source studio : le mode
+   * d'échec le plus coûteux, puisqu'il ne signale rien.
+   */
+  const formulationWazdan =
+    new RegExp(`game\\s+average\\s+return\\s+to\\s+player\\s*:?\\s*${CHIFFRE}`, 'i').exec(t)?.[1] ??
+    null;
+
+  let brutHaut = lire('theoretical') ?? lire('maximum') ?? formulationWazdan;
   let brutBas = lire('minimum');
 
   /*
@@ -402,7 +414,10 @@ export function extraireLesFaits(texte: string, pages: FaitsLus['pages'] = []): 
     /maximum\s+theoretical\s+win[^0-9]{0,40}([\d.,]+)\s*x/i.exec(t) ??
     /maximum\s+win\s+amount\s+is\s+limited\s+to\s+([\d.,]+)\s*x/i.exec(t) ??
     /maximum\s+achievable\s+win[^0-9]{0,40}([\d.,]+)\s*x/i.exec(t) ??
-    /maximum\s+winning\s+amount[^0-9]{0,20}[x×]\s*([\d.,]+)/i.exec(t);
+    /maximum\s+winning\s+amount[^0-9]{0,20}[x×]\s*([\d.,]+)/i.exec(t) ??
+    // Wazdan écrit « The maximum win amount **is** 750x bet », sans le
+    // « limited to » qu'attend la formule Pragmatic juste au-dessus.
+    /maximum\s+win\s+amount\s+is\s+([\d.,]+)\s*x/i.exec(t);
   const freqLu = /chance\s+to\s+hit\s+of\s+1\s+in\s+([\d.,]+)/i.exec(t);
 
   const volatilite = VOLATILITES.find(([r]) => r.test(t))?.[1] ?? null;

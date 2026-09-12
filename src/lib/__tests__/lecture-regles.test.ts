@@ -104,6 +104,34 @@ describe('le RTP, selon la formule du studio', () => {
   });
 });
 
+/*
+ * Wazdan n'écrit jamais le sigle « RTP ». La règle exigeait sa présence après
+ * le mot-clé, donc elle rendait `null` sur un panneau que Tesseract restitue
+ * au mot près : 261 fiches auraient reçu leurs images et aucun chiffre.
+ */
+describe('la formulation Wazdan, qui n’écrit pas le sigle', () => {
+  it('lit le RTP sans le mot RTP', () => {
+    expect(extraireLesFaits('Game average return to player: 96.15%').rtp).toBe(96.15);
+    expect(extraireLesFaits('game average return to player 95,5%').rtp).toBe(95.5);
+  });
+
+  it('lit le gain maximum sans « limited to »', () => {
+    expect(extraireLesFaits('The maximum win amount is 750x bet.').gainMax).toBe(750);
+  });
+
+  /*
+   * Le règlement Wazdan se termine par une section générique « Volatility
+   * Levels™ » qui décrit le RÉGLAGE que le joueur peut changer — les trois
+   * modes y figurent sur tous les jeux. Y lire une volatilité étiquetterait
+   * « haute » 259 fiches sur 261, sur la foi d'un paragraphe qui parle d'autre
+   * chose. C'est l'adaptateur qui coupe avant cette section ; ce test fixe ce
+   * qu'il doit lui rester à lire.
+   */
+  it('lit toujours la volatilité quand le jeu l’énonce vraiment', () => {
+    expect(extraireLesFaits('This game has high volatility.').volatilite).toBe('HAUTE');
+  });
+});
+
 describe('le gain maximum, selon la formule du studio', () => {
   it('lit « maximum theoretical win »', () => {
     expect(extraireLesFaits('The maximum theoretical win is 5,000x the bet').gainMax).toBe(5000);
