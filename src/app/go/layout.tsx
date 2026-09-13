@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Mesure } from '@/components/Mesure';
 import { Barlow, Chakra_Petch, Saira_Condensed } from 'next/font/google';
 
 import './../globals.css';
@@ -52,7 +53,8 @@ export const metadata: Metadata = {
 export default function LayoutDeSortie({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${titre.variable} ${ui.variable} ${corps.variable}`}>
-      <body className="bg-fond">{children}</body>
+      <body className="bg-fond">{children}
+        <Mesure /></body>
     </html>
   );
 }

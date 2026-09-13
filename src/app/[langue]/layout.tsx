@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Mesure } from '@/components/Mesure';
 
 import { BANNIERE_OG } from '@/lib/metadonnees';
 import { SITE_URL } from '@/lib/site';
@@ -152,7 +153,8 @@ export default async function LayoutLangue({
       lang={trouverLangue(code).htmlLang}
       className={`${titre.variable} ${ui.variable} ${corps.variable}`}
     >
-      <body>{children}</body>
+      <body>{children}
+        <Mesure /></body>
     </html>
   );
 }

@@ -2,6 +2,32 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-13 — La balise de mesure Google, sur les deux racines
+
+Le site a **deux racines** : `[langue]/layout.tsx` pour les pages publiques et
+`go/layout.tsx` pour l'écran de sortie, qui vit hors de `[langue]` et n'hérite
+donc de rien — c'est déjà ce qui l'avait laissé sans feuille de style pendant
+des semaines. Poser la balise à la main aux deux endroits invitait au doublon,
+et Google en demande **une seule** par page : deux compteraient deux fois la
+même visite. D'où un composant partagé, `src/components/Mesure.tsx`.
+
+`afterInteractive` : la mesure n'a pas à retarder l'affichage.
+
+**Ce que la mesure va confirmer.** Les clics enregistrés montrent déjà un motif
+net : 18 des 23 clics de ces deux jours portent **le même user-agent**, un
+iPhone sous iOS 13.2.3 — une version de 2019 — **sans aucun referer**, depuis
+l'Indonésie, le Brésil, Hong Kong, la Thaïlande, la Corée. Ils attaquent
+directement `/go/<casino>` sans jamais passer par une page du site. C'est un bot
+qui récolte des liens d'affiliation, pas du trafic.
+
+Le coût n'est pas la statistique faussée mais le **ratio clics/FTD** que lit un
+affiliate manager avant de renégocier un CPA. Un filtre reste à écrire : un clic
+sans referer *et* au user-agent obsolète n'est pas un visiteur.
+
+⚠️ **Aucun consentement n'est demandé.** GA4 dépose des identifiants et le site
+s'adresse à l'Europe : c'est une dette à régler avant de pousser sur
+l'acquisition.
+
 ## 2026-09-13 — Sept studios de plus : 1 556 démos
 
 | studio | trouvées | comment il publie |
