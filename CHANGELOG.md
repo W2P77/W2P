@@ -2,6 +2,21 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-13 — Le cadre de démo dit d'où vient la démo
+
+Certains studios refusent de servir leur démo hors des pays qu'ils couvrent :
+Endorphina répond « Forbidden For Your Region », Push Gaming un 403 CloudFront.
+Le visiteur cliquait, le cadre restait **noir, sans un mot**, et il attribuait
+la panne au site qu'il avait sous les yeux.
+
+Ça ne peut pas se prévoir depuis le serveur : c'est le **navigateur du
+visiteur** qui va chercher le jeu, depuis son IP et son pays. Aucun proxy de
+notre côté n'y change rien — un proxy sert à nos captures, pas à la démo du
+visiteur. Le dire est donc la seule réponse honnête, et le lien vers le site du
+studio lui donne une porte de sortie plutôt qu'un écran mort. Le texte ne
+reproche rien à personne : il dit qui sert la démo, et que le pays peut la
+refuser.
+
 ## 2026-09-13 — Les quatre autres studios, et le titre qui écrasait le contenu
 
 Après Wazdan, les pages muettes ont été ouvertes studio par studio et leurs

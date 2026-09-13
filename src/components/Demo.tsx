@@ -50,15 +50,40 @@ export function Demo({
 
       {embarquable ? (
         ouverte ? (
-          <div className="mt-4 overflow-hidden border border-fond-bordure bg-black">
-            <iframe
-              src={url}
-              title={`${nom} — demo`}
-              className="aspect-video h-full w-full"
-              allow="fullscreen; autoplay"
-              referrerPolicy="no-referrer"
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
-            />
+          <div className="mt-4">
+            <div className="overflow-hidden border border-fond-bordure bg-black">
+              <iframe
+                src={url}
+                title={`${nom} — demo`}
+                className="aspect-video h-full w-full"
+                allow="fullscreen; autoplay"
+                referrerPolicy="no-referrer"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+              />
+            </div>
+            {/*
+              * Dire d'où vient la démo, une fois qu'elle est ouverte.
+              *
+              * Certains studios refusent de servir leur démo hors des pays
+              * qu'ils couvrent — Endorphina répond « Forbidden For Your
+              * Region », Push Gaming un 403. Le cadre reste alors noir, et le
+              * visiteur attribue la panne au site qu'il a sous les yeux, pas
+              * au studio. On ne peut pas le prévoir depuis le serveur : c'est
+              * son navigateur qui va chercher le jeu, depuis son IP. Le dire
+              * est la seule réponse honnête — et le lien lui donne une porte
+              * de sortie plutôt qu'un écran mort.
+              */}
+            <p className="mt-2 font-corps text-[12px] leading-relaxed text-texte-doux">
+              {t.demoServieParLeStudio.replace('{studio}', studio)}{' '}
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline decoration-fond-bordure underline-offset-2 hover:text-white"
+              >
+                {t.demoChezLeStudio.replace('{studio}', studio)}
+              </a>
+            </p>
           </div>
         ) : (
           <button
