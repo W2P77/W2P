@@ -40,6 +40,7 @@ import {
   lireLEcran,
   lireLesRegles,
 } from '../src/lib/captures/lecture-regles';
+import { lireCapture, type LectureDeCapture } from '../src/lib/legendes';
 import { televerser } from '../src/lib/visuels/stockage';
 import { LimiteDeDebit, estUneLimiteDeDebit } from '../src/lib/captures/limite-de-debit';
 
@@ -67,7 +68,12 @@ function arg(nom: string): string | undefined {
 
 interface Resultat {
   slug: string;
-  captures: Array<{ fichier: string; titre: string; legende: string }>;
+  captures: Array<{
+    fichier: string;
+    titre: string;
+    legende: string;
+    lecture?: LectureDeCapture | null;
+  }>;
   rtp: number | null;
   rtpMin: number | null;
   volatilite: string | null;
@@ -278,6 +284,16 @@ async function capturerUnJeu(
 
     let titre = 'The base game';
     let legende = `${jeu.nom} as the demo opens it, before any spin.`;
+    /*
+     * Ce que la page explique est reconnu **ici**, pendant qu'on a le texte.
+     *
+     * C'est le seul moment où il existe : l'OCR ne part pas en base, seul son
+     * verdict le fait. Le refaire au rendu supposerait d'expédier le texte au
+     * navigateur — dix kilooctets par fiche, dans trois langues qui n'en
+     * affichent aucune. `lireCapture` rend `null` dès qu'elle n'est pas sûre,
+     * et la légende générique reprend alors la main.
+     */
+    let lecture: LectureDeCapture | null = null;
     if (nom.startsWith('regles')) {
       const i = numeroRegle++;
       titre = titrePage(i);
@@ -285,11 +301,27 @@ async function capturerUnJeu(
       // c'est celle qui prouve quelque chose.
       const porteLeRtp = /RTP/i.test(faits.pages[i]?.texte ?? '');
       legende = porteLeRtp && phraseFaits ? `Stated by the game itself: ${phraseFaits}.` : '';
+      lecture = lireCapture(faits.pages[i]?.texte);
     } else if (nom === 'achat') {
       titre = 'Buying the feature';
       legende = 'The purchase confirmation as the game presents it, before any spin is committed.';
     }
-    captures.push({ fichier: webp, titre, legende });
+    /*
+     * Le champ est posé sur toute page de règles, `null` compris.
+     *
+     * `null` n'est pas un vide : il dit « cette page est passée par la
+     * reconnaissance et n'a rien donné ». C'est ce qui distingue une page
+     * illisible d'une page jamais soumise, et c'est le marque-page dont le
+     * rattrapage a besoin pour ne pas relire quatre heures d'OCR à chaque
+     * relance. Les autres captures — jeu de base, achat — n'ont pas de panneau
+     * à lire et n'ont donc pas le champ du tout.
+     */
+    captures.push({
+      fichier: webp,
+      titre,
+      legende,
+      ...(nom.startsWith('regles') ? { lecture } : {}),
+    });
   }
   rmSync(dossier, { recursive: true, force: true });
 
@@ -391,7 +423,9 @@ async function main() {
     await prisma.jeu.update({
       where: { id: jeu.id },
       data: {
-        captures: r.captures,
+        // La colonne est du JSON : Prisma n'accepte pas une interface nommée,
+        // dont il ne sait pas qu'elle n'a pas de clé surnuméraire.
+        captures: r.captures as never,
         capturesLe: new Date(),
         // Le RTP n'est écrit que s'il a été lu, et qu'il ne contredit pas la
         // base. Sinon la fiche garde ce qu'elle avait, et les captures sont

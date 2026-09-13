@@ -8,7 +8,15 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { legendeDeCapture, typeDeCapture, LEGENDES_ECRITES } from '../legendes';
+import {
+  legendeDeCapture,
+  legendesDeCaptures,
+  lireCapture,
+  lirePageDeRegles,
+  lectureStockee,
+  typeDeCapture,
+  LEGENDES_ECRITES,
+} from '../legendes';
 
 const FAITS = { slug: 'sweet-bonanza', nom: 'Sweet Bonanza', rtp: 96.51, gainMax: 21100, volatilite: 'TRES_HAUTE' };
 
@@ -87,5 +95,233 @@ describe('légendes de captures', () => {
     for (const par of Object.values(goo)) for (const langue of ['en', 'fr', 'de'] as const) {
       expect(par[langue].length).toBeGreaterThan(60);
     }
+  });
+});
+
+/**
+ * Ce que la page de règles dit, dans la langue du visiteur.
+ *
+ * Les captures sont prises en anglais : un visiteur français ou allemand
+ * regarde une image dont il ne lit pas le contenu. Ces tests fixent les trois
+ * garanties qui rendent la restitution acceptable — elle ne parle que de ce
+ * qu'elle a reconnu, elle se tait quand elle doute, et elle ne recopie aucun
+ * chiffre lu dans l'image.
+ *
+ * Les extraits ci-dessous sont des relevés d'OCR **réels**, pris sur les
+ * captures en ligne de Bell Wizard (Wazdan) et 3 Buzzing Wilds (Pragmatic).
+ */
+describe('légendes tirées du texte de la page', () => {
+  const PAGE_FORMATION_DES_GAINS =
+    'GAME RULES All wins are paid for combinations of the same symbol on active line, ' +
+    'from left to right, except SCATTER, which pays at any position on the reels. ' +
+    'Each new game costs one stake. On active line only higher win is paid.';
+
+  const PAGE_TABLE_DE_GAINS =
+    'GAME RULES X5 90.00 FUN X4 6.00 FUN X3 0.90 FUN X5 24.00 FUN X4 2.40 FUN ' +
+    'X3 0.45 FUN X5 12.00 FUN X4 2.10 FUN X3 0.36 FUN';
+
+  const PAGE_RTP =
+    'GAME RULES Malfunction voids all pays and plays. Game average return to player: 96.50% ' +
+    'MAIN GAME Play Button Click to start playing at the current bet level.';
+
+  const PAGE_ILLISIBLE = 'Qganvie rullo Mve nvlld K 9 7 a xr fo Itvividll tt lmt vinl';
+
+  it('reconnaît le sujet de la page dans le texte du studio', () => {
+    expect(lirePageDeRegles(PAGE_FORMATION_DES_GAINS)?.sujet).toBe('formationDesGains');
+    expect(lirePageDeRegles(PAGE_TABLE_DE_GAINS)?.sujet).toBe('tableDeGains');
+    expect(lirePageDeRegles(PAGE_RTP)?.sujet).toBe('chiffresDuJeu');
+  });
+
+  it('se tait quand elle ne reconnaît rien', () => {
+    expect(lirePageDeRegles(PAGE_ILLISIBLE)).toBeNull();
+    expect(lirePageDeRegles('')).toBeNull();
+    expect(lirePageDeRegles(null)).toBeNull();
+    // Et la capture retombe alors sur la légende générique, qui est vraie.
+    expect(legendeDeCapture({ titre: 'Game rules, page 4', texte: PAGE_ILLISIBLE }, FAITS, 'fr')).toBe(
+      "Une page du panneau de règles, telle que le jeu l'affiche.",
+    );
+  });
+
+  it('restitue dans les trois langues ce que la page explique', () => {
+    const attendu: Record<'en' | 'fr' | 'de', string> = {
+      fr: 'de gauche à droite sur les lignes actives',
+      en: 'from left to right on the active paylines',
+      de: 'von links nach rechts auf den aktiven Gewinnlinien',
+    };
+    for (const langue of ['en', 'fr', 'de'] as const) {
+      const texte = legendeDeCapture({ titre: 'Game rules, page 2', texte: PAGE_FORMATION_DES_GAINS }, FAITS, langue);
+      expect(texte).toContain(attendu[langue]);
+      // Le Scatter qui paie partout est dit, parce que le panneau le dit.
+      expect(texte.length).toBeGreaterThan(80);
+    }
+  });
+
+  /*
+   * Le cœur de la règle « on n'invente rien » : la table de gains est montrée,
+   * jamais transcrite. Vingt-sept petits nombres recopiés d'une image, c'est la
+   * façon la plus sûre d'introduire une erreur — et elle serait publiée sous la
+   * signature du site, dans trois langues.
+   */
+  it('ne recopie aucune valeur de symbole lue dans la table de gains', () => {
+    for (const langue of ['en', 'fr', 'de'] as const) {
+      const texte = legendeDeCapture({ titre: 'Game rules, page 1', texte: PAGE_TABLE_DE_GAINS }, FAITS, langue);
+      expect(texte).not.toMatch(/90|24|12|0[.,]45|0[.,]36|FUN/);
+    }
+  });
+
+  it('les chiffres de la légende viennent de la fiche, pas de cette lecture-ci', () => {
+    // Le panneau lu annonce 96,50 % ; la fiche porte 96,51 %, vérifié à la
+    // campagne et borné. C'est la fiche qui parle : une seconde lecture d'OCR
+    // n'a pas à contredire en légende ce que la page affiche en grand.
+    const texte = legendeDeCapture({ titre: 'Game rules, page 4', texte: PAGE_RTP }, FAITS, 'fr');
+    expect(texte).toContain('96,51');
+    expect(texte).not.toContain('96,50');
+  });
+
+  it('un nom de page donné par le studio l’emporte sur la déduction', () => {
+    /*
+     * « BUY FREE SPINS » est un bouton permanent de l'habillage Pragmatic : il
+     * figure sur des pages qui ne parlent pas d'achat. Sur 3 Buzzing Wilds, il
+     * faisait passer la page « Expanding wilds » pour une page d'achat.
+     */
+    const texte = legendeDeCapture(
+      { titre: 'Expanding wilds', texte: 'GAME RULES BUY FREE SPINS expanding wild symbol' },
+      FAITS,
+      'fr',
+    );
+    expect(texte).toBe('La mécanique expliquée par le jeu lui-même, dans ses propres termes.');
+  });
+
+  it('ne dépasse pas cinq phrases, chiffres compris', () => {
+    const pragmatic =
+      'GAME RULES LOW VOLATILITY All symbols pay from left to right on selected paylines. ' +
+      'All wins are multiplied by bet per line. Only the highest win is paid per line. ' +
+      'When winning on multiple paylines, all wins are added to the total win. ' +
+      'The maximum RTP of this game is 96.03% The minimum RTP of this game is 96.02% ' +
+      'The maximum RTP of the game when using "BUY FREE SPINS" is 96.02% ' +
+      'MINIMUM BET: $0.20 MAXIMUM BET: $240.00 Malfunction voids all pays and plays.';
+    for (const langue of ['en', 'fr', 'de'] as const) {
+      const texte = legendeDeCapture({ titre: 'Game rules, page 4', texte: pragmatic }, FAITS, langue);
+      expect(texte.split(/(?<=[.!?])\s+/).length).toBeLessThanOrEqual(5);
+      // Le RTP de l'achat n'est pas celui du jeu : c'est le contresens le plus
+      // fréquent du secteur, il ne doit jamais être la phrase qu'on coupe.
+      expect(texte).toMatch(/bought feature|partie achetée|gekaufte Feature/);
+    }
+  });
+
+  it('signale la suite plutôt que de répéter la même phrase', () => {
+    const lot = [
+      { titre: 'Game rules, page 1', texte: PAGE_TABLE_DE_GAINS },
+      { titre: 'Game rules, page 2', texte: PAGE_TABLE_DE_GAINS },
+    ];
+    const [premiere, seconde] = legendesDeCaptures(lot, FAITS, 'fr');
+    expect(premiere).not.toContain('Suite');
+    expect(seconde).toContain('Suite de la page précédente.');
+    expect(seconde.startsWith(premiere)).toBe(true);
+  });
+
+  it('deux pages illisibles ne sont pas « la suite » l’une de l’autre', () => {
+    const lot = [
+      { titre: 'Game rules, page 6', texte: PAGE_ILLISIBLE },
+      { titre: 'Game rules, page 7', texte: PAGE_ILLISIBLE },
+    ];
+    expect(legendesDeCaptures(lot, FAITS, 'fr').every((l) => !l.includes('Suite'))).toBe(true);
+  });
+
+  /*
+   * « Land 3 FS scatter symbols » et « Land 4 FS scatter symbols » cohabitent
+   * sur la même page chez Hacksaw : deux bonus distincts. Retenir le premier
+   * publierait un déclenchement faux.
+   */
+  it('ne lit un nombre neuf que si la page est unanime', () => {
+    const unique = 'BONUS Land 3 FS scatter symbols at the same time in the base game to activate the bonus feature with 10 free spins.';
+    expect(legendeDeCapture({ titre: 'Game rules, page 2', texte: unique }, FAITS, 'fr')).toContain(
+      '3 Scatters simultanés',
+    );
+    const contradictoire = `${unique} Land 4 FS scatter symbols at the same time to activate the second bonus feature.`;
+    expect(legendeDeCapture({ titre: 'Game rules, page 2', texte: contradictoire }, FAITS, 'fr')).not.toContain(
+      'Scatters simultanés',
+    );
+  });
+
+  it('la volatilité lue dans le panneau n’est jamais republiée telle quelle', () => {
+    /*
+     * Chez Wazdan, une section « Volatility Levels » décrit un **réglage** du
+     * joueur, pas le jeu : l'y lire aurait étiqueté 259 fiches sur 261 en
+     * « volatilité haute ». La reconnaître aide à situer la page ; la répéter
+     * serait faux. Seule la valeur de la fiche a le droit d'être dite.
+     */
+    const page = 'GAME RULES VOLATILITY LEVELS High volatility Low volatility Medium volatility';
+    const sans = { ...FAITS, rtp: null, gainMax: null, volatilite: null };
+    const texte = legendeDeCapture({ titre: 'Game rules, page 3', texte: page }, sans, 'fr');
+    expect(texte).not.toMatch(/volatilité (?:haute|basse|moyenne)/);
+  });
+
+  /*
+   * ── Ce que la base porte, et ce que le site en fait ─────────────────────
+   *
+   * La reconnaissance se fait une fois, au moment de la capture, et c'est son
+   * verdict qui est rangé dans la fiche — pas le texte OCR, qui coûterait une
+   * dizaine de kilooctets par fiche envoyés au navigateur pour n'être affiché
+   * dans aucune des trois langues.
+   *
+   * Deux chemins, donc, et une seule phrase attendue au bout : ce qu'un script
+   * montre en simulation doit être exactement ce que le visiteur lira.
+   */
+  describe('la lecture rangée dans la capture', () => {
+    it('donne la même phrase que le texte dont elle est tirée', () => {
+      for (const page of [PAGE_FORMATION_DES_GAINS, PAGE_TABLE_DE_GAINS, PAGE_RTP]) {
+        for (const langue of ['en', 'fr', 'de'] as const) {
+          const parLeTexte = legendeDeCapture({ titre: 'Game rules, page 2', texte: page }, FAITS, langue);
+          // Le passage par JSON n'est pas décoratif : c'est le voyage réel du
+          // champ, de la colonne `captures` jusqu'au composant.
+          const parLaLecture = legendeDeCapture(
+            { titre: 'Game rules, page 2', lecture: JSON.parse(JSON.stringify(lireCapture(page))) },
+            FAITS,
+            langue,
+          );
+          expect(parLaLecture).toBe(parLeTexte);
+        }
+      }
+    });
+
+    it('emporte les chiffres de déclenchement, seul endroit où ils se lisent', () => {
+      const page =
+        'BONUS Land 3 FS scatter symbols at the same time in the base game to activate ' +
+        'the bonus feature with 10 free spins.';
+      const lecture = lireCapture(page);
+      expect(lecture?.scatters).toBe(3);
+      expect(lecture?.tours).toBe(10);
+      expect(legendeDeCapture({ titre: 'Game rules, page 2', lecture }, FAITS, 'fr')).toContain(
+        '3 Scatters simultanés',
+      );
+    });
+
+    /*
+     * Le champ vient d'une colonne JSON écrite par un script : entre l'écriture
+     * et la lecture, rien ne garantit sa forme. Une fiche ne tombe pas pour
+     * autant — la légende générique reprend la main, comme sur une page
+     * illisible.
+     */
+    it('retombe sur le modèle générique devant une forme inattendue', () => {
+      for (const valeur of [null, 'tableDeGains', 42, {}, { sujet: 'cequejeveux' }, []]) {
+        expect(lectureStockee(valeur)).toBeNull();
+        expect(legendeDeCapture({ titre: 'Game rules, page 5', lecture: valeur }, FAITS, 'fr')).toBe(
+          "Une page du panneau de règles, telle que le jeu l'affiche.",
+        );
+      }
+    });
+
+    /*
+     * « Lue, rien de sûr » et « pas encore lue » sont deux états distincts :
+     * c'est ce qui permet au rattrapage de reprendre une passe de quatre heures
+     * sans relire ce qui l'a déjà été. Les deux affichent la même phrase.
+     */
+    it('ne dit rien de plus quand la page a été lue sans rien donner', () => {
+      expect(lireCapture(PAGE_ILLISIBLE)).toBeNull();
+      expect(legendeDeCapture({ titre: 'Game rules, page 6', lecture: null }, FAITS, 'de')).toBe(
+        'Eine Seite des Regelwerks, wie das Spiel sie zeigt.',
+      );
+    });
   });
 });

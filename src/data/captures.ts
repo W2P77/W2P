@@ -17,10 +17,24 @@
  * vingt-sept petits nombres lus dans une image est exactement la manière dont
  * une erreur entre dans une fiche. La capture montre, le texte résume.
  */
+import type { LectureDeCapture } from '@/lib/legendes';
+
 export interface Capture {
   fichier: string;
   titre: string;
   legende: string;
+  /**
+   * Ce que la page de règles explique, reconnu au moment de la capture.
+   *
+   * Pas le texte OCR : le sujet de la page et les codes des formulations
+   * reconnues, une centaine d'octets. Le texte brut n'est jamais publié — il
+   * pèserait une dizaine de kilooctets par fiche dans la page, et personne ne
+   * l'a relu. Voir `LectureDeCapture` dans `src/lib/legendes.ts`.
+   *
+   * Absent sur les captures d'avant ce chantier, et sur celles dont l'OCR n'a
+   * rien permis d'affirmer : la légende générique reprend alors la main.
+   */
+  lecture?: LectureDeCapture | null;
 }
 
 export interface CapturesDeJeu {

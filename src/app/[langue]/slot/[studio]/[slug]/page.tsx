@@ -277,6 +277,7 @@ export default async function PageJeu({
               captures={jeu.captures}
               faitesLe={jeu.capturesLe}
               faits={{ rtp, gainMax: jeu.gainMaxMultiple, volatilite: jeu.volatilite }}
+              langue={langue}
             />
 
             {/*

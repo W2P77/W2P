@@ -217,8 +217,19 @@ export async function fermerLeLecteur(): Promise<void> {
  *
  * Partagé entre la recherche (ci-dessus) et le contrôle final du script :
  * c'est le même critère, il ne doit pas diverger.
+ *
+ * La clause de nullité — « MALFUNCTION VOIDS ALL PAYS AND PLAYS. » — est là
+ * pour les studios qui **n'impriment pas leur RTP dans le jeu**. Chez
+ * 1spin4win, 2 panneaux sur 10 seulement portent la ligne « RTP - 97.40% » ;
+ * les huit autres s'ouvraient correctement, se faisaient photographier, et
+ * étaient jetés faute de témoin, puis rechargés à la campagne suivante pour
+ * le même sort. La mention, elle, est peinte sur **chaque** page de leur
+ * panneau. Élargir une alternance ne peut que faire correspondre davantage :
+ * la recherche d'icône de Pragmatic ne lit que la bande haute (y 30–220), où
+ * cette phrase ne figure jamais.
  */
-export const EN_TETE_PANNEAU = /RTP|GAME RULES|PAYTABLE/i;
+export const EN_TETE_PANNEAU =
+  /RTP|GAME RULES|PAYTABLE|MALFUNCTION VOIDS ALL PAYS/i;
 
 /**
  * La barre de commandes de l'habillage **historique** de Pragmatic.
@@ -356,7 +367,22 @@ export function extraireLesFaits(texte: string, pages: FaitsLus['pages'] = []): 
   const bandeauEvoplay =
     new RegExp(`\\(\\s*RTP\\s+${CHIFFRE}\\s*%`, 'i').exec(t)?.[1] ?? null;
 
-  let brutHaut = lire('theoretical') ?? lire('maximum') ?? formulationWazdan ?? bandeauEvoplay;
+  /*
+   * 1spin4win écrit « RTP - 97.40% » en tout petit dans l'angle haut-gauche de
+   * sa table de gains, sans verbe et sans « return to player » : aucune des
+   * règles ci-dessus ne l'attrape. Ce n'est pas ce qui débloque le studio —
+   * ses 226 fiches ont déjà leur taux en source studio — c'est un contrôle :
+   * là où le panneau a pu être lu, il confirmait la base au centième.
+   */
+  const bandeau1spin4win =
+    new RegExp(`RTP\\s*[-–—:]\\s*${CHIFFRE}\\s*%`, 'i').exec(t)?.[1] ?? null;
+
+  let brutHaut =
+    lire('theoretical') ??
+    lire('maximum') ??
+    formulationWazdan ??
+    bandeauEvoplay ??
+    bandeau1spin4win;
   let brutBas = lire('minimum');
 
   /*

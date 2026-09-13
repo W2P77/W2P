@@ -1,10 +1,8 @@
-'use client';
-
 import { GalerieCaptures } from './GalerieCaptures';
 import type { Capture } from '@/data/captures';
-import { useLangue } from '@/i18n/useLangue';
-import { remplir } from '@/i18n/textes';
-import { legendeDeCapture, titreDeCapture, type FaitsDeCapture } from '@/lib/legendes';
+import type { Langue } from '@/i18n/langues';
+import { remplir, textes } from '@/i18n/textes';
+import { legendesDeCaptures, titreDeCapture, type FaitsDeCapture } from '@/lib/legendes';
 
 /**
  * Les captures faites dans la démo officielle du studio.
@@ -20,6 +18,19 @@ import { legendeDeCapture, titreDeCapture, type FaitsDeCapture } from '@/lib/leg
  * La date de capture est affichée, et ce n'est pas une coquetterie : un studio
  * peut livrer une nouvelle version d'un jeu avec des valeurs différentes. Une
  * capture sans date prétend valoir pour toujours.
+ *
+ * ── Pourquoi ce composant ne part plus dans le navigateur ─────────────────
+ *
+ * Il était `'use client'` pour une seule raison : `useLangue()` lit la langue
+ * dans le chemin. Mais la page la connaît déjà — elle est dans l'URL, donc
+ * dans ses paramètres — et l'écrire en propriété évite d'entraîner
+ * `src/lib/legendes.ts` dans le lot client : **11 ko gzip** de vocabulaire de
+ * panneaux et de phrases en trois langues, sur chacune des fiches de jeu, pour
+ * un texte que le serveur sait écrire tout seul. Le catalogue voisin a déjà
+ * payé ce genre d'import à 11,4 Mo de bundle.
+ *
+ * Seule la galerie reste cliente : c'est l'agrandissement au clic qui a besoin
+ * du navigateur, pas la légende.
  */
 export function CapturesJeu({
   jeu,
@@ -27,14 +38,16 @@ export function CapturesJeu({
   captures,
   faitesLe,
   faits,
+  langue,
 }: {
   jeu: string;
   slug: string;
   captures: unknown;
   faitesLe: Date | null;
   faits: Omit<FaitsDeCapture, 'nom'>;
+  langue: Langue;
 }) {
-  const { langue, t } = useLangue();
+  const t = textes(langue);
   /*
    * Le champ vient d'une colonne JSON : rien ne garantit sa forme à la
    * lecture. On la vérifie ici plutôt que de laisser une fiche tomber en 500
@@ -57,11 +70,24 @@ export function CapturesJeu({
    * La légende est calculée ici, pas lue en base : 5 018 captures sur 6 777
    * n'en avaient aucune, et celles qui existaient étaient en anglais sur les
    * trois versions du site. Voir `src/lib/legendes.ts`.
+   *
+   * ── Pourquoi la fiche entière d'un coup ──────────────────────────────────
+   *
+   * Une capture seule ne sait pas que la page précédente disait déjà la même
+   * chose. Or une table de gains tient couramment sur deux ou trois pages, et
+   * chacune mérite à bon droit la même phrase — ce qui reste un doublon dans la
+   * page. `legendesDeCaptures` marque les suites au lieu de les répéter, et il
+   * lui faut la série pour ça.
+   *
+   * Les titres sont traduits **après** : c'est le titre anglais du pipeline qui
+   * dit de quel écran il s'agit, et le traduire d'abord ferait passer toutes
+   * les pages de règles pour des écrans inconnus.
    */
-  const legendees = lot.map((c) => ({
+  const legendes = legendesDeCaptures(lot, { ...faits, nom: jeu, slug }, langue);
+  const legendees = lot.map((c, i) => ({
     ...c,
     titre: titreDeCapture(c.titre, langue),
-    legende: legendeDeCapture(c, { ...faits, nom: jeu, slug }, langue),
+    legende: legendes[i],
   }));
 
   return (

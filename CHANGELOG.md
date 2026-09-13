@@ -2,6 +2,102 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-13 — 1spin4win branché, et le témoin qui jetait ses captures
+
+**226 fiches attendaient une seule chose : des coordonnées.** Le lanceur de
+1spin4win est direct — pas de jeton, pas de Cloudflare, pas de fenêtre à
+ouvrir sur le poste : un `<canvas>` 1280×719, un bouton de démarrage à
+(640, 709), l'icône « i » de la barre du bas à (148, 727). Deux ancres fixes,
+parce qu'elles appartiennent au lanceur ; tout le reste — la flèche « page
+suivante », la pastille d'achat de bonus — **bouge avec l'habillage** et est
+mesuré à l'image, comme la plus grosse tache claire *compacte* d'une fenêtre
+étroite. Trois pièges payés à la reconnaissance sont documentés dans le
+fichier : le bouton de démarrage change de couleur d'un jeu à l'autre (vert
+ici, bleu là-bas), le néon qui cerne le panneau pèse plus lourd que la flèche,
+et deux pages voisines peuvent être visuellement identiques — s'arrêter au
+premier écran immobile rendait quatre pages sur six, en silence.
+
+**Le témoin d'entrée dans le panneau rejetait des captures parfaitement
+bonnes.** `EN_TETE_PANNEAU` exigeait « RTP », « GAME RULES » ou « PAYTABLE »
+dans l'OCR d'au moins une page. Or 1spin4win **n'imprime son taux que sur une
+minorité de ses jeux** : sur dix panneaux ouverts et photographiés, deux
+seulement portent la ligne « RTP - 97.40% ». Les huit autres repartaient en
+file avec leurs quatre à sept captures jetées, pour être rechargés à la
+campagne suivante et subir le même sort. La mention de nullité —
+« MALFUNCTION VOIDS ALL PAYS AND PLAYS. » — est peinte sur **chaque** page de
+leur panneau et se lit sans faute : le témoin l'accepte désormais, et le studio
+passe de 1 jeu sur 10 à 10 sur 10. Élargir une alternance ne peut que faire
+correspondre davantage, et la recherche d'icône de Pragmatic ne lit que la
+bande haute, où cette phrase ne figure jamais.
+
+**Le taux, quand il est affiché, est maintenant lu** — « RTP - 97.40% », sans
+verbe, échappait à toutes les règles existantes. Ce n'est pas ce qui débloque
+le studio : ses fiches ont déjà leur taux en source studio. C'est un contrôle,
+et il est bon — là où le panneau a pu être lu, il confirmait la base au
+centième (Brumbys 243 : 97,60 ; Fruit Cafe 20 : 97,00 ; Lucky Clover 27 :
+96,90).
+
+## 2026-09-13 — Les légendes disent enfin ce que la capture montre
+
+**53,9 % des légendes du site étaient des doublons à l'intérieur de leur propre
+fiche**, et 99,3 % des fiches à captures en portaient au moins un : 16 827
+phrases en trop sur 31 200, dont 5 468 sur les seules pages de panneau. Sept
+pages de règles différentes — la table de gains, la règle de formation des
+gains, le RTP, le menu de jeu automatique, les réglages, les mentions de fin —
+recevaient toutes « Une page du panneau de règles, telle que le jeu l'affiche ».
+La légende était dérivée du **type** de la capture, et le type ne sait rien dire
+de plus.
+
+**Ce qui change : la reconnaissance se fait à l'écriture, pas au rendu.** Le
+pipeline lit déjà chaque page de panneau par OCR pour y chercher le RTP. Ce
+texte servait une fois puis disparaissait ; il est maintenant confronté à 43
+formulations relevées au mot près chez Pragmatic, Wazdan, Hacksaw et BGaming,
+rattachées à 15 sujets. Ce qui part en base, c'est le **verdict** — le sujet de
+la page, les codes des formulations reconnues, au plus deux chiffres de
+déclenchement —, une centaine d'octets rangés dans le champ `lecture` de la
+capture.
+
+**Le texte OCR, lui, ne part pas.** Le publier coûterait une dizaine de
+kilooctets par fiche expédiés au navigateur, pour une prose que personne n'a
+relue et qui n'est affichée dans aucune des trois langues. BetsRank a déjà payé
+cette facture à 11,4 Mo de bundle. Chaque sujet porte une phrase **écrite et
+relue une fois** en français, en anglais et en allemand ; les chiffres viennent
+de la fiche, jamais de l'image.
+
+**On ne traduit jamais l'OCR, et on ne devine pas.** Sous le seuil de preuve,
+`lireCapture` rend `null` et la légende générique reste — elle est vraie, elle
+est juste pauvre. Un nombre lu à neuf ne l'est que s'il est **unanime** dans la
+page : « Land 3 FS scatter symbols » et « Land 4 FS scatter symbols »
+cohabitent chez Hacksaw, et retenir le premier publierait un déclenchement
+faux. Les valeurs de symboles ne sont jamais transcrites : recopier vingt-sept
+petits nombres lus dans une image est la façon la plus sûre d'introduire une
+erreur, et elle serait signée par le site en trois langues.
+
+**Une table de gains sur trois pages n'est pas trois fois la même page.** Les
+légendes sont donc calculées pour la fiche entière et non capture par capture :
+la répétition est signalée — « Suite de la page précédente » — plutôt que
+réécrite. Le dire est exact, et ça rend la série lisible.
+
+**Le bloc des captures ne part plus dans le navigateur.** `CapturesJeu` était
+`'use client'` pour une seule raison — `useLangue()` lit la langue dans le
+chemin — et entraînait `src/lib/legendes.ts` avec lui : le vocabulaire des
+panneaux et les phrases en trois langues pèsent **11 ko gzip**, servis sur
+chacune des 1 090 fiches publiées. La page connaît déjà la langue, elle est
+dans son URL ; elle la passe en propriété, le composant redevient serveur, et
+le module disparaît du lot client — **4,5 ko de moins qu'avant ce chantier**,
+alors que le module a quadruplé. Seule la galerie reste cliente : c'est
+l'agrandissement au clic qui a besoin du navigateur, pas la légende.
+
+**Le rattrapage.** `scripts/relire-legendes-captures.ts` relit les 6 652 pages
+de panneau déjà en ligne, là où elles sont publiées : les images existent, le
+panneau y est lisible, il suffisait de les rouvrir. `capturesLe` étant posé,
+aucune campagne ne les aurait reprises. La passe n'écrit que le champ `lecture`
+— ni RTP, ni volatilité, ni légende existante — et ne consomme aucun build :
+les fiches changent à la revalidation ISR suivante. Une page lue sans rien
+donner reçoit `null`, qui veut dire « lue, rien de sûr » et non « pas encore
+lue » : c'est la différence qui rend la passe interruptible et relançable sans
+refaire trois heures d'OCR.
+
 ## 2026-09-13 — Une recherche instantanée, groupée par catégorie
 
 Le champ de l'accroche postait vers `/catalogue` et n'affichait rien avant le

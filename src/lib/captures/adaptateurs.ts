@@ -274,6 +274,8 @@ import { HACKSAW } from './adaptateur-hacksaw';
 import { RED_TIGER } from './adaptateur-red-tiger';
 import { WAZDAN } from './adaptateur-wazdan';
 import { EVOPLAY } from './adaptateur-evoplay';
+import { AMUSNET } from './adaptateur-amusnet';
+import { UN_SPIN_4_WIN } from './adaptateur-1spin4win';
 
 /*
  * La clé est le `slug` du studio en base, pas son nom : c'est elle que
@@ -321,4 +323,13 @@ export const ADAPTATEURS: Record<string, Adaptateur> = {
    */
   'red-tiger': RED_TIGER,
   netent: RED_TIGER,
+  amusnet: AMUSNET,
+  /*
+   * Le lanceur 1spin4win est direct, sans jeton, et se laisse embarquer sans
+   * tete : ce sont les coordonnees qui manquaient, pas l'acces. 226 fiches qui
+   * ont deja leur RTP en source studio et a qui il ne manque qu'une capture
+   * pour etre publiables. La cle est entre quotes parce qu'elle commence par
+   * un chiffre.
+   */
+  '1spin4win': UN_SPIN_4_WIN,
 };

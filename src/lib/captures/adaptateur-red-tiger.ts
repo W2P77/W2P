@@ -562,7 +562,18 @@ export const RED_TIGER: Adaptateur = {
         .catch(() => false);
 
     /* ── 1. Le bas du règlement : la seule vue qui porte un chiffre ───────── */
-    if (!(await cliquer(cadre, AIDE))) return 0;
+    if (!(await cliquer(cadre, AIDE))) {
+      /*
+       * Un HELP qui refuse de s'ouvrir, c'est presque toujours la session qui
+       * vient de mourir sous nos pieds : le lanceur a rendu « You are logged
+       * out » pendant qu'on jouait, et le cadre n'affiche plus rien de
+       * cliquable. Rendre 0 remettrait le jeu en file et la campagne
+       * continuerait à ouvrir des démos dans le ban, ce qui le prolonge —
+       * exactement ce que `LimiteDeDebit` existe pour empêcher.
+       */
+      if (await auBan(page)) throw new LimiteDeDebit('fansite.evo-games.com');
+      return 0;
+    }
     await page.waitForTimeout(4_500);
 
     /*
