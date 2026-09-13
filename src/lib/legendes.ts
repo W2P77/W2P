@@ -544,6 +544,158 @@ const ENONCES: Enonce[] = [
     motifs: [/hold\s*(?:&|and)\s*win/i, /respin\s+feature/i],
   },
 
+  /*
+   * ── La famille « Hold the Jackpot » de Wazdan ──────────────────────────
+   *
+   * Wazdan pèse 2 207 des 8 951 pages de panneau du site, un quart, et la
+   * quasi-totalité de ses jeux à jackpot rejouent le même texte au mot près —
+   * seuls le chiffre du déclenchement (« 4 … on the middle row », « at least
+   * 6 ») et le nombre de rouleaux changent. Ces pages étaient muettes à 60-70 %
+   * alors que leur OCR est parfaitement lisible : ce n'était pas un problème
+   * d'image mais un trou de vocabulaire, `hold-and-win` ne reconnaissant que
+   * « hold & win » et « respin feature ».
+   *
+   * Aucun de ces énoncés ne cite un chiffre : ils varient d'un jeu à l'autre
+   * dans la même famille, et les recopier publierait un déclenchement faux sur
+   * les fiches voisines.
+   */
+  {
+    code: 'hold-the-jackpot',
+    sujet: 'holdAndWin',
+    poids: 3,
+    motifs: [/activates?\s+the\s+Hold\s+the\s+Jackpot/i, /Hold\s+the\s+Jackpot\s*(?:™)?\s+Bonus\s+Game/i],
+    dit: {
+      en: 'Bonus symbols landing in sufficient number open the Hold the Jackpot bonus game.',
+      fr: 'Les symboles Bonus, en nombre suffisant, ouvrent le jeu bonus Hold the Jackpot.',
+      de: 'Bonussymbole öffnen in ausreichender Zahl das Hold-the-Jackpot-Bonusspiel.',
+    },
+  },
+  {
+    code: 'aucun-symbole-ordinaire',
+    sujet: 'holdAndWin',
+    poids: 3,
+    motifs: [/no\s+regular\s+symbols\s+in\s+the\s+base\s+game/i],
+    dit: {
+      en: 'The base game holds no regular symbols: every prize is won inside the bonus game.',
+      fr: "Le jeu de base ne contient aucun symbole ordinaire : tous les gains se remportent dans le jeu bonus.",
+      de: 'Das Basisspiel enthält keine regulären Symbole: Alle Gewinne fallen im Bonusspiel.',
+    },
+  },
+  {
+    code: 'symboles-collants',
+    sujet: 'holdAndWin',
+    poids: 3,
+    motifs: [/stick\s+to\s+the\s+reels/i, /locked\s+in\s+place\s+while\s+other\s+symbols\s+are\s+spun/i],
+    dit: {
+      en: 'Certain symbols stick to the reels and stay locked there while the others keep spinning.',
+      fr: 'Certains symboles se collent aux rouleaux et y restent verrouillés pendant que les autres tournent.',
+      de: 'Bestimmte Symbole haften an den Walzen und bleiben dort fixiert, während die übrigen weiterdrehen.',
+    },
+  },
+  {
+    code: 'respins-relances',
+    sujet: 'holdAndWin',
+    poids: 3,
+    motifs: [/Re-?Spins?\s+are\s+granted/i, /resets\s+the\s+number\s+of\s+Re-?Spins/i],
+    dit: {
+      en: 'Each new bonus symbol resets the re-spin counter.',
+      fr: 'Chaque nouveau symbole Bonus relance le compteur de re-spins.',
+      de: 'Jedes neue Bonussymbol setzt den Re-Spin-Zähler zurück.',
+    },
+  },
+  {
+    code: 'fin-du-jeu-bonus',
+    sujet: 'holdAndWin',
+    poids: 2,
+    motifs: [
+      /Bonus\s+Game\s+continues\s+until\s+Re-?Spins\s+are\s+finished/i,
+      /all\s+reels\s+are\s+filled\s+with\s+Bonus\s+symbols/i,
+    ],
+    dit: {
+      en: 'The bonus game runs until the re-spins are exhausted or every reel is filled.',
+      fr: "Le jeu bonus se poursuit jusqu'à épuisement des re-spins, ou jusqu'à ce que tous les rouleaux soient remplis.",
+      de: 'Das Bonusspiel läuft, bis die Re-Spins aufgebraucht sind oder alle Walzen gefüllt wurden.',
+    },
+  },
+  {
+    code: 'jackpots-fixes',
+    sujet: 'holdAndWin',
+    poids: 3,
+    motifs: [/MINI,?\s+MINOR,?\s+and\s+MAJOR\s+Jackpot\s+symbols/i],
+    dit: {
+      en: 'MINI, MINOR and MAJOR jackpot symbols can appear during the bonus game and pay the matching jackpot.',
+      fr: 'Les symboles Jackpot MINI, MINOR et MAJOR peuvent apparaître pendant le jeu bonus et versent le jackpot correspondant.',
+      de: 'MINI-, MINOR- und MAJOR-Jackpot-Symbole können im Bonusspiel erscheinen und zahlen den jeweiligen Jackpot.',
+    },
+  },
+  {
+    code: 'grand-jackpot',
+    sujet: 'holdAndWin',
+    poids: 3,
+    motifs: [/GRAND\s+Jackpot\s+is\s+the\s+maximum\s+prize/i, /Collecting\s+all\s+\d+\s+Bonus\s+symbols/i],
+    dit: {
+      en: 'Filling the whole grid with bonus symbols awards the GRAND jackpot, the top prize of the game.',
+      fr: 'Remplir toute la grille de symboles Bonus décroche le GRAND Jackpot, le gain le plus élevé du jeu.',
+      de: 'Wer das gesamte Feld mit Bonussymbolen füllt, gewinnt den GRAND Jackpot, den Höchstgewinn des Spiels.',
+    },
+  },
+  {
+    code: 'symbole-collecteur',
+    sujet: 'symbolesSpeciaux',
+    poids: 3,
+    // Le facteur varie — 1-20x sur 12 Bells, 1-10x sur Mighty Wild: Panther —
+    // donc il n'est pas dit.
+    motifs: [/Collector\s+symbol\s+accumulates/i],
+    dit: {
+      en: 'A collector symbol gathers the values shown on screen and multiplies them at random.',
+      fr: "Un symbole Collecteur réunit les valeurs présentes à l'écran et les multiplie au hasard.",
+      de: 'Ein Collector-Symbol sammelt die auf dem Bildschirm gezeigten Werte und multipliziert sie zufällig.',
+    },
+  },
+  {
+    code: 'symbole-mystere',
+    sujet: 'symbolesSpeciaux',
+    poids: 3,
+    motifs: [/Mystery\s+symbol\s+can\s+(?:only\s+)?transform\s+into/i],
+    dit: {
+      en: 'A mystery symbol turns into another bonus symbol, revealed at the end of the round.',
+      fr: 'Un symbole Mystère se transforme en un autre symbole Bonus, révélé à la fin de la partie.',
+      de: 'Ein Mystery-Symbol verwandelt sich in ein anderes Bonussymbol, das am Ende der Runde aufgedeckt wird.',
+    },
+  },
+
+  /*
+   * ── Les classiques de Wazdan ───────────────────────────────────────────
+   *
+   * L'autre moitié du catalogue du studio : des machines à fruits dont le
+   * panneau tient en sept pages, lisibles sauf la table de gains elle-même,
+   * qui n'est faite que d'images et de nombres.
+   */
+  {
+    code: 'gains-pour-mise-minimale',
+    sujet: 'tableDeGains',
+    poids: 3,
+    motifs: [/Paytable\s+shows\s+the\s+win\s+for\s+minimal\s+bet/i],
+    dit: {
+      en: 'The paytable shows the wins for the minimum bet.',
+      fr: 'La table de gains affiche les gains pour la mise minimale.',
+      de: 'Die Gewinntabelle zeigt die Gewinne für den Mindesteinsatz.',
+    },
+  },
+  {
+    code: 'wild-etend-les-lignes',
+    sujet: 'lignesDePaiement',
+    poids: 3,
+    // « WILD on any position changes 7 winning lines into 81 in current game » :
+    // les deux nombres changent d'un jeu à l'autre, la regle non.
+    motifs: [/changes?\s+\d+\s+winning\s+lines?\s+into\s+\d+/i],
+    dit: {
+      en: 'A wild anywhere on the reels extends the number of winning lines for that spin.',
+      fr: "Un Wild, où qu'il tombe, étend le nombre de lignes gagnantes pour ce tour.",
+      de: 'Ein Wild erweitert – wo immer es landet – die Anzahl der Gewinnlinien für diesen Dreh.',
+    },
+  },
+
   // ── Les symboles ───────────────────────────────────────────────────────
   {
     code: 'wild-substitue',

@@ -324,4 +324,60 @@ describe('légendes tirées du texte de la page', () => {
       );
     });
   });
+
+  /*
+   * ── La famille « Hold the Jackpot » de Wazdan ──────────────────────────
+   *
+   * Un quart des pages de panneau du site. Les extraits ci-dessous sont l'OCR
+   * réel de 12 Bells et de Mighty Wild: Panther, recopié tel quel, coquilles
+   * de Tesseract comprises : c'est ce que la passe voit, et le test ne vaut
+   * que s'il lit la même chose qu'elle.
+   */
+  describe('le panneau de Wazdan', () => {
+    const DECLENCHEMENT =
+      "Drawing at least 6 Hold the Jackpot Bonus symbols activates the Hold the Jackpot Bonus Game. " +
+      'There are no regular symbols in the base game and prizes can only be won in the Bonus Game.';
+    const RESPINS =
+      'All Bonus symbols stick to the reels during the Bonus Game. ' +
+      '3 Re-Spins are granted at the beginning of the Bonus Game. ' +
+      'Each new Bonus symbol resets the number of Re-Spins to 3. ' +
+      'The Bonus Game continues until Re-Spins are finished, or all reels are filled with Bonus symbols.';
+
+    const WAZDAN = { slug: '12-bells', nom: '12 Bells', rtp: null, gainMax: null, volatilite: null };
+
+    it('reconnaît la mécanique là où le vocabulaire « hold & win » ne voyait rien', () => {
+      expect(lirePageDeRegles(DECLENCHEMENT)?.sujet).toBe('holdAndWin');
+      expect(lirePageDeRegles(RESPINS)?.sujet).toBe('holdAndWin');
+    });
+
+    /*
+     * C'est tout l'objet du chantier : deux pages du même panneau ne peuvent
+     * pas recevoir la même phrase. Avant, elles en recevaient une seule pour
+     * sept pages.
+     */
+    it('donne deux phrases différentes à deux pages différentes', () => {
+      const a = legendeDeCapture({ titre: 'Game rules, page 1', lecture: lireCapture(DECLENCHEMENT) }, WAZDAN, 'fr');
+      const b = legendeDeCapture({ titre: 'Game rules, page 3', lecture: lireCapture(RESPINS) }, WAZDAN, 'fr');
+      expect(a).not.toBe(b);
+      expect(a).toContain('jeu bonus Hold the Jackpot');
+      expect(b).toContain('compteur de re-spins');
+    });
+
+    /*
+     * Le chiffre du déclenchement change à l'intérieur de la même famille —
+     * « at least 6 » sur Mighty Wild: Panther, « 4 … on the middle row » sur
+     * 12 Bells. Le recopier publierait un déclenchement faux sur la fiche
+     * voisine, qui rejoue le même texte au mot près.
+     */
+    it('ne recopie aucun chiffre lu dans l\'image', () => {
+      for (const langue of ['fr', 'en', 'de'] as const) {
+        const legende = legendeDeCapture(
+          { titre: 'Game rules, page 1', lecture: lireCapture(DECLENCHEMENT) },
+          WAZDAN,
+          langue,
+        );
+        expect(legende).not.toMatch(/\d/);
+      }
+    });
+  });
 });

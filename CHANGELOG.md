@@ -2,6 +2,34 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-13 — Le panneau de Wazdan se lit enfin (un quart du site)
+
+Wazdan pèse **2 207 des 8 951 pages de panneau** du site, et 60 à 70 % d'entre
+elles restaient muettes après le chantier des légendes. L'OCR n'y était pour
+rien — relu, il rend « Drawing at least 6 Hold the Jackpot Bonus symbols
+activates the Hold the Jackpot Bonus Game » sans une faute. C'était un trou de
+vocabulaire : l'énoncé `hold-and-win` ne connaissait que « hold & win » et
+« respin feature », deux formulations que ce studio n'emploie jamais.
+
+**Onze énoncés relevés au mot près** sur 12 Bells, Mighty Wild: Panther et
+Magic Fruits 81 : le déclenchement du jeu bonus, l'absence de symbole ordinaire
+en jeu de base, les symboles qui se collent aux rouleaux, la relance du
+compteur de re-spins, la fin de partie, les jackpots MINI/MINOR/MAJOR, le GRAND
+Jackpot, le Collecteur, le Mystère — plus deux pour les classiques à fruits, la
+table de gains lue à la mise minimale et le Wild qui étend les lignes.
+
+**Aucun ne cite un chiffre, et c'est verrouillé par un test.** Le déclenchement
+vaut « 4 symboles sur la rangée du milieu » sur 12 Bells et « au moins 6 » sur
+Mighty Wild: Panther, pour un texte par ailleurs identique au mot près ; le
+Collecteur multiplie par 1-20x ici et 1-10x là. Recopier ces nombres
+publierait une règle fausse sur la fiche voisine — le test refuse toute
+légende Wazdan qui contient un chiffre.
+
+Mesuré sur trois fiches représentatives avant la passe complète : **22 pages
+identifiées, 1 muette** — la seule restante étant la table de gains elle-même,
+qui n'est faite que d'images et de nombres. Auparavant, ces mêmes 23 pages
+donnaient 7 fois la même phrase.
+
 ## 2026-09-13 — 1spin4win branché, et le témoin qui jetait ses captures
 
 **226 fiches attendaient une seule chose : des coordonnées.** Le lanceur de
