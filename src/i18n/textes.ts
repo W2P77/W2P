@@ -203,6 +203,18 @@ const EN = {
   analyseTitre: 'Everything we know about this game',
   faqTitre: 'Frequently asked questions',
   sortiEn: 'released {annee}',
+
+  // ── La recherche instantanee (liste deroulante) ────────────────────────
+  rechercheGroupeJeux: 'Slots',
+  rechercheGroupeStudios: 'Providers',
+  rechercheGroupeGuides: 'Guides',
+  rechercheGroupeCasinos: 'Partner casinos',
+  rechercheEnCours: 'Searching…',
+  rechercheRien: 'Nothing matches “{terme}”.',
+  rechercheVoirTout: 'See every result for “{terme}”',
+  rechercheResultatsAria: 'Search results',
+  rechercheAstuce: 'Arrow keys to browse, Enter to open, Esc to close',
+  rechercheLienPartenaire: 'Sponsored link',
 } as const;
 
 export type CleTexte = keyof typeof EN;
@@ -378,6 +390,18 @@ const FR: Record<CleTexte, string> = {
   analyseTitre: 'Tout ce que nous savons de ce jeu',
   faqTitre: 'Questions fréquentes',
   sortiEn: 'sorti en {annee}',
+
+  // ── La recherche instantanee (liste deroulante) ────────────────────────
+  rechercheGroupeJeux: 'Machines à sous',
+  rechercheGroupeStudios: 'Fournisseurs',
+  rechercheGroupeGuides: 'Guides',
+  rechercheGroupeCasinos: 'Casinos partenaires',
+  rechercheEnCours: 'Recherche…',
+  rechercheRien: 'Rien ne correspond à « {terme} ».',
+  rechercheVoirTout: 'Voir tous les résultats pour « {terme} »',
+  rechercheResultatsAria: 'Résultats de recherche',
+  rechercheAstuce: 'Flèches pour parcourir, Entrée pour ouvrir, Échap pour fermer',
+  rechercheLienPartenaire: 'Lien partenaire',
 };
 
 const DE: Record<CleTexte, string> = {
@@ -551,6 +575,18 @@ const DE: Record<CleTexte, string> = {
   analyseTitre: 'Alles, was wir über dieses Spiel wissen',
   faqTitre: 'Häufige Fragen',
   sortiEn: 'erschienen {annee}',
+
+  // ── La recherche instantanee (liste deroulante) ────────────────────────
+  rechercheGroupeJeux: 'Slots',
+  rechercheGroupeStudios: 'Studios',
+  rechercheGroupeGuides: 'Ratgeber',
+  rechercheGroupeCasinos: 'Partner-Casinos',
+  rechercheEnCours: 'Suche läuft…',
+  rechercheRien: 'Nichts passt zu „{terme}“.',
+  rechercheVoirTout: 'Alle Treffer für „{terme}“ anzeigen',
+  rechercheResultatsAria: 'Suchergebnisse',
+  rechercheAstuce: 'Pfeiltasten zum Blättern, Enter zum Öffnen, Esc zum Schließen',
+  rechercheLienPartenaire: 'Partnerlink',
 };
 
 const TOUT: Record<Langue, Record<CleTexte, string>> = { en: EN, fr: FR, de: DE };

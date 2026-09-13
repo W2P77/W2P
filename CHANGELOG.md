@@ -2,6 +2,53 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-13 — Une recherche instantanée, groupée par catégorie
+
+Le champ de l'accroche postait vers `/catalogue` et n'affichait rien avant le
+rechargement. Il rend maintenant une liste déroulante à la frappe, groupée en
+**machines à sous / fournisseurs / guides / casinos partenaires**, l'ordre des
+groupes suivant la pertinence : « hacksaw » sort le studio en premier,
+« gates » ses jeux.
+
+**L'index n'est pas embarqué, et ne peut pas l'être.** BetsRank tient sa
+recherche en mémoire dans le navigateur — 1 894 fiches, au prix d'un index
+allégé, la version complète pesant 11,4 Mo de bundle. Le catalogue d'ici en
+compte **11 658** : même réduit au nom et au studio, l'index dépasserait le
+mégaoctet, servi sur chaque page. D'où une route, `/api/recherche`, qui
+interroge Postgres, et un anti-rebond de 180 ms côté champ. Coût réel mesuré au
+build : **+2,4 ko sur la page d'accueil** (12,8 → 15,2 ko), +3 ko de premier
+chargement, et **rien sur le lot partagé**, qui reste à 103 ko.
+
+**Seules les fiches publiées sont proposées** : `filtrePubliable()`, le même
+filtre que le catalogue. Proposer une fiche sans RTP ni capture enverrait le
+visiteur précisément là où le site n'a pas tenu sa promesse, et il n'a aucun
+moyen de le deviner avant d'avoir cliqué. Idem pour les studios : celui dont
+aucune fiche n'est finie ne sort pas.
+
+**Deux pièges payés.**
+
+La liste ne s'affichait pas. Elle existait dans le DOM, répondait au clavier,
+et restait invisible : l'accroche est en `overflow-hidden` — elle doit l'être,
+ses halos débordent volontairement et sans confinement la page défile
+latéralement au téléphone — et elle coupait la liste net sous la pilule. Elle
+est donc projetée dans `body`, sa position mesurée sur la pilule et refaite au
+défilement.
+
+Une fois projetée, elle n'était plus un descendant du champ : le « clic
+dehors » la refermait avant que le clic n'atteigne le lien. Elle porte un
+repère `data-recherche` que ce test reconnaît. Le symptôme est traître — une
+ligne impossible à ouvrir à la souris, et parfaitement fonctionnelle au
+clavier.
+
+**Au passage :** le formulaire pointait sur `/catalogue`, sans langue. Un
+visiteur en français validait sa recherche et atterrissait sur `/en/catalogue`
+— le point d'entrée du site le ramenait à l'anglais.
+
+Les casinos sont filtrés par pays dans la route, ce que la route peut se
+permettre parce qu'elle est dynamique : ailleurs le filtrage a lieu dans le
+navigateur, les pages étant rendues avec `revalidate`. Leurs liens sortent par
+`/go/`, en `rel="sponsored nofollow"`, et sont étiquetés « lien partenaire ».
+
 ## 2026-09-13 — 264 fiches publiées n'avaient pas de vignette
 
 Les 1 855 jaquettes de `public/images/slots` viennent du lot importé de

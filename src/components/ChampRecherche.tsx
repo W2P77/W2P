@@ -1,6 +1,11 @@
 'use client';
 
+import { useCallback, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+
 import { useLangue } from '@/i18n/useLangue';
+import { useRecherche } from '@/lib/recherche/useRecherche';
+import { ListeRecherche } from '@/components/ListeRecherche';
 
 /**
  * Le champ de recherche de l'accroche.
@@ -27,9 +32,49 @@ import { useLangue } from '@/i18n/useLangue';
  * un même contour. Partout ailleurs les deux teintes alternent ; ici elles se
  * rejoignent, et c'est ce qui la désigne comme le point d'entrée du site
  * plutôt qu'un champ de formulaire parmi d'autres.
+ *
+ * ── Ce que ce fichier fait, et ce qu'il ne fait pas ───────────────────────
+ *
+ * Il tient la pilule, et rien d'autre. L'anti-rebond, l'appel réseau et le
+ * clavier vivent dans `useRecherche` ; la liste dans `ListeRecherche`. Le
+ * catalogue compte 11 658 fiches et aucune n'entre dans le navigateur : c'est
+ * cette séparation qui permettra de poser le même champ dans l'en-tête sans y
+ * recopier une ligne de logique.
  */
 export function ChampRecherche({ className = '' }: { className?: string }) {
-  const { t } = useLangue();
+  const { langue, t } = useLangue();
+  const routeur = useRouter();
+  const bloc = useRef<HTMLDivElement>(null);
+  const pilule = useRef<HTMLFormElement>(null);
+
+  const aller = useCallback((href: string) => routeur.push(href), [routeur]);
+  const recherche = useRecherche(langue, aller);
+  const { fermer, ouvert } = recherche;
+
+  /*
+   * Un clic hors du bloc referme la liste.
+   *
+   * Le `blur` du champ ne suffirait pas : il se produit aussi quand on clique
+   * **dans** la liste, et refermer à ce moment-là démonte le lien avant que le
+   * clic ne l'atteigne. Le symptôme est une ligne impossible à ouvrir à la
+   * souris — et qui marche parfaitement au clavier, donc invisible en test.
+   *
+   * La liste étant projetée dans `body`, elle n'est pas un descendant de ce
+   * bloc : le test porte donc aussi sur son repère `data-recherche`, sans quoi
+   * tout clic dedans compterait comme un clic dehors.
+   */
+  useEffect(() => {
+    if (!ouvert) return;
+    const auClic = (e: MouseEvent) => {
+      const cible = e.target as Element | null;
+      if (bloc.current?.contains(cible as Node)) return;
+      if (cible?.closest?.('[data-recherche]')) return;
+      fermer();
+    };
+    document.addEventListener('mousedown', auClic);
+    return () => document.removeEventListener('mousedown', auClic);
+  }, [ouvert, fermer]);
+
   return (
     /*
      * Plus de marge négative : elle servait à rejoindre le bord gauche du
@@ -37,7 +82,7 @@ export function ChampRecherche({ className = '' }: { className?: string }) {
      * simplement sur le titre — ce qui était déjà l'intention, obtenue au
      * détour d'un décalage compensé.
      */
-    <div className={`relative pt-3.5 ${className}`}>
+    <div ref={bloc} className={`relative pt-3.5 ${className}`}>
       {/*
        * Aucun trait n'est dessiné ici, et c'est le point.
        *
@@ -50,7 +95,22 @@ export function ChampRecherche({ className = '' }: { className?: string }) {
        * porte donc rien ; il se glisse sous une ligne qui existait déjà.
        * Voir `ConduiteDecrochee`.
        */}
-      <form role="search" action="/catalogue">
+      <form
+        ref={pilule}
+        role="search"
+        onSubmit={(e) => {
+          /*
+           * Le formulaire pointait sur `/catalogue`, sans langue.
+           *
+           * Un visiteur en français validait sa recherche et atterrissait donc
+           * sur `/en/catalogue` : le middleware, ne trouvant pas de langue dans
+           * l'adresse, pose celle par défaut. Le point d'entrée du site
+           * ramenait le site à l'anglais.
+           */
+          e.preventDefault();
+          recherche.versLeCatalogue();
+        }}
+      >
         <div className="champ-neon">
           {/*
            * Hauteur fixée, et non déduite du padding.
@@ -65,8 +125,17 @@ export function ChampRecherche({ className = '' }: { className?: string }) {
             <input
               type="search"
               name="q"
+              value={recherche.terme}
+              onChange={(e) => recherche.saisir(e.target.value)}
+              onKeyDown={recherche.auClavier}
               placeholder={t.rechercherPlaceholder}
               aria-label={t.rechercher}
+              role="combobox"
+              aria-expanded={ouvert}
+              aria-controls="recherche-resultats"
+              aria-autocomplete="list"
+              aria-activedescendant={recherche.idActif ?? undefined}
+              autoComplete="off"
               className="w-full bg-transparent font-corps text-[15px] leading-tight text-texte outline-none placeholder:text-texte-faible sm:text-[16px]"
             />
             <button
@@ -82,6 +151,8 @@ export function ChampRecherche({ className = '' }: { className?: string }) {
           </div>
         </div>
       </form>
+
+      <ListeRecherche recherche={recherche} langue={langue} ancre={pilule} />
     </div>
   );
 }
