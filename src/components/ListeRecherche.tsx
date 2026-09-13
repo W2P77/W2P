@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import Link from 'next/link';
 
 import { remplir, textes } from '@/i18n/textes';
-import type { Langue } from '@/i18n/langues';
+import { tauxLocal, type Langue } from '@/i18n/langues';
 import type { CategorieRecherche, ResultatRecherche } from '@/lib/recherche/types';
 import type { Recherche } from '@/lib/recherche/useRecherche';
 
@@ -64,9 +64,9 @@ interface Cadre {
  * vient chaque chiffre, laisser un blanc à sa place ferait croire à un oubli
  * d'affichage plutôt qu'à une donnée qu'on n'a pas encore.
  */
-function sousTitre(r: ResultatRecherche, t: ReturnType<typeof textes>): string {
+function sousTitre(r: ResultatRecherche, t: ReturnType<typeof textes>, langue: Langue): string {
   if (r.categorie === 'jeu') {
-    const rtp = r.rtp == null ? t.rtpInconnu : `RTP ${r.rtp.toFixed(2)}%`;
+    const rtp = r.rtp == null ? t.rtpInconnu : `RTP ${tauxLocal(r.rtp, langue)} %`;
     return `${r.studio ?? ''} · ${rtp}`;
   }
   if (r.categorie === 'studio') {
@@ -230,7 +230,7 @@ export function ListeRecherche({
                             {r.titre}
                           </span>
                           <span className="block truncate font-mono text-[11px] text-texte-faible">
-                            {sousTitre(r, t)}
+                            {sousTitre(r, t, langue)}
                           </span>
                         </span>
                       </Link>

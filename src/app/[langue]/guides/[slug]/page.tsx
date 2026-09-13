@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Lien } from '@/components/Lien';
-import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
+import { LANGUE_DEFAUT, estUneLangue, tauxLocal } from '@/i18n/langues';
 import { remplir, textes } from '@/i18n/textes';
 
 import { metadonneesDePage } from '@/lib/metadonnees';
@@ -33,7 +33,8 @@ export async function generateMetadata({
 
 export default async function Guide({ params }: { params: Promise<{ slug: string; langue: string }> }) {
   const { langue: brutT } = await params;
-  const t = textes(estUneLangue(brutT) ? brutT : LANGUE_DEFAUT);
+  const langue = estUneLangue(brutT) ? brutT : LANGUE_DEFAUT;
+  const t = textes(langue);
   const { slug } = await params;
   const g = guideParSlug(slug);
   if (!g) notFound();
@@ -99,7 +100,7 @@ export default async function Guide({ params }: { params: Promise<{ slug: string
                           <span className="font-mono text-[12px] text-texte">
                             {jeu.rtpStudio == null
                               ? t.rtpInconnu
-                              : `${Number(jeu.rtpStudio).toFixed(2)}%`}
+                              : `${tauxLocal(Number(jeu.rtpStudio), langue)} %`}
                           </span>
                         </span>
                       </Lien>

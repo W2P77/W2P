@@ -2,6 +2,33 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-13 — Le RTP s'écrivait « 96.18 % » en français, dans le titre
+
+where2spin a été soumis à Search Console le 12/09 au soir et le crawl a
+commencé : ce que le robot lit maintenant, il l'enregistre. Un contrôle de ce
+que le site **sert réellement** a donc été fait, plutôt qu'une relecture du
+code.
+
+Trois points sur quatre étaient bons : `robots.txt` correct, sitemap à 4 290
+URL ne contenant que des fiches publiées, fiche non publiée en `noindex` et
+hors sitemap, canonical et hreflang FR/EN/DE avec `x-default`.
+
+**Le quatrième ne l'était pas.** Le titre des 4 290 URL écrivait le taux de
+retour « 96.18 % » — point décimal — dans les trois langues, alors que le
+français et l'allemand veulent la virgule. C'est le titre que Google affiche
+dans ses résultats : la copie visible était la fausse. Et sur la fiche
+elle-même, la légende écrivait « RTP 96,50 % » quand le bloc de chiffres juste
+à côté affichait « 96.50% ».
+
+La cause est une constante recopiée : la locale de formatage vivait dans
+**trois** modules et manquait au quatrième. Elle est désormais à un seul
+endroit, avec la fonction qui écrit un taux, et le titre, le bloc de chiffres,
+le RTP de l'achat, les guides et la recherche s'en servent tous.
+
+**Reste `CarteJeu`**, la vignette du catalogue, qui ne reçoit pas la langue :
+la lui passer demande de la faire descendre depuis quatre pages. Fait à part,
+pour ne pas mélanger une correction urgente et un remaniement.
+
 ## 2026-09-13 — Une clause d'habillage légendait six tables de gains
 
 **Les six pages du panneau d'All Ways Egypt sortaient toutes « Les mentions de

@@ -14,7 +14,7 @@ import { metadonneesDePage } from '@/lib/metadonnees';
 import { estPublieable } from '@/lib/publication';
 import { SITE_URL } from '@/lib/site';
 import { Lien } from '@/components/Lien';
-import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
+import { LANGUE_DEFAUT, LOCALE, estUneLangue, tauxLocal } from '@/i18n/langues';
 import { remplir, textes } from '@/i18n/textes';
 import { mecaniqueTraduite } from '@/lib/traduire-donnees';
 import { baliseFaq, estUneTableLive, questionsFrequentes, type FaitsDuJeu } from '@/lib/analyse-jeu';
@@ -68,7 +68,7 @@ export async function generateMetadata({
   const valeurs = {
     jeu: jeu.nom,
     studio: jeu.studio.nom,
-    rtp: jeu.rtpStudio ? Number(jeu.rtpStudio).toFixed(2) : '',
+    rtp: jeu.rtpStudio ? tauxLocal(Number(jeu.rtpStudio), langue) : '',
   };
   const avecRtp = jeu.rtpStudio != null;
 
@@ -120,7 +120,7 @@ export default async function PageJeu({
   const langue = estUneLangue(brutLangue) ? brutLangue : LANGUE_DEFAUT;
   const t = textes(langue);
   /* Les milliers d'un plafond s'écrivent selon la langue : 21 100 / 21,100 / 21.100. */
-  const LOCALE = { en: 'en-GB', fr: 'fr-FR', de: 'de-DE' } as const;
+
   const jeu = await jeuParSlug(slug);
   if (!jeu) notFound();
 
@@ -339,7 +339,7 @@ export default async function PageJeu({
                 </span>
               </div>
               <p className="mt-1 font-mono text-[26px] font-bold text-white">
-                {rtp == null ? '—' : `${rtp.toFixed(2)}%`}
+                {rtp == null ? '—' : `${tauxLocal(rtp, langue)} %`}
               </p>
 
               {paliers.length > 0 && (
@@ -351,7 +351,7 @@ export default async function PageJeu({
               {jeu.rtpAchatBonus != null && (
                 <p className="mt-1 text-[11px] text-texte-doux">
                   {t.etiquetteAchatBonus}{' '}
-                  <span className="font-mono">{Number(jeu.rtpAchatBonus).toFixed(2)}%</span>
+                  <span className="font-mono">{tauxLocal(Number(jeu.rtpAchatBonus), langue)} %</span>
                 </p>
               )}
               {jeu.rtpSource ? (

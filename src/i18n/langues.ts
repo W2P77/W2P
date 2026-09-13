@@ -35,6 +35,22 @@ export type Langue = (typeof LANGUES)[number]['code'];
 
 export const LANGUE_DEFAUT: Langue = 'en';
 
+/**
+ * La locale de formatage des nombres, par langue.
+ *
+ * Elle était redéfinie dans trois modules — et **absente du quatrième**, celui
+ * des métadonnées : le RTP sortait « 96.18 % » dans le titre des 4 290 URL du
+ * site, y compris en français et en allemand, où la virgule est la règle. Le
+ * corps de la page l'écrivait pourtant « 96,18 % ». C'est le titre que Google
+ * affiche dans ses résultats, donc c'était la copie visible qui était fausse.
+ */
+export const LOCALE: Record<Langue, string> = { en: 'en-GB', fr: 'fr-FR', de: 'de-DE' };
+
+/** Un taux de retour, écrit comme la langue du visiteur l'écrit. */
+export function tauxLocal(valeur: number, l: Langue): string {
+  return valeur.toLocaleString(LOCALE[l], { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 export function estUneLangue(valeur: string): valeur is Langue {
   return LANGUES.some((l) => l.code === valeur);
 }
