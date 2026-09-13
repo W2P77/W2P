@@ -377,12 +377,25 @@ export function extraireLesFaits(texte: string, pages: FaitsLus['pages'] = []): 
   const bandeau1spin4win =
     new RegExp(`RTP\\s*[-–—:]\\s*${CHIFFRE}\\s*%`, 'i').exec(t)?.[1] ?? null;
 
+  /*
+   * Nolimit City : « The theoretical return to the player for this game is
+   * 96.10% ». Le mot « theoretical » y est, mais sans le sigle RTP derrière —
+   * et la même page aligne six autres taux, ceux des achats de fonction et
+   * du xBoost. Attraper le premier nombre après « theoretical » publierait le
+   * taux d'un achat comme celui du jeu. L'ancre est donc « for this game is »,
+   * qui n'accompagne que le taux de base.
+   */
+  const formulationNolimit =
+    new RegExp(`return\\s+to\\s+the\\s+player\\s+for\\s+this\\s+game\\s+is\\s*${CHIFFRE}`, 'i').exec(t)?.[1] ??
+    null;
+
   let brutHaut =
     lire('theoretical') ??
     lire('maximum') ??
     formulationWazdan ??
     bandeauEvoplay ??
-    bandeau1spin4win;
+    bandeau1spin4win ??
+    formulationNolimit;
   let brutBas = lire('minimum');
 
   /*

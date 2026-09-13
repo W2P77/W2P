@@ -149,6 +149,29 @@ describe('le bandeau Evoplay', () => {
   });
 });
 
+/*
+ * Nolimit City écrit « The theoretical return to the player for this game is
+ * 96.10% » — le mot « theoretical » y est, sans le sigle derrière. Et la même
+ * page aligne les taux des achats de fonction et du xBoost, dans la même
+ * tournure : attraper le premier nombre après « theoretical » publierait le
+ * taux d'un achat comme celui du jeu. L'ancre est « for this game is ».
+ */
+describe('la formulation Nolimit City, au milieu des taux d’achat', () => {
+  it('lit le taux du jeu et pas celui d’une fonction achetée', () => {
+    const page =
+      'xBoost: The theoretical return to the player when using xBoost is 96.30%. ' +
+      'Nolimit Bonus: The theoretical return to the player when buying Nolimit Bonus is 96.44%. ' +
+      'The theoretical return to the player for this game is 96.10%.';
+    expect(extraireLesFaits(page).rtp).toBe(96.1);
+  });
+
+  it('ne lit rien quand seule une fonction achetée est chiffrée', () => {
+    expect(
+      extraireLesFaits('The theoretical return to the player when buying Nolimit Bonus is 96.44%.').rtp,
+    ).toBeNull();
+  });
+});
+
 describe('le gain maximum, selon la formule du studio', () => {
   it('lit « maximum theoretical win »', () => {
     expect(extraireLesFaits('The maximum theoretical win is 5,000x the bet').gainMax).toBe(5000);

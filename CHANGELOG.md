@@ -2,6 +2,40 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-13 — Nolimit City n'est pas Red Tiger, et il a son adaptateur
+
+Le CHANGELOG du 12/09 disait que Nolimit City « tourne sur la plateforme de
+Red Tiger et NetEnt ». C'est vrai de la **page hôte seulement** : même
+document Next.js multi-tenant, même porte d'âge. Mais le jeu ne passe jamais
+par `fansite.evo-games.com` — il vient du lanceur propre du studio, en PixiJS,
+depuis `demo.nolimitcdn.com`. Branché sur l'adaptateur Red Tiger, le studio
+échouait trois fois de suite : `demoUrl` écartée, cadre jamais reconnu, puis
+un **faux ban** au bout de 75 s. Mesuré sur douze ouvertures en trente minutes,
+toutes servies en 200 : le compteur d'Evolution n'est pas dans la boucle, et
+Akamai non plus — Nolimit se capture **sans tête**.
+
+`src/lib/captures/adaptateur-nolimit-city.ts` : commandes cliquées en
+proportion de la boîte du canvas (le jeu est dessiné en 1280×720 et mis à
+l'échelle), et un menu qui, lui, est du HTML — « Game rules », « Pay table »,
+« MAX WIN », plus la ligne du taux, lue dans `li.rtp:not(.rtp-feature)` pour
+exclure les six taux d'achats de fonction listés juste dessous.
+
+**Le piège payé** : `lireLesRegles` recadre l'OCR à partir de x=130, et
+Nolimit écrit à x≈74 — l'OCR lisait « e rules » et « lfunction voids all
+pays », et les quatre vues échouaient le garde-fou de publication. Résolu par
+une feuille de style injectée dans le cadre, 120 px de marge à gauche du menu.
+
+**Et le lecteur de règles apprend la formulation** : « The theoretical return
+to the player for this game is 96.10% », sans le sigle. L'ancre est « for this
+game is », parce que la même page dit « …when buying Nolimit Bonus is 96.44% »
+dans la même tournure — attraper le premier nombre après « theoretical »
+publierait le taux d'un achat comme celui du jeu. Un test le verrouille.
+
+144 fiches, 145 avec leur RTP : publiables à la première capture. La ligne
+dans `ADAPTATEURS` suit dans le commit qui branche Stakelogic — ce fichier est
+le seul point où les agents se croisent, et l'un d'eux y a encore une ligne
+de test.
+
 ## 2026-09-13 — La vignette du catalogue écrivait encore « 96.18% »
 
 L'entrée précédente avait laissé `CarteJeu` de côté : la vignette d'un jeu —
