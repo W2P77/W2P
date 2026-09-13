@@ -2,6 +2,40 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-13 — Spinomenal, le plus gros stock, a son adaptateur
+
+**633 fiches, 554 avec leur RTP** : le plus gros stock capturable du catalogue.
+`src/lib/captures/adaptateur-spinomenal.ts`, écrit par un premier agent coupé
+par la limite de session, **relu et éprouvé par un second** — qui a fait tourner
+l'adaptateur lui-même sur onze jeux couvrant chaque habillage avant la
+simulation du runner : 7 jeux sur 7, de 4 à 10 captures.
+
+La `demoUrl` est la fiche produit du studio, dont l'iframe frappe un jeton frais
+à chaque chargement : on lit son `src` dans la page rendue, jamais dans le HTML
+brut, puis on y navigue plein cadre. Sans tête, ça passe — pas de Cloudflare,
+pas de page marketing servie à un « Headless ».
+
+**Deux moteurs sous la même enveloppe.** Le récent a un ruban HTML ; l'ancien
+(Construct 2) peint tout dans le canvas et son « ? » **bouge selon
+l'habillage** — cinq positions relevées sur cinq familles de jeux. D'où le
+bouton HTML d'abord, puis des candidats ordonnés par la famille lue dans le
+`gameCode`, et **un seul juge** : la hauteur DOM du panneau, commun aux deux
+moteurs.
+
+**Le défaut trouvé par la relecture** : `boundingBox()` attend trente secondes
+un élément absent, et le bouton d'achat n'existe pas sur l'ancien moteur. Un
+jeu ancien coûtait **86 s** au lieu de 25. Sur ~330 fiches, c'est cinq heures
+de campagne rendues.
+
+**Aucun panneau n'écrit le RTP** — vérifié dans le DOM de neuf jeux, deux
+moteurs, zéro occurrence de « RTP », « return to player » ou d'un pourcentage.
+Le studio publie ses taux sur la fiche produit, déjà lue. La campagne apporte
+donc les images ; la fiche garde son taux, et un écart panneau/base ne pourra
+jamais être signalé pour ce studio.
+
+À réparer côté données, pas côté adaptateur : **13 fiches en `cdn-newdev`**
+répondent « Error 9989 » et échoueront en clair à chaque campagne.
+
 ## 2026-09-13 — Stakelogic et Nolimit City branchés ; la relecture mesurée
 
 **La relecture complète a tourné : 10 144 pages, 7 223 identifiées, 2 920

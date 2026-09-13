@@ -278,6 +278,7 @@ import { AMUSNET } from './adaptateur-amusnet';
 import { UN_SPIN_4_WIN } from './adaptateur-1spin4win';
 import { NOLIMIT_CITY } from './adaptateur-nolimit-city';
 import { STAKELOGIC } from './adaptateur-stakelogic';
+import { SPINOMENAL } from './adaptateur-spinomenal';
 
 /*
  * La clé est le `slug` du studio en base, pas son nom : c'est elle que
@@ -348,4 +349,11 @@ export const ADAPTATEURS: Record<string, Adaptateur> = {
    * sont ecartes en clair. 143 fiches, toutes avec leur RTP.
    */
   stakelogic: STAKELOGIC,
+  /*
+   * Spinomenal : la demoUrl est la fiche produit, dont l'iframe frappe le jeton
+   * du lanceur. Deux moteurs sous la meme enveloppe, un seul temoin (le panneau
+   * HTML). Aucun panneau n'ecrit le RTP : la campagne apporte les images, la
+   * fiche garde son taux. 633 fiches, 554 avec leur RTP, 13 en cdn-newdev.
+   */
+  spinomenal: SPINOMENAL,
 };
