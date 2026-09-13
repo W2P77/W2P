@@ -441,7 +441,21 @@ async function main() {
     executablePath: CHROME || undefined,
     // Cloudflare refuse un Chromium sans tête devant certains RGS de démo.
     headless: !adaptateur.avecTete,
-    args: ['--autoplay-policy=no-user-gesture-required'],
+    args: [
+      '--autoplay-policy=no-user-gesture-required',
+      /*
+       * Ne jamais toucher au trousseau macOS.
+       *
+       * Chromium chiffre ses cookies avec une clé qu'il range dans le
+       * trousseau du compte, et la première fois il demande le mot de passe
+       * de session — une boîte système « Chromium veut accéder au
+       * trousseau », en plein milieu d'une campagne nocturne. Le propriétaire
+       * l'a vue le 14/09/2026 et a eu raison de refuser : aucune capture n'a
+       * besoin d'un cookie chiffré. Le trousseau factice supprime la demande.
+       */
+      '--use-mock-keychain',
+      '--password-store=basic',
+    ],
   });
 
   /**

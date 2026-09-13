@@ -2,6 +2,17 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-14 — Chromium ne demande plus le mot de passe du trousseau
+
+En pleine campagne nocturne, macOS a affiché « Chromium veut accéder au
+trousseau » et demandé le mot de passe de session au propriétaire. C'est
+Chromium qui range dans le trousseau la clé de chiffrement de ses cookies —
+normal pour un navigateur, absurde pour un robot qui photographie des pages
+sans jamais avoir besoin d'un cookie. Refuser ne cassait rien, mais une boîte
+système qui réclame un mot de passe à minuit est une question qu'on ne doit
+pas poser. Le runner lance désormais Chromium avec un trousseau factice
+(`--use-mock-keychain`, `--password-store=basic`).
+
 ## 2026-09-13 — Yggdrasil, une fédération de moteurs ; trente écarts tranchés
 
 **Yggdrasil n'est pas un studio, c'est une trentaine de moteurs** sous une
