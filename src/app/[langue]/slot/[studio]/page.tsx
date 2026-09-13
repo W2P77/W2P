@@ -73,7 +73,8 @@ export default async function PageStudio({
   searchParams: Promise<{ page?: string }>;
 }) {
   const { langue: brutT } = await params;
-  const t = textes(estUneLangue(brutT) ? brutT : LANGUE_DEFAUT);
+  const langue = estUneLangue(brutT) ? brutT : LANGUE_DEFAUT;
+  const t = textes(langue);
   const [{ studio }, { page: pageBrute }] = await Promise.all([params, searchParams]);
   const page = Math.max(1, Number(pageBrute ?? 1));
   const s = await studioParSlug(studio, page);
@@ -105,7 +106,7 @@ export default async function PageStudio({
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           {s.jeux.map((j, i) => (
-            <CarteJeu key={j.slug} jeu={j} index={i} />
+            <CarteJeu key={j.slug} jeu={j} index={i} langue={langue} />
           ))}
         </div>
 

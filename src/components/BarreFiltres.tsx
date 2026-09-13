@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
 import { useLangue } from '@/i18n/useLangue';
+import { LOCALE, type Langue } from '@/i18n/langues';
 import { textes } from '@/i18n/textes';
 
 /**
@@ -19,7 +20,17 @@ import { textes } from '@/i18n/textes';
  */
 type Textes = ReturnType<typeof textes>;
 
-const listes = (t: Textes) => ({
+/*
+ * Le seuil s'écrit comme la langue l'écrit : « RTP 96,5 %+ » en français et
+ * en allemand, « RTP 96.5%+ » en anglais. La valeur envoyée dans l'URL, elle,
+ * garde son point : c'est un paramètre, pas un texte lu par le visiteur.
+ */
+const seuilRtp = (valeur: string, langue: Langue) => {
+  const n = Number(valeur).toLocaleString(LOCALE[langue]);
+  return langue === 'en' ? `RTP ${n}%+` : `RTP ${n} %+`;
+};
+
+const listes = (t: Textes, langue: Langue) => ({
   VOLATILITES: [
     { valeur: '', libelle: t.filtreToutesVolatilites },
     { valeur: 'BASSE', libelle: t.volBasse },
@@ -35,9 +46,9 @@ const listes = (t: Textes) => ({
   ],
   RTP_MIN: [
     { valeur: '', libelle: t.filtreToutRtp },
-    { valeur: '96', libelle: 'RTP 96%+' },
-    { valeur: '96.5', libelle: 'RTP 96.5%+' },
-    { valeur: '97', libelle: 'RTP 97%+' },
+    { valeur: '96', libelle: seuilRtp('96', langue) },
+    { valeur: '96.5', libelle: seuilRtp('96.5', langue) },
+    { valeur: '97', libelle: seuilRtp('97', langue) },
   ],
 });
 
@@ -46,8 +57,8 @@ export function BarreFiltres({
 }: {
   studios: { slug: string; nom: string; _count: { jeux: number } }[];
 }) {
-  const { t } = useLangue();
-  const { VOLATILITES, TRIS, RTP_MIN } = listes(t);
+  const { t, langue } = useLangue();
+  const { VOLATILITES, TRIS, RTP_MIN } = listes(t, langue);
   const router = useRouter();
   const params = useSearchParams();
 

@@ -1,4 +1,4 @@
-import type { Langue } from '@/i18n/langues';
+import { LOCALE, tauxLocal, type Langue } from '@/i18n/langues';
 
 /**
  * Le texte d'analyse sous la liste des casinos.
@@ -60,14 +60,19 @@ export interface Section {
   paragraphes: string[];
 }
 
-const LOCALE: Record<Langue, string> = { en: 'en-GB', fr: 'fr-FR', de: 'de-DE' };
-
 function nombre(n: number, langue: Langue): string {
   return new Intl.NumberFormat(LOCALE[langue]).format(n);
 }
 
+/*
+ * Les chiffres viennent de `tauxLocal`, comme partout sur le site ; seule
+ * l'espace devant le signe est décidée ici. L'anglais colle le « % » au
+ * nombre, le français et l'allemand l'en séparent, et le texte d'analyse a
+ * toujours suivi cette règle-là.
+ */
 function taux(n: number, langue: Langue): string {
-  return langue === 'en' ? `${n.toFixed(2)}%` : `${n.toFixed(2).replace('.', ',')} %`;
+  const v = tauxLocal(n, langue);
+  return langue === 'en' ? `${v}%` : `${v} %`;
 }
 
 function annee(d: Date | null): string | null {

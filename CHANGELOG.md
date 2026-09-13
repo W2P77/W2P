@@ -2,6 +2,38 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-13 — La vignette du catalogue écrivait encore « 96.18% »
+
+L'entrée précédente avait laissé `CarteJeu` de côté : la vignette d'un jeu —
+celle de la page d'accueil, du catalogue, des pages studio, des nouveautés, des
+démos, des « reviews », des favoris et des jeux voisins en bas de chaque fiche
+— écrivait toujours le taux avec le point décimal, dans les trois langues. Un
+visiteur français ouvrait une grille à « 96.18% » et, un clic plus loin, une
+fiche à « 96,18 % ».
+
+La vignette est un composant serveur : elle ne peut pas lire la langue dans
+l'URL comme le font les composants clients. Elle la reçoit donc de la page qui
+la pose — sept pages, une propriété chacune — et les deux grilles clientes
+(« mes jeux », le catalogue par studio) la tirent de `useLangue()`, qu'elles
+avaient déjà.
+
+Le tour des autres nombres visibles a trouvé deux restes : les seuils du filtre
+« RTP minimum » (`RTP 96.5%+`, en dur, pour les trois langues), et le mois qui
+coiffe chaque groupe de « Dernières sorties », figé en anglais — « September
+2026 » en tête des pages françaises et allemandes. Corrigés tous les deux. Le
+texte d'analyse avait son propre formateur de taux, un `replace('.', ',')`, au
+rendu strictement identique : il prend maintenant ses chiffres de `tauxLocal`
+et ne garde que la décision de l'espace devant le signe, que l'anglais ne met
+pas.
+
+Laissés tels quels, et pourquoi : le JSON-LD reste au point décimal, c'est un
+format machine, pas un texte ; l'image de partage est un autre sujet ; le
+plafond de gain de la fiche passait déjà par la locale. Les compteurs
+(« 1090 jeux ») n'ont ni point ni virgule à corriger, mais ils ignorent le
+séparateur de milliers — à trancher à part. Et `legendes.ts` garde une copie
+privée de la table des locales, aux mêmes valeurs : elle n'est pas fausse,
+juste dupliquée.
+
 ## 2026-09-13 — Ce qui reste muet après la relecture, appris
 
 Au départ du chantier, **60 % des 11 378 légendes servies étaient génériques**

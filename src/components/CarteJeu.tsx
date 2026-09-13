@@ -1,5 +1,6 @@
 import { EtoileEnregistrer } from './EtoileEnregistrer';
 import { Lien } from '@/components/Lien';
+import { tauxLocal, type Langue } from '@/i18n/langues';
 
 /**
  * La vignette d'un jeu.
@@ -38,7 +39,21 @@ const VOLATILITE_EN: Record<string, string> = {
   TRES_HAUTE: 'Very high',
 };
 
-export function CarteJeu({ jeu, index = 0 }: { jeu: JeuVignette; index?: number }) {
+/*
+ * La langue est posée par la page, pas lue dans l'URL : la vignette est un
+ * composant serveur, elle n'a pas de `usePathname`. Sans elle, le RTP
+ * s'écrivait « 96.18% » sur les grilles françaises et allemandes, quand la
+ * fiche ouverte juste derrière disait « 96,18 % ».
+ */
+export function CarteJeu({
+  jeu,
+  index = 0,
+  langue,
+}: {
+  jeu: JeuVignette;
+  index?: number;
+  langue: Langue;
+}) {
   const cyanDabord = index % 2 === 0;
   const rtp = jeu.rtpStudio == null ? null : Number(jeu.rtpStudio);
   const degrade = cyanDabord
@@ -131,7 +146,7 @@ export function CarteJeu({ jeu, index = 0 }: { jeu: JeuVignette; index?: number 
 
           <span className="flex items-center justify-between gap-2 border-t border-fond-bordure px-2.5 py-2">
             <span className="font-ui text-[13px] font-bold tabular-nums text-white">
-              {rtp == null ? <span className="text-texte-faible">RTP —</span> : `${rtp.toFixed(2)}%`}
+              {rtp == null ? <span className="text-texte-faible">RTP —</span> : `${tauxLocal(rtp, langue)} %`}
             </span>
             <span className="truncate font-ui text-[9px] font-semibold uppercase tracking-[0.1em] text-texte-faible">
               {jeu.volatilite ? VOLATILITE_EN[jeu.volatilite] ?? jeu.studio.nom : jeu.studio.nom}

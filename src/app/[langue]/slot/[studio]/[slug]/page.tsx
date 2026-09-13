@@ -425,7 +425,7 @@ export default async function PageJeu({
             </div>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
               {voisins.map((v, i) => (
-                <CarteJeu key={v.slug} jeu={v} index={i} />
+                <CarteJeu key={v.slug} jeu={v} index={i} langue={langue} />
               ))}
             </div>
           </section>

@@ -70,7 +70,8 @@ export default async function Catalogue({
 }) {
   const sp = await searchParams;
   const { langue: brutL } = await params;
-  const t = textes(estUneLangue(brutL) ? brutL : LANGUE_DEFAUT);
+  const langue = estUneLangue(brutL) ? brutL : LANGUE_DEFAUT;
+  const t = textes(langue);
   const [resultat, studios] = await Promise.all([
     chercherJeux({
       q: sp.q,
@@ -150,7 +151,7 @@ export default async function Catalogue({
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
             {resultat.jeux.map((j, i) => (
-              <CarteJeu key={j.slug} jeu={j} index={i} />
+              <CarteJeu key={j.slug} jeu={j} index={i} langue={langue} />
             ))}
           </div>
         )}

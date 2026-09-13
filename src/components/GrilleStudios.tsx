@@ -28,7 +28,7 @@ export interface StudioVignette {
 }
 
 export function GrilleStudios({ studios }: { studios: StudioVignette[] }) {
-  const { t } = useLangue();
+  const { t, langue } = useLangue();
   const [ouvert, setOuvert] = useState<string | null>(null);
   const [cache, setCache] = useState<Record<string, JeuVignette[]>>({});
   const [charge, setCharge] = useState<string | null>(null);
@@ -113,7 +113,7 @@ export function GrilleStudios({ studios }: { studios: StudioVignette[] }) {
                   <>
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
                       {(cache[s.slug] ?? []).slice(0, 24).map((j, i) => (
-                        <CarteJeu key={j.slug} jeu={j} index={i} />
+                        <CarteJeu key={j.slug} jeu={j} index={i} langue={langue} />
                       ))}
                     </div>
                     {(cache[s.slug]?.length ?? 0) > 24 && (

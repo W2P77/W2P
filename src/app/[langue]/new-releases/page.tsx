@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
+import { LANGUE_DEFAUT, LOCALE, estUneLangue, type Langue } from '@/i18n/langues';
 import { textes } from '@/i18n/textes';
 import { metadonneesDePage } from '@/lib/metadonnees';
 import { EnTete } from '@/components/EnTete';
@@ -35,8 +35,13 @@ const CHAMPS = {
   studio: { select: { nom: true, slug: true } },
 } as const;
 
-function moisDe(d: Date) {
-  return d.toLocaleDateString('en', { month: 'long', year: 'numeric' });
+/*
+ * Le mois est un titre de section, lu par le visiteur : il s'écrit dans sa
+ * langue. Figé sur `'en'`, il donnait « September 2026 » en tête des
+ * nouveautés françaises et allemandes.
+ */
+function moisDe(d: Date, langue: Langue) {
+  return d.toLocaleDateString(LOCALE[langue], { month: 'long', year: 'numeric' });
 }
 
 export default async function Nouveautes({
@@ -45,7 +50,8 @@ export default async function Nouveautes({
   params: Promise<{ langue: string }>;
 }) {
   const { langue: brutL } = await params;
-  const t = textes(estUneLangue(brutL) ? brutL : LANGUE_DEFAUT);
+  const langue = estUneLangue(brutL) ? brutL : LANGUE_DEFAUT;
+  const t = textes(langue);
   const jeux = await prisma.jeu.findMany({
     where: { sortieLe: { not: null }, ...(await filtrePubliable()) },
     orderBy: { sortieLe: 'desc' },
@@ -62,7 +68,7 @@ export default async function Nouveautes({
    */
   const parMois = new Map<string, typeof jeux>();
   for (const j of jeux) {
-    const cle = moisDe(new Date(j.sortieLe!));
+    const cle = moisDe(new Date(j.sortieLe!), langue);
     parMois.set(cle, [...(parMois.get(cle) ?? []), j]);
   }
 
@@ -92,7 +98,7 @@ export default async function Nouveautes({
               </div>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
                 {lot.map((j, i) => (
-                  <CarteJeu key={j.slug} jeu={j} index={i} />
+                  <CarteJeu key={j.slug} jeu={j} index={i} langue={langue} />
                 ))}
               </div>
             </section>

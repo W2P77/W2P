@@ -42,7 +42,7 @@ export function basculerJeu(jeu: JeuVignette): boolean {
 }
 
 export function MesJeux() {
-  const { t } = useLangue();
+  const { t, langue } = useLangue();
   const [jeux, setJeux] = useState<JeuVignette[] | null>(null);
 
   // Lu après le montage : `localStorage` n'existe pas au rendu serveur, et
@@ -65,7 +65,7 @@ export function MesJeux() {
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
       {jeux.map((j, i) => (
-        <CarteJeu key={j.slug} jeu={j} index={i} />
+        <CarteJeu key={j.slug} jeu={j} index={i} langue={langue} />
       ))}
     </div>
   );

@@ -57,7 +57,8 @@ export default async function Reviews({
   searchParams: Promise<{ page?: string }>;
 }) {
   const { langue: brutL } = await params;
-  const t = textes(estUneLangue(brutL) ? brutL : LANGUE_DEFAUT);
+  const langue = estUneLangue(brutL) ? brutL : LANGUE_DEFAUT;
+  const t = textes(langue);
   const { page: pageBrute } = await searchParams;
   const page = Math.max(1, Number(pageBrute ?? 1));
   const parPage = 24;
@@ -101,7 +102,7 @@ export default async function Reviews({
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           {jeux.map((j, i) => (
-            <CarteJeu key={j.slug} jeu={j} index={i} />
+            <CarteJeu key={j.slug} jeu={j} index={i} langue={langue} />
           ))}
         </div>
 
