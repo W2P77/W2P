@@ -411,7 +411,11 @@ const ENONCES: Enonce[] = [
     code: 'mises-min-max',
     sujet: 'chiffresDuJeu',
     poids: 2,
-    motifs: [/minimum\s+bet\s*:/i, /maximum\s+bet\s*:/i],
+    motifs: [
+      /minimum\s+bet\s*:/i,
+      /maximum\s+bet\s*:/i,
+      /allowed\s+bet\s+levels\s+for\s+this\s+game\s+are\s+between/i,
+    ],
     dit: {
       en: 'The same page gives the minimum and maximum bet the game accepts.',
       fr: 'La même page donne la mise minimale et la mise maximale acceptées par le jeu.',
@@ -442,6 +446,52 @@ const ENONCES: Enonce[] = [
       /land\s+\d\s+(?:FS\s+)?scatter[^.]{0,90}(?:activate|trigger|award)/i,
       /\d\s+(?:or\s+more\s+)?scatters?[^.]{0,60}(?:award|trigger)s?\s+\d+\s+free\s+spins/i,
     ],
+  },
+  /*
+   * Le déclenchement, dit à la façon de Pragmatic : « 3, 4 or 5 SCATTER
+   * symbols hit in the base game awards the FREE SPINS feature ». Les deux
+   * motifs ci-dessus attendaient « land » ou un nombre de tours dans la même
+   * phrase, que ce studio n'écrit jamais.
+   */
+  {
+    code: 'declenchement-scatters',
+    sujet: 'toursGratuits',
+    poids: 3,
+    // Pas de `dit` non plus : le nombre est relu plus bas, et seulement s'il
+    // est unanime dans la page.
+    motifs: [
+      /scatter\s+symbols?\s+hit\s+in\s+the\s+base\s+game\s+awards?\s+the\s+FREE\s+SPINS/i,
+      /to\s+trigger\s+the\s+FREE\s+SPINS\s+feature/i,
+    ],
+  },
+  {
+    code: 'declenchement-scatters-nommes',
+    sujet: 'toursGratuits',
+    poids: 3,
+    // Sans `dit` : le nombre est relu plus bas, s'il est unanime dans la page.
+    motifs: [/scatter\s+symbols?[^.]{0,60}will\s+trigger[^.]{0,40}free\s+spins/i, /\d\+?\s+scatter\s+symbols?\s+trigger\s+free\s+spins/i],
+  },
+  {
+    code: 'choix-de-la-formule',
+    sujet: 'toursGratuits',
+    poids: 3,
+    motifs: [/choose\s+one\s+out\s+of\s+\w+\s+(?:possible\s+)?options/i, /option\s+to\s+choose\s+one\s+out\s+of/i],
+    dit: {
+      en: 'Before the round begins, the player picks one of several free-spin formats.',
+      fr: 'Avant le début de la série, le joueur choisit entre plusieurs formules de tours gratuits.',
+      de: 'Vor Beginn der Runde wählt der Spieler zwischen mehreren Freispiel-Varianten.',
+    },
+  },
+  {
+    code: 'sans-relance',
+    sujet: 'toursGratuits',
+    poids: 2,
+    motifs: [/feature\s+cannot\s+be\s+retriggered/i],
+    dit: {
+      en: 'The feature cannot be retriggered once it has started.',
+      fr: 'La fonction ne peut pas être relancée une fois commencée.',
+      de: 'Die Funktion kann nach dem Start nicht erneut ausgelöst werden.',
+    },
   },
   {
     code: 'gain-verse-en-fin-de-serie',
@@ -486,13 +536,24 @@ const ENONCES: Enonce[] = [
     },
   },
   {
+    code: 'achat-direct-depuis-le-jeu',
+    sujet: 'achatDeBonus',
+    poids: 2,
+    motifs: [/purchase\s+bonus\s+game\s+features\s+directly/i, /FeatureSpins/i],
+    dit: {
+      en: 'A dedicated button buys the bonus straight from the main game.',
+      fr: 'Un bouton dédié achète le bonus directement depuis le jeu principal.',
+      de: 'Eine eigene Taste kauft den Bonus direkt aus dem Hauptspiel.',
+    },
+  },
+  {
     code: 'rtp-achat-distinct',
     sujet: 'achatDeBonus',
     // Le piège le mieux documenté du secteur : sur huit titres mesurés, six
     // portaient en base le retour de l'achat au lieu de celui du jeu. Quand le
     // panneau distingue les deux, le dire est le plus utile de la page.
     poids: 3,
-    motifs: [/RTP\s+of\s+the\s+game\s+when\s+using/i],
+    motifs: [/RTP\s+of\s+the\s+game\s+when\s+using/i, /RTP\s+when\s+buying/i],
     dit: {
       en: 'The panel states a separate RTP for the bought feature: it is not the base game figure.',
       fr: "Le panneau annonce un RTP distinct pour la partie achetée : ce n'est pas celui du jeu de base.",
@@ -701,7 +762,17 @@ const ENONCES: Enonce[] = [
     code: 'wild-substitue',
     sujet: 'symbolesSpeciaux',
     poids: 3,
-    motifs: [/wild[^.]{0,60}substitutes?\s+for\s+all\s+symbols\s+except/i],
+    motifs: [
+      /wild[^.]{0,60}substitutes?\s+for\s+all\s+symbols\s+except/i,
+      // Play'n GO : « The WILD symbol substitutes for any other reel symbols
+      // except the bonus SCATTER », et sur l'habillage graphique « WILDS
+      // substitute for all other symbols, except SCATTERS. »
+      /wilds?[^.]{0,40}substitutes?\s+for\s+a(?:ny|ll)\s+other\s+(?:reel\s+)?symbols?,?\s+except/i,
+      // Hacksaw : « The Wild symbols substitutes for all symbols in the
+      // paytable » — sans exception nommée, donc hors de portée des deux
+      // motifs ci-dessus.
+      /wild\s+symbols?\s+substitutes?\s+for\s+all\s+symbols\s+in\s+the\s+paytable/i,
+    ],
     dit: {
       en: 'The wild substitutes for every symbol except the scatter.',
       fr: 'Le Wild remplace tous les symboles sauf le Scatter.',
@@ -717,6 +788,46 @@ const ENONCES: Enonce[] = [
       en: 'The scatter appears on all reels.',
       fr: 'Le Scatter apparaît sur tous les rouleaux.',
       de: 'Der Scatter erscheint auf allen Walzen.',
+    },
+  },
+  /*
+   * ── La page « SPECIAL WILDS » de Pragmatic ─────────────────────────────
+   *
+   * Trois variantes du même symbole y sont décrites l'une après l'autre, en
+   * majuscules suivies d'un tiret. Chacune est une information que l'image
+   * seule ne donne pas au lecteur francophone ou germanophone.
+   */
+  {
+    code: 'wilds-aleatoires',
+    sujet: 'symbolesSpeciaux',
+    poids: 3,
+    motifs: [/RANDOM\s+WILDS?\s*[-–—]/i, /WILD\s+symbols\s+can\s+appear\s+on\s+random\s+positions/i],
+    dit: {
+      en: 'On random base-game spins, wild symbols can appear anywhere on the grid.',
+      fr: 'Sur des tours de jeu de base tirés au hasard, des Wilds peuvent apparaître à toute position de la grille.',
+      de: 'Bei zufälligen Drehungen im Basisspiel können Wild-Symbole an beliebiger Stelle des Rasters erscheinen.',
+    },
+  },
+  {
+    code: 'wilds-extensibles',
+    sujet: 'symbolesSpeciaux',
+    poids: 3,
+    motifs: [/EXPANDING\s+WILDS?\s*[-–—]/i, /expand\s+to\s+fill\s+the\s+whole\s+reel/i],
+    dit: {
+      en: 'An expanding wild stretches to cover its whole reel.',
+      fr: "Un Wild extensible s'étire pour couvrir tout son rouleau.",
+      de: 'Ein expandierendes Wild dehnt sich über die gesamte Walze aus.',
+    },
+  },
+  {
+    code: 'wild-entourant',
+    sujet: 'symbolesSpeciaux',
+    poids: 3,
+    motifs: [/SURROUNDING\s+WILD/i],
+    dit: {
+      en: 'The surrounding wild turns every position around it into a wild as well.',
+      fr: "Le Wild entourant transforme en Wild toutes les positions qui l'entourent.",
+      de: 'Das umgebende Wild verwandelt auch alle Positionen um sich herum in Wilds.',
     },
   },
   {
@@ -746,7 +857,13 @@ const ENONCES: Enonce[] = [
      * nombres lus dans une image, c'est la façon la plus sûre d'y introduire
      * une erreur. La capture montre, le texte situe.
      */
-    motifs: [/(?:[345]\s*[-–]\s*[$€£]\s?\d|[xX×]\s?[345]\s+\d)/g],
+    motifs: [
+      /(?:[345]\s*[-–]\s*[$€£]\s?\d|[xX×]\s?[345]\s+\d)/g,
+      // BGaming aligne « 13+ 100.00 FUN » — le nombre de symboles, le gain,
+      // la devise de la démo. Deux pages de table de gains par jeu, sur 122
+      // fiches, que ni le vocabulaire ni la structure ci-dessus ne voyaient.
+      /\b\d{1,2}\+?\s+\d+[.,]\d{2}\s+(?:FUN|EUR|USD|CAD)\b/g,
+    ],
     occurrences: 6,
     dit: {
       en: 'The pay table, symbol by symbol, at the bet shown at the bottom of the screen.',
@@ -760,7 +877,10 @@ const ENONCES: Enonce[] = [
     code: 'gauche-droite-adjacents',
     sujet: 'formationDesGains',
     poids: 3,
-    motifs: [/pay\s+from\s+left\s+to\s+right\s+on\s+adjacent\s+reels/i],
+    motifs: [
+      /pay\s+from\s+left\s+to\s+right\s+on\s+adjacent\s+reels/i,
+      /predefined\s+lines\s+on\s+adjacent\s+reels\s+from\s+left\s+to\s+right/i,
+    ],
     dit: {
       en: 'Symbols pay from left to right on adjacent reels, starting from the leftmost reel.',
       fr: 'Les symboles paient de gauche à droite sur des rouleaux adjacents, à partir du rouleau le plus à gauche.',
@@ -792,6 +912,95 @@ const ENONCES: Enonce[] = [
       de: 'Der Scatter ist die Ausnahme: er zahlt von jeder Position auf den Walzen.',
     },
   },
+  /*
+   * La page « Information » de Play'n GO, présente sur ses 113 fiches. Les
+   * coquilles de l'OCR sont dans les motifs parce qu'elles sont systématiques
+   * dans cette police : « pald out », « wviinnings ».
+   */
+  {
+    code: 'gains-additionnes',
+    sujet: 'formationDesGains',
+    poids: 3,
+    motifs: [
+      /w\w*innings\s+are\s+added\s+together/i,
+      /winning\s+combinations\s+are\s+pa\w{1,3}\s+out\s+at\s+the\s+end\s+of\s+a\s+game\s+round/i,
+    ],
+    dit: {
+      en: 'Wins on several paylines in one round are added together and paid when the round ends.',
+      fr: "Les gains obtenus sur plusieurs lignes dans un même tour s'additionnent et sont versés à la fin du tour.",
+      de: 'Gewinne auf mehreren Linien einer Runde werden addiert und am Ende der Runde ausgezahlt.',
+    },
+  },
+  /*
+   * Hacksaw répète ces deux paragraphes sur ses 108 fiches, dans la section
+   * « WAYS TO WIN » puis « BONUS BUY ». Le second porte son propre poids parce
+   * que `achat-propose` est volontairement faible : « BONUS BUY » seul est un
+   * bouton d'habillage, pas une page d'achat.
+   */
+  /*
+   * ── BGaming ────────────────────────────────────────────────────────────
+   *
+   * 1 173 pages de panneau, dont beaucoup de prose propre à chaque jeu — des
+   * héros, des boss, des coffres — qu'on ne cherche pas à reconnaître. Ces
+   * trois-là, en revanche, reviennent d'un jeu à l'autre au mot près.
+   */
+  {
+    code: 'gains-selon-le-nombre-de-symboles',
+    sujet: 'formationDesGains',
+    poids: 3,
+    motifs: [
+      /w\w*ins?\s+are\s+formed\s+depending\s+on\s+the\s+number\s+of\s+symbols/i,
+      /payouts\s+are\s+made\s+according\s+to\s+the\s+(?:number\s+of\s+symbols|paytable)/i,
+    ],
+    dit: {
+      en: 'Wins depend on how many matching symbols land, and are paid according to the pay table.',
+      fr: 'Les gains dépendent du nombre de symboles obtenus et sont payés selon la table de gains.',
+      de: 'Die Gewinne richten sich nach der Anzahl der erzielten Symbole und werden gemäß Gewinntabelle ausgezahlt.',
+    },
+  },
+  {
+    code: 'tour-rapide',
+    sujet: 'reglages',
+    poids: 2,
+    motifs: [
+      /quick\s+spin\s*-\s*(?:if\s+enabled\s+)?the\s+speed\s+of\s+(?:the\s+)?spinning\s+reels\s+increases/i,
+      /settings\s+button\s+opens\s+a\s+panel\s+with\s+game\s+speed\s+and\s+volume/i,
+    ],
+    dit: {
+      en: 'The panel sets the reel speed and the volume, with a quick-spin option the licence may withhold.',
+      fr: "Le panneau règle la vitesse des rouleaux et le volume, avec un tour rapide que la licence peut interdire.",
+      de: 'Das Panel regelt Walzentempo und Lautstärke, samt Schnelldreh-Option, die die Lizenz untersagen kann.',
+    },
+  },
+  {
+    code: 'bareme-des-tours-gratuits',
+    sujet: 'toursGratuits',
+    poids: 3,
+    /*
+     * Une preuve de structure : BGaming aligne « 5x 15 free spins », « 4x 12
+     * free spins », « 3x 10 free spins » en colonne, sans une phrase autour.
+     * Trois lignes au moins, et les nombres ne sont pas recopiés — ils
+     * changent à chaque jeu et se lisent dans l'image.
+     */
+    motifs: [/\d\s*[x×]\s+\d+\s+free\s+spins/gi],
+    occurrences: 3,
+    dit: {
+      en: 'The scatter count decides how many free spins are awarded, on the scale shown here.',
+      fr: 'Le nombre de Scatters décide du nombre de tours gratuits, selon le barème affiché ici.',
+      de: 'Die Anzahl der Scatter bestimmt die Zahl der Freispiele, nach der hier gezeigten Staffel.',
+    },
+  },
+  {
+    code: 'combinaisons-valables-partout',
+    sujet: 'formationDesGains',
+    poids: 3,
+    motifs: [/requirements\s+for\s+a\s+winning\s+combination\s+in\s+the\s+base\s+game\s+are\s+also\s+used/i],
+    dit: {
+      en: 'The winning combinations of the base game also apply during the bonus features and the free spins.',
+      fr: 'Les combinaisons gagnantes du jeu de base valent aussi pendant les fonctions bonus et les tours gratuits.',
+      de: 'Die Gewinnkombinationen des Basisspiels gelten auch während der Bonusfunktionen und Freispiele.',
+    },
+  },
   {
     code: 'plus-haut-gain-par-ligne',
     sujet: 'formationDesGains',
@@ -807,7 +1016,12 @@ const ENONCES: Enonce[] = [
     code: 'gains-cumules',
     sujet: 'formationDesGains',
     poids: 2,
-    motifs: [/all\s+wins\s+are\s+added\s+to\s+the\s+total\s+win/i],
+    motifs: [
+      /all\s+wins\s+are\s+added\s+to\s+the\s+total\s+win/i,
+      // BGaming : « In case of multiple winning combinations the sum of the
+      // win is added. »
+      /multiple\s+winning\s+combinations\s+the\s+sum\s+of\s+the\s+win\s+is\s+added/i,
+    ],
     dit: {
       en: 'Wins landed on several paylines are added together.',
       fr: "Les gains obtenus sur plusieurs lignes s'additionnent.",
@@ -883,7 +1097,12 @@ const ENONCES: Enonce[] = [
     code: 'autoplay-limites',
     sujet: 'jeuAutomatique',
     poids: 2,
-    motifs: [/stops?\s+autoplay\s+(?:at|if)/gi],
+    motifs: [
+      /stops?\s+autoplay\s+(?:at|if)/gi,
+      // BGaming dit « autospin will stop after you win », « autospin will stop
+      // when a bonus game is triggered » : même menu, autre verbe.
+      /autospins?\s+will\s+stop\s+(?:after|when)/gi,
+    ],
     occurrences: 2,
     dit: {
       en: 'It can stop the run on any win, when free spins begin, or as soon as the balance moves by a set amount.',
@@ -917,7 +1136,10 @@ const ENONCES: Enonce[] = [
     code: 'raccourcis-clavier',
     sujet: 'commandes',
     poids: 2,
-    motifs: [/space\s+and\s+enter\s+buttons\s+on\s+the\s+keyboard/i],
+    motifs: [
+      /space\s+and\s+enter\s+buttons\s+on\s+the\s+keyboard/i,
+      /spacebar\s+to\s+spin/i,
+    ],
     dit: {
       en: 'The space and enter keys start and stop the spin.',
       fr: "Les touches Espace et Entrée lancent et arrêtent le tour.",
@@ -928,7 +1150,11 @@ const ENONCES: Enonce[] = [
     code: 'compteurs',
     sujet: 'commandes',
     poids: 2,
-    motifs: [/active\s+counters/i, /total\s+bet\s*-\s*current\s+bet/i],
+    motifs: [
+      /active\s+counters/i,
+      /total\s+bet\s*-\s*current\s+bet/i,
+      /current\s+balance\s+is\s+shown\s+in\s+the\s+BALANCE\s+display/i,
+    ],
     dit: {
       en: 'The counters on screen: current win, total bet, balance.',
       fr: "Les compteurs de l'écran : gain en cours, mise totale, solde.",
@@ -964,12 +1190,53 @@ const ENONCES: Enonce[] = [
     motifs: [/close\s+full\s+screen/i],
   },
 
+  /*
+   * ── Le menu de réglages de Pragmatic ───────────────────────────────────
+   *
+   * Pragmatic pèse 4 276 des 9 057 pages de panneau du site, et cette page-là
+   * revient dans presque tous ses jeux : trois des six pages muettes tirées au
+   * sort en portaient le texte, au mot près. `son-et-musique` ne la voyait pas
+   * — ce studio n'écrit ni « sound volume » ni « music volume », mais des
+   * lignes de menu en majuscules suivies d'un tiret.
+   */
+  {
+    code: 'menu-reglages',
+    sujet: 'reglages',
+    poids: 3,
+    motifs: [/INTRO\s+SCREEN\s*[-–—]\s*toggles/i, /SOUND\s+FX\s*[-–—]\s*toggles/i],
+    dit: {
+      // Formulée sans nommer le menu : quand le studio a titré la page
+      // « Settings menu », le modèle du type l'a déjà nommé, et la légende
+      // sortait « Le menu des réglages tel que le jeu le propose. Le menu des
+      // réglages : … ».
+      en: 'It toggles the intro screen, the ambient sound and the sound effects, and opens the game history.',
+      fr: "On y règle l'écran d'accueil, l'ambiance sonore et les effets, et on y ouvre l'historique des parties.",
+      de: 'Dort lassen sich Startbildschirm, Hintergrundton und Soundeffekte schalten sowie der Spielverlauf öffnen.',
+    },
+  },
+  {
+    code: 'menu-de-mise',
+    sujet: 'reglages',
+    poids: 2,
+    motifs: [/bet\s+menu\s+shows\s+the[^.]{0,120}in\s+both\s+coins\s+and\s+cash/i],
+    dit: {
+      en: 'The bet menu, which shows the total bet in both coins and cash.',
+      fr: 'Le menu de mise, qui affiche la mise totale en jetons et en argent.',
+      de: 'Das Einsatzmenü, das den Gesamteinsatz sowohl in Münzen als auch in Geld anzeigt.',
+    },
+  },
+
   // ── Les mentions de fin de panneau ─────────────────────────────────────
   {
     code: 'dysfonctionnement',
     sujet: 'mentionsLegales',
     poids: 2,
-    motifs: [/malfunction\s+voids\s+all\s+pays/i],
+    /*
+     * « volds », « vaids » : Tesseract confond le i et le l dans cette police,
+     * et la clause est le témoin le plus répandu du site. Le verbe est donc lu
+     * large — « malfunction v???s all pays » ne peut être rien d'autre.
+     */
+    motifs: [/malfunction\s+v\w{2,4}s\s+all\s+pays/i],
     dit: {
       en: 'The clause voiding all pays and plays in the event of a malfunction.',
       fr: 'La clause qui annule gains et parties en cas de dysfonctionnement.',
@@ -980,7 +1247,14 @@ const ENONCES: Enonce[] = [
     code: 'parties-interrompues',
     sujet: 'mentionsLegales',
     poids: 2,
-    motifs: [/unfinished\s+game\s+rounds/i, /interrupted\s+rounds/i],
+    motifs: [
+      /unfinished\s+game\s+rounds/i,
+      /interrupted\s+rounds/i,
+      // Play'n GO titre la page « Unfinished Games » et ouvre par « If your
+      // game round is disrupted » : c'est la page 1 de chacun de ses jeux.
+      /unfinished\s+games/i,
+      /game\s+round\s+is\s+disrupted/i,
+    ],
     dit: {
       en: 'What becomes of interrupted rounds, and how long an inactive session lasts.',
       fr: "Le sort des parties interrompues, et la durée au bout de laquelle une session inactive prend fin.",
@@ -1449,7 +1723,44 @@ export function legendeDeCapture(
   if (type === 'chiffres') {
     return phraseDesFaits(faits, langue) ?? MODELES[langue].regles(faits.nom);
   }
-  return MODELES[langue][type](faits.nom);
+
+  /*
+   * Le titre du studio ouvre, ce que la page dit complète.
+   *
+   * Le nom donné par le panneau reste ce qui décide du sujet — c'est la
+   * précaution du paragraphe précédent, et elle ne bouge pas. Mais il ne
+   * suffit pas : « Special wilds » et « Expanding wilds » sont deux pages
+   * différentes qui recevaient la **même** phrase, « La mécanique expliquée
+   * par le jeu lui-même », parce que le modèle du type ignore le titre autant
+   * que le contenu. 488 captures de mécanique et 213 d'achat étaient dans ce
+   * cas, à un cinquième de doublons.
+   *
+   * Deux énoncés au plus : le modèle a déjà dit de quoi il s'agit, le
+   * complément n'est là que pour dire quoi.
+   */
+  const modele = MODELES[langue][type](faits.nom);
+  const complement = ditsDeLecture(lectureDe(capture), langue, 2);
+  return complement ? `${modele} ${complement}` : modele;
+}
+
+/**
+ * Ce que la page dit, sans l'ouverture qui annonce son sujet.
+ *
+ * Sert aux captures que le studio a nommées : leur titre tient déjà lieu
+ * d'ouverture, et la répéter ferait « La mécanique expliquée par le jeu
+ * lui-même. La page où le jeu explique sa mécanique Hold & Win. »
+ */
+function ditsDeLecture(
+  lecture: LectureDeCapture | null,
+  langue: Langue,
+  combien: number,
+): string | null {
+  if (!lecture) return null;
+  const dits = lecture.enonces
+    .slice(0, combien)
+    .map((code) => ENONCES.find((e) => e.code === code)?.dit?.[langue])
+    .filter((d): d is string => Boolean(d));
+  return dits.length ? dits.join(' ') : null;
 }
 
 /**

@@ -2,6 +2,42 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-13 — Les quatre autres studios, et le titre qui écrasait le contenu
+
+Après Wazdan, les pages muettes ont été ouvertes studio par studio et leurs
+formulations relevées au mot près. Mesuré sur échantillon régulier :
+
+| studio | pages du site | avant | après |
+|---|---|---|---|
+| Hacksaw | 963 | 6 lues · 3 muettes | **25 lues · 1 muette** |
+| Play'n GO | 438 | 3 · 2 | **6 lues · 1 muette** |
+| Pragmatic | 4 276 (47 %) | 2 lues sur 5 | 3 lues sur 5 |
+| BGaming | 1 173 | 12 · 18 | vocabulaire ajouté, à remesurer |
+
+**La clause de dysfonctionnement est le témoin le plus répandu du site, et
+l'OCR l'écrit « volds ».** Tesseract confond le i et le l dans la police de
+Play'n GO — « voids » ne correspondait pas, et la page de mentions légales de
+chacun de ses 113 jeux passait à la trappe, avec « pald out » et « wviinnings »
+dans la même page. Ces coquilles sont désormais dans les motifs, parce qu'elles
+sont systématiques et non accidentelles.
+
+**Le titre du studio écrasait le contenu de la page.** Quand le panneau nomme
+sa page lui-même — « Special wilds », « Expanding wilds » —, ce nom décide du
+sujet, et c'est voulu : il évite qu'une page de Wilds soit légendée comme un
+achat à cause du bouton « BUY FREE SPINS » peint en permanence dans l'habillage
+Pragmatic. Mais le modèle du type ignore le titre autant que le contenu : les
+deux pages recevaient **la même phrase**, « La mécanique expliquée par le jeu
+lui-même ». 488 captures de mécanique et 213 d'achat étaient dans ce cas. Le
+titre ouvre toujours, et ce que la page dit vient maintenant le compléter, deux
+énoncés au plus.
+
+**Autres pièges payés** : `achat-propose` est volontairement faible (poids 1)
+parce que « BONUS BUY » est un bouton d'habillage — il fallait donc un second
+énoncé pour la vraie page d'achat de Hacksaw, pas un élargissement du premier.
+Et la table de gains de BGaming, « 13+ 100.00 FUN » en colonnes, se reconnaît à
+sa **structure** : six lignes de ce gabarit, sans qu'aucun de ces nombres soit
+recopié dans la légende.
+
 ## 2026-09-13 — Le panneau de Wazdan se lit enfin (un quart du site)
 
 Wazdan pèse **2 207 des 8 951 pages de panneau** du site, et 60 à 70 % d'entre
