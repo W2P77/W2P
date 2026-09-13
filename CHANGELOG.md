@@ -2,6 +2,44 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-14 — Habanero branché, et un audit de chaque fiche publiée
+
+**Habanero** — `src/lib/captures/adaptateur-habanero.ts`. 222 fiches avec démo,
+**6 RTP en base** : la lecture du panneau est leur seule voie vers la
+publication. Lanceur direct `app-test.insvr.com`, sans tête, aucun blocage sur
+222 requêtes et ~35 chargements. Seules les clés `SG` (202 slots) sont prises ;
+les 20 tables et vidéo-pokers n'ont ni menu ni section RTP et sont écartés en
+clair. Le Help est du HTML, ouvert par l'API du jeu ; la section « Return To
+Player (RTP) » dit **« The theoretical RTP for Hot Hot Fruit is 96.84% »**.
+
+Deux pièges dans cette phrase, tous deux réglés dans le lecteur de règles et
+verrouillés par des tests. **Le nom du jeu y est**, et il commence parfois par
+un chiffre — 5 Lucky Lions, 12 Zodiacs, Zeus 2 — où la règle générale
+s'arrêtait et rendait `null`. **Et la plage** s'écrit « 96.51% - 96.79% », avec
+un % après chaque nombre, forme que la règle de plage de BGaming ne voyait
+pas : la règle générale rendait alors le **bas**, publié comme défaut, sans
+écart possible puisque la fiche n'a pas de taux — le chiffre faux en source
+studio, le pire cas du site. Le haut est le défaut du lanceur (`GameRTP`), le
+bas un palier.
+
+Un garde-fou de plus, dans l'adaptateur : cinq jeux n'ont **aucune ligne
+inconditionnelle** (« 96.03% if Green Jelly Mode is selected »). L'adaptateur
+relit la première ligne et refuse, nommé, si le taux du lanceur n'y figure
+pas — plutôt que de publier le taux d'un mode comme celui du jeu.
+
+À corriger en base, pas ici : **une trentaine de noms** dérivés du slug ont
+perdu leur apostrophe (« Azlands Gold » pour Aztlan's Gold) ou leur suffixe
+(« Queen of Queens 1024 » pour Queen of Queens II). Relevé complet dans le
+rapport de reconnaissance.
+
+**`scripts/auditer-fiches-publiees.ts`** — depuis que Google crawle, une fiche
+douteuse en ligne coûte plus qu'une fiche absente. La publication est décidée
+par une règle et validée par des heuristiques ; ce script regarde **chaque
+capture publiée** avec un œil de robot : écran quasi uniforme (écart-type de
+luminance sous 12), image trop petite ou trop légère, fiche sans page de
+règles, RTP ou gain max hors de toute plausibilité, légendes en double. Il
+n'écrit rien et rend la liste de ce qu'un humain doit regarder.
+
 ## 2026-09-14 — Chromium ne demande plus le mot de passe du trousseau
 
 En pleine campagne nocturne, macOS a affiché « Chromium veut accéder au

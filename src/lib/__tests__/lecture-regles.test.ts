@@ -196,6 +196,30 @@ describe('les moteurs Yggdrasil, sans le sigle', () => {
   });
 });
 
+/*
+ * Habanero met le nom du jeu dans la phrase, et ce nom commence parfois par un
+ * chiffre : « The theoretical RTP for 5 Lucky Lions is 96.51% - 96.79% ». La
+ * règle générale s'arrêtait sur le 5. Et sa plage porte un « % » après chaque
+ * nombre, forme que la règle de plage de BGaming ne voit pas : elle rendait le
+ * bas. Le haut est le défaut du lanceur, le bas un palier.
+ */
+describe('la formulation Habanero, avec le nom du jeu dans la phrase', () => {
+  it('saute un nom qui commence par un chiffre', () => {
+    expect(extraireLesFaits('The theoretical RTP for 12 Zodiacs is 94.10%').rtp).toBe(94.1);
+    expect(extraireLesFaits('The theoretical RTP for Zeus 2 is 96.00%').rtp).toBe(96);
+  });
+
+  it('lit une plage en gardant le haut pour défaut', () => {
+    const f = extraireLesFaits('The theoretical RTP for 5 Lucky Lions is 96.51% - 96.79%');
+    expect(f.rtp).toBe(96.79);
+    expect(f.rtpMin).toBe(96.51);
+  });
+
+  it('ne prend pas le taux d’un jackpot pour celui du jeu', () => {
+    expect(extraireLesFaits('The theoretical RTP for MINOR JACKPOT is 0.50%').rtp).toBeNull();
+  });
+});
+
 describe('le gain maximum, selon la formule du studio', () => {
   it('lit « maximum theoretical win »', () => {
     expect(extraireLesFaits('The maximum theoretical win is 5,000x the bet').gainMax).toBe(5000);

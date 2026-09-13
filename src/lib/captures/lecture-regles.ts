@@ -413,6 +413,21 @@ export function extraireLesFaits(texte: string, pages: FaitsLus['pages'] = []): 
     new RegExp(`theoretical\\s+average\\s+return\\s+to\\s+player\\s+is\\s*:?\\s*${CHIFFRE}\\s?%`, 'i').exec(t)?.[1] ??
     null;
 
+  /*
+   * Habanero : « The theoretical RTP for 5 Lucky Lions is 96.51% - 96.79% ».
+   * Le nom du jeu est dans la phrase et commence parfois par un chiffre —
+   * 5 Lucky Lions, 12 Zodiacs, Zeus 2 — où `jusquAuNombre` s'arrête, attend
+   * le taux, et rend null. Le nom est donc sauté jusqu'au « is ». Et la plage
+   * s'écrit avec « % » après chaque nombre, forme que la règle de plage
+   * ci-dessous (celle de BGaming) ne voit pas : la règle générale rendait
+   * alors le BAS. Le haut est le défaut — c'est le `GameRTP` du lanceur —, le
+   * bas un palier. « for MINOR JACKPOT is 0.50% » ne passe pas `CHIFFRE`.
+   */
+  const formulationHabanero = new RegExp(
+    `theoretical\\s+RTP\\s+for\\s+.{1,60}?\\s+is\\s*:?\\s*${CHIFFRE}\\s?%(?:\\s*[-–—]\\s*${CHIFFRE}\\s?%)?`,
+    'i',
+  ).exec(t);
+
   let brutHaut =
     lire('theoretical') ??
     lire('maximum') ??
@@ -422,7 +437,9 @@ export function extraireLesFaits(texte: string, pages: FaitsLus['pages'] = []): 
     formulationNolimit ??
     formulationStakelogic ??
     formulationGati ??
-    formulationReelPlay;
+    formulationReelPlay ??
+    formulationHabanero?.[1] ??
+    null;
   let brutBas = lire('minimum');
 
   /*
@@ -442,6 +459,12 @@ export function extraireLesFaits(texte: string, pages: FaitsLus['pages'] = []): 
   ).exec(t);
   if (plage) {
     const [a, b] = [plage[1], plage[2]];
+    const hautEnPremier = (nombre(a) ?? 0) >= (nombre(b) ?? 0);
+    brutHaut = hautEnPremier ? a : b;
+    brutBas = hautEnPremier ? b : a;
+  } else if (formulationHabanero?.[2]) {
+    // La plage Habanero, « 96.51% - 96.79% » : même convention, haut en défaut.
+    const [a, b] = [formulationHabanero[1], formulationHabanero[2]];
     const hautEnPremier = (nombre(a) ?? 0) >= (nombre(b) ?? 0);
     brutHaut = hautEnPremier ? a : b;
     brutBas = hautEnPremier ? b : a;

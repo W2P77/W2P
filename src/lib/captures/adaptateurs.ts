@@ -280,6 +280,7 @@ import { NOLIMIT_CITY } from './adaptateur-nolimit-city';
 import { STAKELOGIC } from './adaptateur-stakelogic';
 import { SPINOMENAL } from './adaptateur-spinomenal';
 import { YGGDRASIL } from './adaptateur-yggdrasil';
+import { HABANERO } from './adaptateur-habanero';
 
 /*
  * La clé est le `slug` du studio en base, pas son nom : c'est elle que
@@ -365,4 +366,12 @@ export const ADAPTATEURS: Record<string, Adaptateur> = {
    * trois chargements en une minute : deux minutes de pause entre les jeux.
    */
   yggdrasil: YGGDRASIL,
+  /*
+   * Habanero : lanceur direct, sans tete, un Help HTML qui porte la section
+   * RTP — « The theoretical RTP for 5 Lucky Lions is 96.51% - 96.79% », que
+   * le lecteur sait lire depuis le 14/09. Seules les cles SG (202 slots) ;
+   * 20 tables et video-pokers ecartes en clair. 222 fiches, 6 RTP en base :
+   * la lecture du panneau est leur seule voie vers la publication.
+   */
+  habanero: HABANERO,
 };
