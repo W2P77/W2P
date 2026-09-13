@@ -342,6 +342,46 @@ async function capturerUnJeu(
   };
 }
 
+/**
+ * Écrire en base malgré le pooler, qui ferme les connexions dormantes.
+ *
+ * ── Ce que ça a coûté ─────────────────────────────────────────────────────
+ *
+ * La campagne 1spin4win est morte à son 106ᵉ jeu sur 223, sur un
+ * « Server has closed the connection ». Ce n'est pas une panne : Supavisor
+ * coupe une connexion restée inactive, et une campagne passe **une minute par
+ * jeu à ne rien demander à la base** — elle photographie. La connexion tombe
+ * donc forcément au bout de quelques dizaines de jeux, et l'échec arrive au
+ * moment précis où l'on a du travail à sauver.
+ *
+ * Rien n'était perdu — `capturesLe` fait marque-page et les jeux non traités
+ * restent en file — mais le programme s'arrêtait, et personne ne le voyait
+ * avant de relire le journal. Deux heures de machine libre pour rien.
+ *
+ * ── Pourquoi trois essais et pas une reconnexion explicite ────────────────
+ *
+ * Le client Prisma rétablit sa connexion tout seul à la requête suivante :
+ * il n'y a rien à rouvrir à la main. Ce qu'il ne fait pas, c'est **rejouer**
+ * la requête qui est tombée. C'est donc tout ce qu'on ajoute, et seulement
+ * pour les erreurs de transport — une contrainte violée ou une donnée refusée
+ * doit continuer d'échouer bruyamment, au premier essai.
+ */
+const TRANSPORT = /closed the connection|Connection reset|ECONNRESET|EPIPE|timed? out|Can't reach database/i;
+
+async function ecrireMalgreLePooler<T>(ecrire: () => Promise<T>): Promise<T> {
+  const ATTENTES = [1_000, 4_000, 12_000];
+  for (let essai = 0; ; essai++) {
+    try {
+      return await ecrire();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      if (essai >= ATTENTES.length || !TRANSPORT.test(message)) throw e;
+      console.log(`  … la base a coupé, nouvel essai dans ${ATTENTES[essai] / 1000} s`);
+      await new Promise((fin) => setTimeout(fin, ATTENTES[essai]));
+    }
+  }
+}
+
 async function main() {
   const studio = arg('studio') ?? 'pragmatic-play';
   const limite = Number(arg('limite') ?? 3);
@@ -420,7 +460,7 @@ async function main() {
     if (!appliquer) return;
     for (const c of r.captures) await televerser(join(ATELIER, c.fichier), c.fichier);
     const jeu = jeux.find((j) => j.slug === r.slug)!;
-    await prisma.jeu.update({
+    await ecrireMalgreLePooler(() => prisma.jeu.update({
       where: { id: jeu.id },
       data: {
         // La colonne est du JSON : Prisma n'accepte pas une interface nommée,
@@ -451,7 +491,7 @@ async function main() {
         ...(r.volatilite && !r.ecart ? { volatilite: r.volatilite as never } : {}),
         ...(r.gainMax != null && !r.ecart ? { gainMaxMultiple: Math.round(r.gainMax) } : {}),
       },
-    });
+    }));
     // Le dossier de travail ne garde rien : les images vivent chez Supabase.
     for (const c of r.captures) rmSync(join(ATELIER, c.fichier), { force: true });
   };

@@ -2,6 +2,43 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-13 — Une campagne ne meurt plus parce que le pooler a coupé
+
+La campagne 1spin4win s'est arrêtée à son **106ᵉ jeu sur 223**, sur un
+`Server has closed the connection`. Ce n'est pas une panne : Supavisor ferme
+les connexions dormantes, et une campagne passe **une minute par jeu sans rien
+demander à la base** — elle photographie. La connexion tombe donc forcément au
+bout de quelques dizaines de jeux, et l'échec arrive au moment précis où l'on a
+du travail à sauver.
+
+Rien n'était perdu — `capturesLe` fait marque-page, les jeux non traités
+restent en file — mais le programme s'arrêtait et personne ne le voyait avant
+de relire le journal : deux heures de machine libre pour rien.
+
+L'écriture rejoue donc trois fois, à 1, 4 et 12 secondes, **et seulement pour
+les erreurs de transport** : une contrainte violée ou une donnée refusée doit
+continuer d'échouer bruyamment, au premier essai. Il n'y a rien à rouvrir à la
+main — le client Prisma rétablit sa connexion tout seul à la requête suivante ;
+ce qu'il ne fait pas, c'est **rejouer** celle qui est tombée.
+
+### Mesuré au passage : le blocage géographique et celui de la base
+
+Un VPN américain a été essayé pour débloquer Endorphina (224 fiches) et Push
+Gaming (84). Le mur géographique tombe : `player.eu.demo.pushgaming.com` rend
+**403 depuis la France** (« CloudFront is configured to block access from your
+country », refusé au bord en 45 ms) et **404 depuis Atlanta** — on entre, c'est
+l'adresse qui n'existe pas. Endorphina répond 200 là où la France lisait
+« Forbidden For Your Region ».
+
+Mais **Supabase refuse la connexion à travers le VPN** : le TCP s'ouvre, puis
+Postgres ferme, systématiquement — le comportement d'une protection qui écarte
+les IP de datacenter, et Proton sort chez Datacamp. Capturer et publier dans le
+même passage devient donc impossible tant qu'on ne peut pas ne router **que**
+le navigateur. Sans split tunneling, il faudrait un mode hors-ligne : capturer
+sur le disque sous VPN, téléverser et écrire une fois coupé. Une heure de
+travail pour 308 fiches, remise à plus tard — 1 402 fiches sont capturables
+sans aucun VPN.
+
 ## 2026-09-13 — Le cadre de démo dit d'où vient la démo
 
 Certains studios refusent de servir leur démo hors des pays qu'ils couvrent :
