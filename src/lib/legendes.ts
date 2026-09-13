@@ -397,6 +397,29 @@ const ENONCES: Enonce[] = [
     ],
   },
   {
+    code: 'gain-max-annonce',
+    sujet: 'chiffresDuJeu',
+    poids: 3,
+    /*
+     * « The maximum win amount is 5000x bet. » — la dernière page de chaque
+     * Wazdan, avec la clause de nullité et la note d'indépendance des parties.
+     * Pas de `dit` : le chiffre est celui de la fiche, vérifié à la campagne,
+     * et c'est `phraseDesFaits` qui l'écrit — jamais celui lu dans l'image.
+     */
+    motifs: [/maximum\s+win\s+amount\s+is\s+\d/i],
+  },
+  {
+    code: 'table-suit-la-mise',
+    sujet: 'chiffresDuJeu',
+    poids: 1,
+    motifs: [/paytable\s+reflects\s+current\s+bet\s+configuration/i],
+    dit: {
+      en: 'The pay table follows the bet currently set.',
+      fr: 'La table de gains suit la mise en cours.',
+      de: 'Die Gewinntabelle folgt dem aktuell eingestellten Einsatz.',
+    },
+  },
+  {
     code: 'plage-de-rtp',
     sujet: 'chiffresDuJeu',
     poids: 2,
@@ -447,6 +470,8 @@ const ENONCES: Enonce[] = [
     motifs: [
       /land\s+\d\s+(?:FS\s+)?scatter[^.]{0,90}(?:activate|trigger|award)/i,
       /\d\s+(?:or\s+more\s+)?scatters?[^.]{0,60}(?:award|trigger)s?\s+\d+\s+free\s+spins/i,
+      /scatter\s+symbols?\s+triggers?\s+(?:the\s+)?BONUS\s+FEATURE/i,
+      /\d+\s+free\s+spins\s+are\s+awarded/i,
     ],
   },
   /*
@@ -472,6 +497,39 @@ const ENONCES: Enonce[] = [
     poids: 3,
     // Sans `dit` : le nombre est relu plus bas, s'il est unanime dans la page.
     motifs: [/scatter\s+symbols?[^.]{0,60}will\s+trigger[^.]{0,40}free\s+spins/i, /\d\+?\s+scatter\s+symbols?\s+trigger\s+free\s+spins/i],
+  },
+  {
+    code: 'declenchement-aleatoire',
+    sujet: 'toursGratuits',
+    poids: 3,
+    motifs: [/random\s+chance\s+that\s+the\s+FREE\s+SPINS\s+feature\s+will\s+trigger/i],
+    dit: {
+      en: 'The free spins can trigger at random when the special symbols land, without a fixed count.',
+      fr: 'Les tours gratuits peuvent se déclencher au hasard à la chute des symboles spéciaux, sans nombre fixe.',
+      de: 'Die Freispiele können beim Landen der Spezialsymbole zufällig auslösen, ohne feste Anzahl.',
+    },
+  },
+  {
+    code: 'formule-tiree-au-sort',
+    sujet: 'toursGratuits',
+    poids: 3,
+    motifs: [/one\s+of\s+the\s+following\s+types\s+is\s+randomly\s+chosen/i],
+    dit: {
+      en: 'The type of free spins played is drawn at random among several.',
+      fr: 'Le type de tours gratuits joué est tiré au sort parmi plusieurs.',
+      de: 'Die gespielte Freispiel-Variante wird zufällig aus mehreren gezogen.',
+    },
+  },
+  {
+    code: 'wilds-ajoutes-au-hasard',
+    sujet: 'toursGratuits',
+    poids: 2,
+    motifs: [/WILD\s+symbols\s+are\s+added\s+in\s+random\s+positions/i],
+    dit: {
+      en: 'Wilds are added at random positions during the spins.',
+      fr: 'Des Wilds sont ajoutés à des positions aléatoires pendant les tours.',
+      de: 'Während der Drehungen werden Wilds an zufälligen Positionen hinzugefügt.',
+    },
   },
   {
     code: 'choix-de-la-formule',
@@ -626,7 +684,14 @@ const ENONCES: Enonce[] = [
     code: 'hold-the-jackpot',
     sujet: 'holdAndWin',
     poids: 3,
-    motifs: [/activates?\s+the\s+Hold\s+the\s+Jackpot/i, /Hold\s+the\s+Jackpot\s*(?:™)?\s+Bonus\s+Game/i],
+    motifs: [
+      /activates?\s+the\s+Hold\s+the\s+Jackpot/i,
+      /Hold\s+the\s+Jackpot\s*(?:™)?\s+Bonus\s+Game/i,
+      // Un retour à la ligne entre « Hold » et « the Jackpot » suffit à
+      // l'OCR pour y glisser un mot parasite ; « the Jackpot™ Bonus Game »
+      // reste, et n'appartient qu'à cette famille.
+      /the\s+Jackpot\s*™?\s+Bonus\s+Game/i,
+    ],
     dit: {
       en: 'Bonus symbols landing in sufficient number open the Hold the Jackpot bonus game.',
       fr: 'Les symboles Bonus, en nombre suffisant, ouvrent le jeu bonus Hold the Jackpot.',
@@ -642,6 +707,30 @@ const ENONCES: Enonce[] = [
       en: 'The base game holds no regular symbols: every prize is won inside the bonus game.',
       fr: "Le jeu de base ne contient aucun symbole ordinaire : tous les gains se remportent dans le jeu bonus.",
       de: 'Das Basisspiel enthält keine regulären Symbole: Alle Gewinne fallen im Bonusspiel.',
+    },
+  },
+  {
+    code: 'bonus-payes-en-bonus',
+    sujet: 'holdAndWin',
+    poids: 2,
+    motifs: [/Bonus\s+symbols\s+pay\s+only\s+in\s+the\s+Bonus\s+Game/i],
+    dit: {
+      en: 'Bonus symbols pay only inside the bonus game.',
+      fr: 'Les symboles Bonus ne paient que dans le jeu bonus.',
+      de: 'Bonussymbole zahlen nur im Bonusspiel.',
+    },
+  },
+  {
+    code: 'matrice-des-cloches',
+    sujet: 'holdAndWin',
+    poids: 3,
+    // 9 Bells, 12 Bells, Sizzling Bells : chaque cloche tirée remplit une
+    // case, et la matrice pleine ouvre le jeu bonus des cloches.
+    motifs: [/\d+\s+Bells\s+Matrix/i],
+    dit: {
+      en: 'Every bell landed fills a slot in a matrix; once it is full, the bells bonus game opens.',
+      fr: 'Chaque cloche obtenue remplit une case d’une matrice ; pleine, elle ouvre le jeu bonus des cloches.',
+      de: 'Jede erzielte Glocke füllt ein Feld einer Matrix; ist sie voll, öffnet sich das Glocken-Bonusspiel.',
     },
   },
   {
@@ -765,7 +854,8 @@ const ENONCES: Enonce[] = [
     sujet: 'symbolesSpeciaux',
     poids: 3,
     motifs: [
-      /wild[^.]{0,60}substitutes?\s+for\s+all\s+symbols\s+except/i,
+      // « ©xcept » : Tesseract prend le e ornementé de cette police pour ©.
+      /wild[^.]{0,60}substitutes?\s+for\s+all\s+symbols\s+.xcept/i,
       // Play'n GO : « The WILD symbol substitutes for any other reel symbols
       // except the bonus SCATTER », et sur l'habillage graphique « WILDS
       // substitute for all other symbols, except SCATTERS. »
@@ -782,6 +872,30 @@ const ENONCES: Enonce[] = [
       en: 'The wild substitutes for every symbol except the scatter.',
       fr: 'Le Wild remplace tous les symboles sauf le Scatter.',
       de: 'Das Wild ersetzt alle Symbole außer dem Scatter.',
+    },
+  },
+  {
+    code: 'wild-empile',
+    sujet: 'symbolesSpeciaux',
+    poids: 2,
+    motifs: [/is\s+stacked\s+and\s+present\s+on\s+all\s+reels/i],
+    dit: {
+      en: 'The wild comes stacked and is present on every reel in the base game.',
+      fr: 'Le Wild est empilé et présent sur tous les rouleaux en jeu de base.',
+      de: 'Das Wild ist gestapelt und im Basisspiel auf allen Walzen vorhanden.',
+    },
+  },
+  {
+    code: 'scatter-sur-certains-rouleaux',
+    sujet: 'symbolesSpeciaux',
+    poids: 2,
+    // « SCATTER symbol appears on reels 1, 3 and 5 » : lesquels change d'un
+    // jeu à l'autre, donc on ne les nomme pas.
+    motifs: [/scatter\s+symbol\s+appears\s+on\s+reels\s+\d/i],
+    dit: {
+      en: 'The scatter only appears on certain reels.',
+      fr: 'Le Scatter n’apparaît que sur certains rouleaux.',
+      de: 'Der Scatter erscheint nur auf bestimmten Walzen.',
     },
   },
   {
@@ -1116,7 +1230,10 @@ const ENONCES: Enonce[] = [
     code: 'scatter-ajoute-aux-lignes',
     sujet: 'formationDesGains',
     poids: 2,
-    motifs: [/wins?\s+for\s+scatters?\s+are\s+added\s+to\s+active\s+line\s+wins/i],
+    motifs: [
+      /wins?\s+for\s+scatters?\s+are\s+added\s+to\s+active\s+line\s+wins/i,
+      /scatter\s+wins\s+are\s+added\s+to\s+the\s+payline\s+win/i,
+    ],
     dit: {
       en: 'Scatter wins are added to the active line wins.',
       fr: "Les gains de Scatter s'ajoutent à ceux des lignes actives.",
@@ -1176,7 +1293,10 @@ const ENONCES: Enonce[] = [
     code: 'changer-la-mise',
     sujet: 'commandes',
     poids: 3,
-    motifs: [/you\s+can\s+change\s+the\s+bet\s+value\s+by/i],
+    motifs: [
+      /you\s+can\s+change\s+the\s+bet\s+value\s+by/i,
+      /buttons\s+to\s+change\s+the\s+bet\s+value\s+and\s+open\s+the\s+bet\s+menu/i,
+    ],
     dit: {
       en: 'How the bet is changed: the value buttons, the plus and minus, or a long press to jump to the minimum or the maximum.',
       fr: "Comment se change la mise : les boutons de valeur, le plus et le moins, ou un appui maintenu pour aller au minimum ou au maximum.",
@@ -1187,11 +1307,37 @@ const ENONCES: Enonce[] = [
     code: 'bouton-de-tour',
     sujet: 'commandes',
     poids: 2,
-    motifs: [/click\s+to\s+start\s+playing\s+at\s+the\s+current\s+bet/i, /play\s+button/i],
+    motifs: [
+      /click\s+to\s+start\s+playing\s+at\s+the\s+current\s+bet/i,
+      /play\s+button/i,
+      /press\s+the\s+SPIN\s+button\s+to\s+play/i,
+    ],
     dit: {
       en: 'The spin button, which plays at the bet level currently set.',
       fr: 'Le bouton de lancement, qui joue au niveau de mise en cours.',
       de: 'Die Starttaste, die mit dem aktuell eingestellten Einsatz spielt.',
+    },
+  },
+  {
+    code: 'vitesses-de-tour',
+    sujet: 'commandes',
+    poids: 2,
+    motifs: [/cycles\s+through\s+spin\s+speed\s+settings/i, /normal\s+speed,\s+quick\s+spin\s+and\s+turbo\s+spin/i],
+    dit: {
+      en: 'Three spin speeds: normal, quick and turbo.',
+      fr: 'Trois vitesses de tour : normale, rapide et turbo.',
+      de: 'Drei Drehgeschwindigkeiten: normal, schnell und Turbo.',
+    },
+  },
+  {
+    code: 'jetons-ou-argent',
+    sujet: 'commandes',
+    poids: 1,
+    motifs: [/switch\s+between\s+coins\s+view\s+and\s+cash\s+view/i],
+    dit: {
+      en: 'The balance and bet can be shown in coins or in cash.',
+      fr: 'Le solde et la mise peuvent s’afficher en jetons ou en argent.',
+      de: 'Guthaben und Einsatz lassen sich in Münzen oder in Geld anzeigen.',
     },
   },
   {
@@ -1216,6 +1362,7 @@ const ENONCES: Enonce[] = [
       /active\s+counters/i,
       /total\s+bet\s*-\s*current\s+bet/i,
       /current\s+balance\s+is\s+shown\s+in\s+the\s+BALANCE\s+display/i,
+      /CREDIT\s+and\s+BET\s+labels\s+show\s+the\s+current\s+balance/i,
     ],
     dit: {
       en: 'The counters on screen: current win, total bet, balance.',
@@ -1318,6 +1465,28 @@ const ENONCES: Enonce[] = [
       en: 'The clause voiding all pays and plays in the event of a malfunction.',
       fr: 'La clause qui annule gains et parties en cas de dysfonctionnement.',
       de: 'Die Klausel, die bei einer Störung alle Gewinne und Runden für ungültig erklärt.',
+    },
+  },
+  {
+    code: 'parties-independantes',
+    sujet: 'mentionsLegales',
+    poids: 2,
+    motifs: [/outcome\s+of\s+each\s+and\s+every\s+game\s+is\s+completely\s+independent/i],
+    dit: {
+      en: 'Each round is independent of the last, as the game states.',
+      fr: 'Chaque partie est indépendante de la précédente, comme le jeu le stipule.',
+      de: 'Jede Runde ist von der vorherigen unabhängig, wie das Spiel festhält.',
+    },
+  },
+  {
+    code: 'collant-sans-effet',
+    sujet: 'mentionsLegales',
+    poids: 1,
+    motifs: [/outcome\s+of\s+remaining\s+non-sticky\s+symbols\s+is\s+entirely\s+random/i],
+    dit: {
+      en: 'A sticky symbol changes nothing to the draw of the others.',
+      fr: 'Un symbole collant ne change rien au tirage des autres.',
+      de: 'Ein haftendes Symbol ändert nichts an der Ziehung der übrigen.',
     },
   },
   {
@@ -1683,7 +1852,7 @@ export function legendeDeLecture(
     const dit = code ? ENONCES.find((e) => e.code === code)?.dit?.[langue] : null;
     if (dit) chiffres.push(dit);
   }
-  if (lecture.tous.includes('rtp-annonce')) {
+  if (lecture.tous.includes('rtp-annonce') || lecture.tous.includes('gain-max-annonce')) {
     const phrase = phraseDesFaits(faits, langue);
     if (phrase) chiffres.push(phrase);
   }

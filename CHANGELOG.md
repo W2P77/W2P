@@ -2,6 +2,34 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-13 — Ce qui reste muet après la relecture, appris
+
+Au départ du chantier, **60 % des 11 378 légendes servies étaient génériques**
+(mesuré par `scripts/mesurer-legendes-generiques.ts`, sur la légende rendue et
+non sur la lecture). Un studio faisait exception : 1spin4win, **9 %**, seul à
+avoir été lu au moment de la capture avec le vocabulaire complet. C'est la
+cible des cinq autres.
+
+La relecture lancée, les premières fiches relues ont été rouvertes pour ne
+regarder que ce qui **reste** muet avec le vocabulaire du jour — les seules
+pages qu'il restait à apprendre. Wazdan sort à **220 pages lues pour 27
+muettes**, et les 27 se ressemblent toutes : le plafond de gain annoncé (« The
+maximum win amount is 5000x bet »), la table qui suit la mise, l'indépendance
+des parties, le symbole collant qui ne change rien au tirage des autres, la
+matrice des cloches, un déclenchement coupé par un retour à la ligne. Pragmatic
+tenait à 15 muettes sur 35 : sa page « How to play » entière — vitesses de
+tour, jetons ou argent, bouton de lancement —, le Wild empilé, le Scatter qui
+n'apparaît que sur certains rouleaux, les tours gratuits au déclenchement
+aléatoire ou tirés au sort entre plusieurs formules. Hacksaw, Play'n GO et
+BGaming n'avaient plus qu'une page chacun, propre à un jeu.
+
+**Le plafond de gain annoncé déclenche désormais la phrase des chiffres**, au
+même titre que le RTP annoncé : la valeur écrite est celle de la fiche,
+vérifiée à la campagne, jamais celle lue dans l'image.
+
+Une coquille de plus au vocabulaire : « ©xcept » — Tesseract prend le *e*
+ornementé de la police Pragmatic pour un ©, et la règle du Wild y échappait.
+
 ## 2026-09-13 — Le RTP s'écrivait « 96.18 % » en français, dans le titre
 
 where2spin a été soumis à Search Console le 12/09 au soir et le crawl a
