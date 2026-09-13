@@ -2,6 +2,33 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-13 — Une clause d'habillage légendait six tables de gains
+
+**Les six pages du panneau d'All Ways Egypt sortaient toutes « Les mentions de
+fin du panneau de règles ».** Ce sont des tables de gains et des pages de
+symboles. Une phrase fausse est pire qu'une phrase générique, et celle-ci
+touchait les 647 pages du studio.
+
+La cause vient de la réparation du matin. 1spin4win n'imprime pas son RTP : son
+panneau se reconnaît à la clause « MALFUNCTION VOIDS ALL PAYS AND PLAYS »,
+sans quoi ses captures étaient jetées. Mais cette clause est peinte sur
+**chaque** page de leur panneau, et tant que rien d'autre n'y était reconnu,
+elle emportait la décision partout. `dysfonctionnement` passe donc au poids 1,
+comme `achat-propose` : il lui faut désormais un second énoncé — le sort des
+parties interrompues, la version de l'aide — qui, lui, ne figure que sur la
+vraie page de mentions.
+
+**Et le studio a reçu son vocabulaire** : la table de gains à sa structure
+(« 5. 100 », « 4. 25 », « 3. 10 » en colonnes), le Wild qui multiplie le gain
+qu'il complète, les tours bonus gagnés avec 3, 4 ou 5 Scatters, les gains qui
+ne paient que de gauche à droite, le plafond de mise de l'achat. Sur
+échantillon : **7 pages identifiées sur 9**, contre 0 correctement avant.
+
+**`--refaire`, une troisième porte.** `--muettes` ne reprend que les pages
+restées vides : il suppose qu'un verdict déjà posé est bon. Cette hypothèse
+tombe dès qu'un énoncé décidait à tort — les 647 pages fausses n'auraient été
+rouvertes par aucune des deux portes existantes.
+
 ## 2026-09-13 — Une campagne ne meurt plus parce que le pooler a coupé
 
 La campagne 1spin4win s'est arrêtée à son **106ᵉ jeu sur 223**, sur un

@@ -79,6 +79,20 @@ const MUETTES = process.argv.includes('--muettes');
  * c'est la phrase qu'il faut relire avant une passe de dix mille captures.
  */
 const MONTRER = process.argv.includes('--montrer');
+/*
+ * Tout refaire, marque-page compris.
+ *
+ * `--muettes` ne reprend que les pages restées vides : il suppose qu'un verdict
+ * déjà posé est bon. Ça ne tient plus dès qu'on découvre qu'un énoncé décidait
+ * à tort — la clause « MALFUNCTION VOIDS ALL PAYS », peinte sur chaque page du
+ * panneau de 1spin4win, faisait sortir ses six tables de gains sous la légende
+ * « Les mentions de fin du panneau de règles ». 647 pages portaient un verdict
+ * faux, qu'aucune des deux autres portes n'aurait rouvert.
+ *
+ * À n'employer qu'avec `--studio` ou `--slugs` : sur le catalogue entier, c'est
+ * refaire toute la passe.
+ */
+const REFAIRE = process.argv.includes('--refaire');
 const LANGUES = ['fr', 'en', 'de'] as const;
 
 /** Là où l'on garde ce qu'on s'apprête à écraser — `/tmp` s'efface en cours de journée. */
@@ -140,7 +154,9 @@ async function main() {
    * sans relire ce qui l'a déjà été.
    */
   const aLire = (c: Capture) =>
-    !!c && EST_UNE_PAGE_DE_REGLES.test(c.fichier) && (!('lecture' in c) || (MUETTES && !c.lecture));
+    !!c &&
+    EST_UNE_PAGE_DE_REGLES.test(c.fichier) &&
+    (REFAIRE || !('lecture' in c) || (MUETTES && !c.lecture));
 
   const aRelire = jeux
     .map((j) => ({ ...j, caps: (j.captures as unknown as Capture[] | null) ?? [] }))

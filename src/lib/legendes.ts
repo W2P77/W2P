@@ -415,6 +415,8 @@ const ENONCES: Enonce[] = [
       /minimum\s+bet\s*:/i,
       /maximum\s+bet\s*:/i,
       /allowed\s+bet\s+levels\s+for\s+this\s+game\s+are\s+between/i,
+      // 1spin4win : « MIN. BET 10 - MAX. BET 5000 », en bas de sa table de gains.
+      /MIN\.?\s*BET\s+\d+\s*[-–]\s*MAX\.?\s*BET\s+\d+/i,
     ],
     dit: {
       en: 'The same page gives the minimum and maximum bet the game accepts.',
@@ -772,6 +774,9 @@ const ENONCES: Enonce[] = [
       // paytable » — sans exception nommée, donc hors de portée des deux
       // motifs ci-dessus.
       /wild\s+symbols?\s+substitutes?\s+for\s+all\s+symbols\s+in\s+the\s+paytable/i,
+      // 1spin4win écrit « The WILD symbol substitutes all symbols except
+      // SCATTER », sans la préposition.
+      /wild\s+symbol\s+substitutes\s+all\s+symbols\s+except/i,
     ],
     dit: {
       en: 'The wild substitutes for every symbol except the scatter.',
@@ -863,6 +868,10 @@ const ENONCES: Enonce[] = [
       // la devise de la démo. Deux pages de table de gains par jeu, sur 122
       // fiches, que ni le vocabulaire ni la structure ci-dessus ne voyaient.
       /\b\d{1,2}\+?\s+\d+[.,]\d{2}\s+(?:FUN|EUR|USD|CAD)\b/g,
+      // 1spin4win aligne « 5. 100 », « 4. 25 », « 3. 10 » — le nombre de
+      // symboles, un point, le gain. Le seuil commun de six lignes s'applique :
+      // une table de gains en aligne des dizaines.
+      /\b[345]\.\s+\d{1,4}\b/g,
     ],
     occurrences: 6,
     dit: {
@@ -937,6 +946,59 @@ const ENONCES: Enonce[] = [
    * que `achat-propose` est volontairement faible : « BONUS BUY » seul est un
    * bouton d'habillage, pas une page d'achat.
    */
+  /*
+   * ── 1spin4win ──────────────────────────────────────────────────────────
+   *
+   * 647 pages, et un piège qu'on s'est tendu tout seul : ce studio n'imprime
+   * pas son RTP, donc on reconnaît son panneau à la clause « MALFUNCTION VOIDS
+   * ALL PAYS AND PLAYS » — qui est peinte sur **chaque** page. Tant que rien
+   * d'autre n'y était reconnu, cette clause emportait la décision partout et
+   * six tables de gains sortaient légendées « Les mentions de fin du panneau ».
+   * D'où le poids 1 sur `dysfonctionnement`, et ces énoncés-ci pour que les
+   * vrais sujets gagnent.
+   */
+  {
+    code: 'bonus-spins-gagnes',
+    sujet: 'toursGratuits',
+    poids: 3,
+    // « 15 BONUSSPINS are won with 3,4 or 5 SCATTER symbols on any position. »
+    // Le nombre n'est pas recopié : il est relu plus bas, s'il est unanime.
+    motifs: [/bonus\s?spins\s+are\s+won\s+with/i],
+  },
+  {
+    code: 'gains-de-gauche-a-droite',
+    sujet: 'formationDesGains',
+    poids: 3,
+    motifs: [/wins\s+pay\s+only\s+from\s+left\s+to\s+right/i],
+    dit: {
+      en: 'Wins pay from left to right only.',
+      fr: 'Les gains ne paient que de gauche à droite.',
+      de: 'Gewinne zahlen ausschließlich von links nach rechts.',
+    },
+  },
+  {
+    code: 'plafond-de-l-achat',
+    sujet: 'achatDeBonus',
+    poids: 2,
+    motifs: [/MAX\.?\s*BONUS\s*BUY\s*BET/i],
+    dit: {
+      en: 'The panel gives the ceiling of the bet the bonus can be bought at.',
+      fr: "Le panneau donne le plafond de mise auquel le bonus peut être acheté.",
+      de: 'Das Regelwerk nennt die Einsatzobergrenze, zu der sich der Bonus kaufen lässt.',
+    },
+  },
+  {
+    code: 'wild-double-le-gain',
+    sujet: 'symbolesSpeciaux',
+    poids: 3,
+    motifs: [/doubles?\s+the\s+win\s+when\s+substituting/i],
+    dit: {
+      en: 'When the wild completes a win, it multiplies that win — more so during the bonus spins.',
+      fr: "Quand le Wild complète un gain, il le multiplie — davantage pendant les tours bonus.",
+      de: 'Vervollständigt das Wild einen Gewinn, vervielfacht es ihn — in den Bonusrunden stärker.',
+    },
+  },
+
   /*
    * ── BGaming ────────────────────────────────────────────────────────────
    *
@@ -1230,7 +1292,22 @@ const ENONCES: Enonce[] = [
   {
     code: 'dysfonctionnement',
     sujet: 'mentionsLegales',
-    poids: 2,
+    /*
+     * Faible exprès, et pour la même raison que `achat-propose`.
+     *
+     * La clause de nullité n'est pas toujours au bas d'une page de mentions :
+     * 1spin4win la peint sur **chaque** page de son panneau — c'est d'ailleurs
+     * à elle qu'on reconnaît ce panneau, faute de RTP imprimé. Au poids 2 elle
+     * atteignait le seuil toute seule, et les six pages d'All Ways Egypt, qui
+     * sont des tables de gains et des pages de symboles, sortaient toutes
+     * légendées « Les mentions de fin du panneau de règles ». Une phrase
+     * fausse est pire qu'une phrase générique.
+     *
+     * Au poids 1 il lui faut un second énoncé — le sort des parties
+     * interrompues, la version de l'aide — qui, lui, ne figure que sur la
+     * vraie page de mentions.
+     */
+    poids: 1,
     /*
      * « volds », « vaids » : Tesseract confond le i et le l dans cette police,
      * et la clause est le témoin le plus répandu du site. Le verbe est donc lu
