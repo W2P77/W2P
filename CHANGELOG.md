@@ -2,6 +2,26 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-13 — 264 fiches publiées n'avaient pas de vignette
+
+Les 1 855 jaquettes de `public/images/slots` viennent du lot importé de
+BetsRank. Tout studio ouvert depuis — Wazdan, Play'n GO, Red Tiger — n'en a
+aucune : **264 fiches publiées** affichaient le repli textuel, un nom sur fond
+dégradé, alors que le site venait précisément de photographier leur jeu.
+
+Chacune a pourtant sa capture **« The base game »** : l'écran à l'ouverture de
+la démo, avant le moindre tour. C'est la seule qui montre le jeu et non son
+règlement — une page de règles ferait une vignette illisible en 160 px.
+
+**Écrit en base plutôt que calculé au rendu**, parce que `visuelUrl` est lu par
+les cartes du catalogue, la vitrine d'accueil, le sitemap et la carte de
+partage : un repli à l'affichage aurait dû être répété dans chacun, et le
+premier oubli serait passé inaperçu. L'origine reste lisible dans le chemin —
+`/images/slots/…` pour une jaquette de studio, `…/captures/…` pour une capture
+adoptée — de quoi les reprendre le jour où les vraies arrivent.
+
+264 posées, **plus aucune fiche publiée sans vignette**.
+
 ## 2026-09-13 — La balise de mesure Google, sur les deux racines
 
 Le site a **deux racines** : `[langue]/layout.tsx` pour les pages publiques et
