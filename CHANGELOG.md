@@ -2,6 +2,48 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-13 — Yggdrasil, une fédération de moteurs ; trente écarts tranchés
+
+**Yggdrasil n'est pas un studio, c'est une trentaine de moteurs** sous une
+même marque : Reel Play 76 jeux, iSense 64, Bulletproof 33, GATI 16, Vue 11,
+et 30 démos retirées (403 S3). L'agent a lu l'`index.html` des 445 lanceurs
+pour le savoir, plutôt que d'en déduire un habillage de trois jeux.
+`src/lib/captures/adaptateur-yggdrasil.ts` prend en charge **GATI et Reel
+Play** — panneau HTML, RTP lisible au chiffre —, détecte le moteur à
+l'exécution et **nomme** les autres dans le journal (« moteur Bulletproof, pas
+encore pris en charge », « démo retirée ») au lieu de les faire échouer en
+« icône introuvable ». Pour ce studio, lire le taux n'est pas un bonus : 457
+fiches, 36 RTP en base — c'est la seule voie vers la publication.
+
+**Le ban est mesuré, pas supposé** : `demo.yggdrasilgaming.com` est derrière
+Cloudflare et **trois chargements en 65 s** valent une heure de 429 sur tout
+l'hôte, `retry-after` exact. Le runner ne peut pas le voir — des XHR sans CORS
+finissent en écran noir — donc l'adaptateur écoute les 429, fait une requête
+de contrôle quand le jeu ne répond pas, et lève `LimiteDeDebit`. Deux minutes
+de pause entre les jeux. `PARALLELE = 2` du runner est à lui seul la moitié
+du déclencheur.
+
+**Le piège des variantes** : la démo Reel Play sert parfois un **RTP réduit**
+(94,0 quand la fiche produit dit « 96 %, 94 %, 90.5 % »), et le lanceur le
+déclare (`rtp_variant_active`). L'adaptateur le relit et refuse : un 94,0 lu
+dans une démo bridée, écrit en source studio, serait un mensonge signé.
+
+Le lecteur apprend deux formulations : GATI, « The overall theoretical return
+to player is 96.0% » — mot pour mot le corps de texte d'Evoplay, que seul son
+bandeau sauvait —, et Reel Play, « The Theoretical Average Return to Player
+is: 94.0% ». Un test vérifie qu'aucune n'attrape « when using BUY BONUS is ».
+
+**Trente écarts panneau/base tranchés.** `scripts/resoudre-ecarts.ts` relit
+chaque capture porteuse du taux une seconde fois, plein cadre à double
+résolution, et n'aligne la base que si les deux lectures tombent au même
+chiffre : 30 confirmés, 9 illisibles laissés, 0 infirmé. Vingt-deux sont des
+Pragmatic dont la base portait la norme maison 96,5 et dont le panneau dit
+96,03 ou 96,08 — la valeur non ronde est celle qu'on garde. Un garde-fou de
+plus : **un entier là où la base a des décimales est une lecture tronquée**,
+pas une correction. Wolf Gold, base 96,01, panneau « 96 » lu deux fois — les
+deux lectures ont perdu les mêmes décimales dans la même image. Écarté, avec
+Wisdom of Athena 1000.
+
 ## 2026-09-13 — Spinomenal, le plus gros stock, a son adaptateur
 
 **633 fiches, 554 avec leur RTP** : le plus gros stock capturable du catalogue.

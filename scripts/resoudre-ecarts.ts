@@ -92,8 +92,21 @@ async function main() {
         seconde = null;
       }
 
+      /*
+       * Un entier là où la base a des décimales est une lecture tronquée, pas
+       * une correction. Wolf Gold : base 96,01, panneau « 96 », deux lectures
+       * d'accord — parce que les deux ont perdu les mêmes décimales dans la
+       * même image. Écraser 96,01 par 96 serait dégrader un chiffre précis
+       * en chiffre rond, à l'inverse de tout ce que ce script cherche. Un
+       * entier ne remplace donc un entier que si la base en était un aussi :
+       * 1spin4win écrit vraiment « RTP 97 », et sa base dit 97.
+       */
+      const tronque =
+        Number.isInteger(e.panneau) && !Number.isInteger(e.base) && Math.abs(e.panneau - e.base) < 1;
+
       const verdict: Verdict =
         seconde == null ? 'illisible'
+        : tronque ? 'autre'
         : Math.abs(seconde - e.panneau) <= 0.001 ? 'confirme'
         : Math.abs(seconde - e.base) <= 0.001 ? 'infirme'
         : 'autre';

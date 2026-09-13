@@ -279,6 +279,7 @@ import { UN_SPIN_4_WIN } from './adaptateur-1spin4win';
 import { NOLIMIT_CITY } from './adaptateur-nolimit-city';
 import { STAKELOGIC } from './adaptateur-stakelogic';
 import { SPINOMENAL } from './adaptateur-spinomenal';
+import { YGGDRASIL } from './adaptateur-yggdrasil';
 
 /*
  * La clé est le `slug` du studio en base, pas son nom : c'est elle que
@@ -356,4 +357,12 @@ export const ADAPTATEURS: Record<string, Adaptateur> = {
    * fiche garde son taux. 633 fiches, 554 avec leur RTP, 13 en cdn-newdev.
    */
   spinomenal: SPINOMENAL,
+  /*
+   * Yggdrasil est une federation d'une trentaine de moteurs. L'adaptateur
+   * prend GATI et Reel Play (panneau HTML, RTP lisible), nomme les autres
+   * dans le journal au lieu d'echouer en « icone introuvable », et refuse une
+   * demo servie en variante de RTP reduite. Cloudflare bannit une heure a
+   * trois chargements en une minute : deux minutes de pause entre les jeux.
+   */
+  yggdrasil: YGGDRASIL,
 };

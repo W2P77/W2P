@@ -180,6 +180,22 @@ describe('la formulation Stakelogic, « payback percentage »', () => {
   });
 });
 
+describe('les moteurs Yggdrasil, sans le sigle', () => {
+  it('lit GATI, « overall theoretical return to player is »', () => {
+    expect(extraireLesFaits('The overall theoretical return to player is 96.0%.').rtp).toBe(96);
+  });
+
+  it('lit Reel Play, « Theoretical Average Return to Player is: »', () => {
+    expect(extraireLesFaits('The Theoretical Average Return to Player is: 94.0%').rtp).toBe(94);
+  });
+
+  it('ne prend pas le taux d’un achat de bonus pour celui du jeu', () => {
+    expect(
+      extraireLesFaits('The overall theoretical return to player when using BUY BONUS is 96.5%.').rtp,
+    ).toBeNull();
+  });
+});
+
 describe('le gain maximum, selon la formule du studio', () => {
   it('lit « maximum theoretical win »', () => {
     expect(extraireLesFaits('The maximum theoretical win is 5,000x the bet').gainMax).toBe(5000);

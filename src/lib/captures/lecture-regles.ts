@@ -398,6 +398,21 @@ export function extraireLesFaits(texte: string, pages: FaitsLus['pages'] = []): 
   const formulationStakelogic =
     new RegExp(`payback\\s+percentage\\s*\\(\\s*RTP\\s*\\)\\s+is\\s*${CHIFFRE}`, 'i').exec(t)?.[1] ?? null;
 
+  /*
+   * Yggdrasil est une fédération de moteurs, et deux d'entre eux écrivent le
+   * taux sans le sigle : GATI, « The overall theoretical return to player is
+   * 96.0% » — mot pour mot le corps de texte d'Evoplay, que seul son bandeau
+   * sauvait — et Reel Play, « The Theoretical Average Return to Player is:
+   * 94.0% ». Ni l'une ni l'autre n'attrape « when using BUY BONUS is … », qui
+   * ne contient pas « return to player is ».
+   */
+  const formulationGati =
+    new RegExp(`overall\\s+theoretical\\s+return\\s+to\\s+player\\s+is\\s*${CHIFFRE}\\s?%`, 'i').exec(t)?.[1] ??
+    null;
+  const formulationReelPlay =
+    new RegExp(`theoretical\\s+average\\s+return\\s+to\\s+player\\s+is\\s*:?\\s*${CHIFFRE}\\s?%`, 'i').exec(t)?.[1] ??
+    null;
+
   let brutHaut =
     lire('theoretical') ??
     lire('maximum') ??
@@ -405,7 +420,9 @@ export function extraireLesFaits(texte: string, pages: FaitsLus['pages'] = []): 
     bandeauEvoplay ??
     bandeau1spin4win ??
     formulationNolimit ??
-    formulationStakelogic;
+    formulationStakelogic ??
+    formulationGati ??
+    formulationReelPlay;
   let brutBas = lire('minimum');
 
   /*
