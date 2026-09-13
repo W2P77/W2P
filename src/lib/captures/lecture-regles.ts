@@ -389,13 +389,23 @@ export function extraireLesFaits(texte: string, pages: FaitsLus['pages'] = []): 
     new RegExp(`return\\s+to\\s+the\\s+player\\s+for\\s+this\\s+game\\s+is\\s*${CHIFFRE}`, 'i').exec(t)?.[1] ??
     null;
 
+  /*
+   * Stakelogic : « The theoretical minimum payback percentage (RTP) is
+   * 96.02% ». Le sigle est là, entre parenthèses, mais « minimum » précède
+   * « payback » et la règle générale s'arrête avant. Relevé conforme à la
+   * base sur quatre jeux (96,02 · 95,30 · 94,00 · 96,01).
+   */
+  const formulationStakelogic =
+    new RegExp(`payback\\s+percentage\\s*\\(\\s*RTP\\s*\\)\\s+is\\s*${CHIFFRE}`, 'i').exec(t)?.[1] ?? null;
+
   let brutHaut =
     lire('theoretical') ??
     lire('maximum') ??
     formulationWazdan ??
     bandeauEvoplay ??
     bandeau1spin4win ??
-    formulationNolimit;
+    formulationNolimit ??
+    formulationStakelogic;
   let brutBas = lire('minimum');
 
   /*

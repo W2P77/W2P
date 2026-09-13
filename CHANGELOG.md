@@ -2,6 +2,37 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-13 — Stakelogic et Nolimit City branchés ; la relecture mesurée
+
+**La relecture complète a tourné : 10 144 pages, 7 223 identifiées, 2 920
+muettes.** Le taux de légendes génériques servies passe de **60 % à 34 %** en
+une passe (Wazdan 63 → 21 %, Hacksaw 65 → 27 %, Pragmatic 60 → 37 %, Play'n GO
+72 → 47 %, BGaming 81 → 51 %). Vérifié en ligne : Mighty Wild: Panther, qui
+servait dix-sept fois la même phrase le matin, sert dix-sept phrases
+distinctes. 1spin4win « remonte » de 9 à 29 % : ses 647 pages faussement
+étiquetées « mentions de fin » sont redevenues honnêtement génériques, ce qui
+était le but. Ce qui reste muet est, pour l'essentiel, de la prose propre à un
+jeu — des héros, des boss, une matrice — et des tables de gains faites
+d'images : on ne l'apprendra pas par formulation.
+
+**Stakelogic** — `src/lib/captures/adaptateur-stakelogic.ts`, écrit par un
+agent coupé par la limite de session juste après l'avoir fini, validé ici en
+simulation : **3 jeux sur 3, 9 à 10 captures chacun**. Lanceur direct, sans
+tête ; une couche HTML sur le canvas où chaque bouton porte un `btnname`, les
+classes étant générées. Seule la génération moderne est prise (`gameId` à
+cinq chiffres et plus) : les 50 jeux de l'ancienne plateforme GWT n'ont pas de
+RTP dans leur DOM et sont écartés en clair plutôt que d'échouer un par un en
+« icône introuvable ». Le voile « ENABLE SOUNDS? » dit que le jeu est prêt —
+mesuré de 2,5 à 41 s selon la charge, donc pas de délai fixe. La boîte
+« SUPER STAKE » reçoit NO : activée, elle double la mise et change de mode de
+jeu. **143 fiches, toutes avec leur RTP** : publiables dès la capture.
+
+Le lecteur apprend sa formulation, « The theoretical minimum payback
+percentage (RTP) is 96.02% » — le sigle est là mais « minimum » précède
+« payback » et la règle générale s'arrêtait avant. Test ajouté.
+
+**Nolimit City** rejoint le registre avec l'adaptateur commité juste avant.
+
 ## 2026-09-13 — Nolimit City n'est pas Red Tiger, et il a son adaptateur
 
 Le CHANGELOG du 12/09 disait que Nolimit City « tourne sur la plateforme de

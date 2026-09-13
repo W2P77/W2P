@@ -172,6 +172,14 @@ describe('la formulation Nolimit City, au milieu des taux d’achat', () => {
   });
 });
 
+describe('la formulation Stakelogic, « payback percentage »', () => {
+  it('lit le taux malgré « minimum » avant le sigle', () => {
+    expect(
+      extraireLesFaits('The theoretical minimum payback percentage (RTP) is 96.02%.').rtp,
+    ).toBe(96.02);
+  });
+});
+
 describe('le gain maximum, selon la formule du studio', () => {
   it('lit « maximum theoretical win »', () => {
     expect(extraireLesFaits('The maximum theoretical win is 5,000x the bet').gainMax).toBe(5000);

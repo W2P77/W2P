@@ -276,6 +276,8 @@ import { WAZDAN } from './adaptateur-wazdan';
 import { EVOPLAY } from './adaptateur-evoplay';
 import { AMUSNET } from './adaptateur-amusnet';
 import { UN_SPIN_4_WIN } from './adaptateur-1spin4win';
+import { NOLIMIT_CITY } from './adaptateur-nolimit-city';
+import { STAKELOGIC } from './adaptateur-stakelogic';
 
 /*
  * La clé est le `slug` du studio en base, pas son nom : c'est elle que
@@ -332,4 +334,18 @@ export const ADAPTATEURS: Record<string, Adaptateur> = {
    * un chiffre.
    */
   '1spin4win': UN_SPIN_4_WIN,
+  /*
+   * Nolimit City ne tourne PAS sur la plateforme de Red Tiger, contrairement
+   * a ce que la page hote laisse croire : le jeu vient du lanceur du studio,
+   * sans jeton ni Akamai, et se capture sans tete. 144 fiches, 145 avec leur
+   * RTP — publiables a la premiere capture.
+   */
+  'nolimit-city': NOLIMIT_CITY,
+  /*
+   * Stakelogic : lanceur direct, sans tete, une couche HTML sur le canvas ou
+   * chaque bouton porte un `btnname`. Seule la generation moderne (gameId a
+   * cinq chiffres et plus) est prise ; les 50 jeux de l'ancienne plateforme
+   * sont ecartes en clair. 143 fiches, toutes avec leur RTP.
+   */
+  stakelogic: STAKELOGIC,
 };
