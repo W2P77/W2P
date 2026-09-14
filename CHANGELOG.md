@@ -2,6 +2,34 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-14 — Amusnet : 214 fiches publiées, et le WebGL qui chauffe le poste
+
+La campagne Amusnet a publié **214 fiches sur 252** en deux passages : 41 avant
+qu'elle soit relancée, 173 après. Le RTP est lu à chaque fois — « The average
+return to Player of the game is 96.48% » — depuis que le lecteur connaît la
+phrase. Deux écarts OCR laissés à trancher (5 Glossy Dice à 0,01 près, Secrets
+of Cairo 96,1 → 96,53).
+
+**Le poste est monté à `load 41`** au milieu du premier passage, 48 jeux en
+1 h 40 et les échecs qui montaient. Ce n'était ni un agent ni une fuite de
+pages — le runner ferme les siennes sur tous les chemins, relu. C'est le
+**processus GPU de Chromium** : les jeux Amusnet sont en WebGL, et en mode sans
+tête il est rendu **en logiciel** (SwiftShader), huit cœurs le temps d'un jeu.
+S'y est ajouté un rendu resté coincé depuis le lancement. Relancée avec un
+navigateur neuf, la campagne reprend au marque-page et tient à `load 7`. À
+garder en tête pour les studios en WebGL : le sans-tête coûte du CPU, pas
+seulement du temps.
+
+**38 échecs systématiques**, dont les jeux « dice » (20 Power Hot Dice, 20
+Super Dice, 27 Wins, 5 Glossy Dice…) : un autre habillage, « icône des règles
+introuvable » à chaque passage, poste calme. À reconnaître à part.
+
+**Habanero puis Yggdrasil sont enchaînées dans une seule tâche détachée** :
+la première publie dès la capture (RTP lu dans le Help), la seconde impose deux
+minutes de pause par lot à cause du ban Cloudflare et prendra la nuit. Aucun
+agent n'est plus lancé : la limite de session tombe en moins d'une heure avec
+plusieurs agents en parallèle, et les campagnes n'en ont pas besoin.
+
 ## 2026-09-14 — Nolimit City : 135 publiées, six taux alignés sur le DOM
 
 La campagne Nolimit City a publié **135 fiches sur 142**, un échec, le
