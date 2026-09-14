@@ -2,6 +2,43 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-15 — Second tour : 52 fiches de plus, et quatre corrections vérifiées
+
+Cinq agents, un studio chacun. **429 légendes écrites à la main** sur ce tour,
+Hacksaw et BGaming livrant 106 et 111 captures sans une omission. La cadence
+dépend du studio, pas de l'agent : une minute par fiche chez Nolimit City (4
+captures), **neuf minutes chez Hacksaw** (9 à 11 vues par panneau).
+
+**Quatre corrections passées en base, chacune vérifiée à l'image ou par OCR
+verbatim avant d'y toucher :**
+
+| fiche | en base | réel | preuve |
+|---|---|---|---|
+| Circle of Life | 10 000× | **15 000×** | « a max win of 15 000 times your bet », deux fois dans le panneau |
+| Chaos Crew | 19 lignes | **15** | « The number of possible lines in this game is 15. » |
+| Bullets and Bounty | *aucun plafond* | **20 000×** | annoncé au panneau, la fiche avait un trou |
+| Adventures | grappes de 5+ | **4 et plus** | « 4 or more same symbols », et la table commence au palier 4-5 |
+
+**Deux corrections refusées, et c'est le plus instructif.** Un agent rapportait
+deux RTP Stakelogic à corriger — Apes of Doom 95,52 → 96,00 et Bonus Runner
+95,98 → 95,00. Vérification faite, **la ligne du taux ne figure dans aucune des
+captures téléchargées** : la valeur venait de l'OCR de la campagne, que
+`resoudre-ecarts.ts` avait déjà classée « illisible » à la seconde lecture. Et
+les deux sont des **entiers là où la base a des décimales** — exactement le
+motif de troncature contre lequel le script se garde. Rien n'a été écrit.
+
+C'est la règle qui vaut pour tout ce chantier : **un rapport d'agent est une
+piste, pas une preuve.** Cinq corrections sur sept ont tenu à la vérification,
+deux non.
+
+**Autres écarts signalés, laissés en l'état faute de preuve suffisante** : le
+gain maximum d'Avalon the Lost Kingdom (3 812× en base, absent de ses onze
+captures — c'est une absence, pas une contradiction, mais la légende générée
+l'affirmait « annoncé par le jeu lui-même », ce qui était faux et ne l'est
+plus) ; les multiplicateurs Cerberus d'Adventures (×999 en base, ×11 à ×1800 au
+panneau) ; et les plafonds publiés par Atlantis Gold et Big Sugar Bonanza Xmas,
+absents de leurs fiches.
+
 ## 2026-09-15 — Ce que les légendes écrites à la main ont trouvé
 
 Quatre agents ont écrit à la main les légendes de 21 fiches — 173 captures,
