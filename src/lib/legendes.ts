@@ -1913,6 +1913,42 @@ export interface CaptureALegender {
   legende?: string | null;
   texte?: string | null;
   lecture?: unknown;
+  /**
+   * La légende écrite à la main, une par langue.
+   *
+   * ── Pourquoi en base et pas dans le code ──────────────────────────────
+   *
+   * Gates of Olympus a ses légendes dans `LEGENDES_ECRITES`, en dur. C'était
+   * tenable pour une fiche ; pour deux mille cinq cents, ce serait un fichier
+   * TypeScript de plusieurs mégaoctets, relu à chaque build, et **chaque
+   * légende corrigée demanderait un déploiement**. Rangées dans la capture,
+   * elles se publient par un `upsert` et paraissent à la revalidation
+   * suivante, sans build — la seule voie qui échappe à la règle du push.
+   *
+   * Trois langues séparées, parce que le champ `legende` historique n'en
+   * porte qu'une : 1 759 captures ont ainsi servi de l'anglais aux visiteurs
+   * français et allemands.
+   */
+  legendes?: unknown;
+}
+
+/**
+ * Ce qu'un champ `legendes` venu de la colonne JSON vaut vraiment.
+ *
+ * Il est écrit par un script et relu par le site ; entre les deux, rien ne
+ * garantit sa forme. Une langue manquante n'est pas une erreur — on écrit
+ * parfois le français d'abord — et une forme inattendue vaut « pas de légende
+ * écrite », donc repli sur la lecture, jamais une fiche en 500.
+ */
+export function legendesEcrites(valeur: unknown): Partial<Record<Langue, string>> {
+  if (!valeur || typeof valeur !== 'object' || Array.isArray(valeur)) return {};
+  const v = valeur as Record<string, unknown>;
+  const out: Partial<Record<Langue, string>> = {};
+  for (const langue of ['fr', 'en', 'de'] as const) {
+    const texte = v[langue];
+    if (typeof texte === 'string' && texte.trim().length > 0) out[langue] = texte.trim();
+  }
+  return out;
 }
 
 /**
@@ -1934,6 +1970,13 @@ export function legendeDeCapture(
 ): string {
   const ecrite = LEGENDES_ECRITES[faits.slug]?.[capture.titre]?.[langue];
   if (ecrite) return ecrite;
+
+  /*
+   * La légende écrite à la main gagne sur tout le reste, y compris sur ce que
+   * l'OCR a su lire : quelqu'un a regardé cette capture.
+   */
+  const ecriteALaMain = legendesEcrites(capture.legendes)[langue];
+  if (ecriteALaMain) return ecriteALaMain;
 
   const stockee = (capture.legende ?? '').trim();
   // Une légende écrite ailleurs qu'ici est gardée : elle vaut mieux qu'un

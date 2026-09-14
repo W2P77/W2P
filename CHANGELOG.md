@@ -2,6 +2,40 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-15 — Les légendes écrites à la main, en base et par langue
+
+La légende générée dit de quoi une page **parle** — c'est vrai, jamais faux, et
+c'est déjà du texte propre à chaque page. Elle ne dit pas ce que la capture
+**montre** : la grille, le prix de l'achat à l'écran, les trois paliers de la
+table de gains, la bombe multiplicatrice qui n'existe qu'en tours gratuits.
+Gates of Olympus a ces légendes-là, écrites en regardant les images. C'est le
+niveau qu'on veut partout, et il faut les écrire à la main.
+
+**Elles vivent désormais dans la capture, pas dans le code.** `LEGENDES_ECRITES`
+tenait pour une fiche ; pour deux mille cinq cents, ce serait un fichier
+TypeScript de plusieurs mégaoctets et **chaque virgule corrigée demanderait un
+déploiement**. Rangées dans `captures[].legendes`, elles se publient par un
+`upsert` et paraissent à la revalidation suivante, sans build. Trois langues
+séparées : le champ `legende` historique n'en portait qu'une, et 1 759 captures
+ont ainsi servi de l'anglais aux visiteurs français et allemands.
+
+Elles gagnent sur tout le reste, y compris sur une page que l'OCR sait lire —
+quelqu'un a regardé l'image. Une langue pas encore écrite laisse la lecture
+reprendre la main, et une forme inattendue vaut « pas de légende écrite »,
+jamais une fiche en 500. Le marquage « Suite de la page précédente » les
+épargne déjà : deux pages écrites à la main ne sont la suite de rien.
+
+**`scripts/legendes-a-la-main.ts`** — `--fiche <slug>` télécharge les captures
+en PNG lisibles et imprime les faits vérifiés de la fiche ; `--ecrire <json>`
+les publie, sauvegarde faite. La règle de rédaction est dans l'en-tête du
+script : les chiffres **du jeu** viennent de la fiche, jamais de l'image ; les
+chiffres **de l'image** se recopient s'ils sont nets et se taisent sinon.
+
+**Première fiche écrite : Sweet Bonanza**, huit captures. Un cas d'école y est
+apparu : la page 4/7 affiche « LOW VOLATILITY » quand notre fiche dit haute.
+C'est le classement du studio, pas une mesure — la légende n'en parle pas
+plutôt que de publier une contradiction.
+
 ## 2026-09-15 — Habanero : 198 fiches sur 202, zéro échec
 
 La campagne Habanero est le passage le plus propre du rush : **198 publiées sur

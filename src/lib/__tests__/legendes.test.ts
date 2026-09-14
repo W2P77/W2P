@@ -14,6 +14,7 @@ import {
   lireCapture,
   lirePageDeRegles,
   lectureStockee,
+  legendesEcrites,
   typeDeCapture,
   LEGENDES_ECRITES,
 } from '../legendes';
@@ -333,6 +334,59 @@ describe('légendes tirées du texte de la page', () => {
    * de Tesseract comprises : c'est ce que la passe voit, et le test ne vaut
    * que s'il lit la même chose qu'elle.
    */
+  /*
+   * Les légendes écrites à la main, rangées dans la capture.
+   *
+   * Elles doivent gagner sur tout le reste — y compris sur une page que l'OCR
+   * sait parfaitement lire — parce que quelqu'un a regardé l'image. Et une
+   * forme inattendue ne doit jamais faire tomber une fiche : le champ vient
+   * d'une colonne JSON qu'un script remplit.
+   */
+  describe('une légende écrite à la main', () => {
+    const REGLES = 'Game rules, page 2';
+    const ECRITE = {
+      fr: 'La grille en 6×5 sans ligne de paiement, et le bouton d’achat à 100× la mise.',
+      en: 'The 6×5 grid with no paylines, and the buy button at 100× the bet.',
+      de: 'Das 6×5-Raster ohne Gewinnlinien und die Kauftaste zum 100-fachen Einsatz.',
+    };
+
+    it('passe avant la lecture de la page, dans chaque langue', () => {
+      const capture = { titre: REGLES, lecture: lireCapture('GAME RULES. Wins pay only from left to right, on adjacent reels.'), legendes: ECRITE };
+      expect(legendeDeCapture(capture, FAITS, 'fr')).toBe(ECRITE.fr);
+      expect(legendeDeCapture(capture, FAITS, 'en')).toBe(ECRITE.en);
+      expect(legendeDeCapture(capture, FAITS, 'de')).toBe(ECRITE.de);
+    });
+
+    /* Le texte doit dépasser les 40 caractères qu'exige le lecteur : en deçà,
+       il rend `null` plutôt que de juger une page sur trois mots. */
+    it('laisse la lecture reprendre la main sur une langue pas encore écrite', () => {
+      const capture = { titre: REGLES, lecture: lireCapture('GAME RULES. Wins pay only from left to right, on adjacent reels.'), legendes: { fr: ECRITE.fr } };
+      expect(legendeDeCapture(capture, FAITS, 'fr')).toBe(ECRITE.fr);
+      expect(legendeDeCapture(capture, FAITS, 'de')).toContain('von links nach rechts');
+    });
+
+    it('ignore une forme inattendue plutôt que de faire tomber la fiche', () => {
+      for (const valeur of [null, 'texte', 42, [], { fr: 42 }, { fr: '   ' }, { xx: 'bonjour' }]) {
+        expect(legendesEcrites(valeur)).toEqual({});
+        expect(legendeDeCapture({ titre: REGLES, legendes: valeur }, FAITS, 'fr')).toBe(
+          "Une page du panneau de règles, telle que le jeu l'affiche.",
+        );
+      }
+    });
+
+    /*
+     * Deux pages voisines écrites à la main disent deux choses différentes :
+     * les marquer « Suite de la page précédente » serait faux.
+     */
+    it('n’est jamais marquée comme la suite de la précédente', () => {
+      const memes = [
+        { titre: 'Game rules, page 1', legendes: { fr: 'La même phrase.' } },
+        { titre: 'Game rules, page 2', legendes: { fr: 'La même phrase.' } },
+      ];
+      expect(legendesDeCaptures(memes, FAITS, 'fr')).toEqual(['La même phrase.', 'La même phrase.']);
+    });
+  });
+
   describe('le panneau de Wazdan', () => {
     const DECLENCHEMENT =
       "Drawing at least 6 Hold the Jackpot Bonus symbols activates the Hold the Jackpot Bonus Game. " +
