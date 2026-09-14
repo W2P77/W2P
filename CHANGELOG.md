@@ -2,6 +2,20 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-15 — Habanero : 198 fiches sur 202, zéro échec
+
+La campagne Habanero est le passage le plus propre du rush : **198 publiées sur
+202 exploitables, aucun échec**, le RTP lu dans le Help à chaque fois — y
+compris les plages (5 Lucky Lions, 96,51-96,79 %, haut de plage retenu comme
+défaut) et les noms à chiffre (12 Zodiacs, 5 Mariachis) qui faisaient rendre
+`null` au lecteur la veille. Le studio n'avait **6 RTP en base** : ce sont
+donc ~195 fiches qui reçoivent leur taux en source studio et deviennent
+publiables d'un coup. Trois écarts signalés sur les fiches qui avaient déjà un
+taux, non écrits.
+
+Le catalogue passe à **2 472 fiches publiées** — 1 187 le 12/09 au soir.
+Yggdrasil a pris le relais dans la même tâche détachée pour la nuit.
+
 ## 2026-09-14 — Amusnet : 214 fiches publiées, et le WebGL qui chauffe le poste
 
 La campagne Amusnet a publié **214 fiches sur 252** en deux passages : 41 avant
