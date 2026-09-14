@@ -57,6 +57,16 @@ export interface Adaptateur {
   avecTete?: boolean;
 
   /**
+   * Le navigateur qu'exige ce studio, quand ce n'est pas Chromium.
+   *
+   * TaDa protège son code avec JScrambler, qui détecte le domaine CDP
+   * `Runtime` de Chromium piloté : le jeu se fige sur sa barre de chargement,
+   * les globaux sont retirés, `evaluate` casse. Sous Firefox le même jeu se
+   * charge et se pilote. Rien d'autre à faire dans l'adaptateur.
+   */
+  navigateur?: 'chromium' | 'firefox';
+
+  /**
    * Combien attendre entre deux lots de jeux, en millisecondes.
    *
    * Le serveur de démo de BGaming a mis notre IP au ban (Cloudflare 1015)
@@ -281,6 +291,7 @@ import { STAKELOGIC } from './adaptateur-stakelogic';
 import { SPINOMENAL } from './adaptateur-spinomenal';
 import { YGGDRASIL } from './adaptateur-yggdrasil';
 import { HABANERO } from './adaptateur-habanero';
+import { TADA } from './adaptateur-tada';
 
 /*
  * La clé est le `slug` du studio en base, pas son nom : c'est elle que
@@ -374,4 +385,12 @@ export const ADAPTATEURS: Record<string, Adaptateur> = {
    * la lecture du panneau est leur seule voie vers la publication.
    */
   habanero: HABANERO,
+  /*
+   * TaDa : branche mais hors de la file des campagnes. L'adaptateur capture
+   * (Firefox, graphe de scene Cocos, panneau HTML), mais la demo n'affiche
+   * AUCUN RTP — l'operateur de demo a eteint IsRtpItemDisplay — et aucune des
+   * 233 fiches n'en a en base : une campagne ne publierait rien. A relancer
+   * le jour ou une source de RTP existe.
+   */
+  tada: TADA,
 };

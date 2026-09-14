@@ -2,6 +2,28 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-14 — TaDa : capturable sous Firefox, mais sa démo n'affiche aucun RTP
+
+`src/lib/captures/adaptateur-tada.ts`, et une capacité nouvelle du runner :
+**un adaptateur peut exiger Firefox**. TaDa protège son code avec JScrambler,
+qui détecte le domaine CDP `Runtime` de Chromium piloté — reproduit mot pour
+mot : `load` à 3,9 s, « Code violation j-016-00079 » à 25 s, globaux retirés,
+`evaluate` cassé, écran figé sur la barre de chargement. Sous Firefox le même
+jeu se charge et se pilote. Le jeu se conduit par le **graphe de scène Cocos**
+(`window.cc` exposé, chaque bouton est un nœud nommé) et non par des
+coordonnées : paysage et portrait passent par la même voie.
+
+**Mais la démo n'affiche aucun RTP.** Zéro occurrence dans les 5 000
+caractères du panneau, sur trois générations de jeux. La cause est dans le
+réseau : `IsRtpItemDisplay: false` — l'opérateur de démo a éteint l'affichage.
+Le composant existe, sa phrase est prête (« RTP = {txt0} »), l'API répond même
+deux valeurs (0,9606 certifiée, 0,9708 non) ; mais ce n'est pas un chiffre
+affiché, donc on ne l'écrit pas. Et aucune des 233 fiches n'a de RTP en base :
+**une campagne ne publierait rien**. L'adaptateur est branché, hors de la file,
+à relancer le jour où une source de RTP existe. Recensement sur 39 jeux : ~130
+machines à sous capturables, ~24 builds qui plantent sous tout navigateur, ~78
+qui ne sont pas des machines à sous (tir, bingo, keno, plinko).
+
 ## 2026-09-14 — Amusnet : le panneau s'ouvrait, c'est le témoin qui refusait
 
 La simulation du matin donnait **1 jeu sur 3**, poste calme. L'adaptateur n'a

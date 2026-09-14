@@ -31,7 +31,7 @@
 import { config as loadEnv } from 'dotenv';
 import { mkdirSync, rmSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
-import { chromium, type Browser } from 'playwright';
+import { chromium, firefox, type Browser } from 'playwright';
 import sharp from 'sharp';
 import { ADAPTATEURS, SANS_PANNEAU } from '../src/lib/captures/adaptateurs';
 import {
@@ -437,7 +437,9 @@ async function main() {
   }
 
   mkdirSync(ATELIER, { recursive: true });
-  const nav = await chromium.launch({
+  const nav = adaptateur.navigateur === 'firefox'
+    ? await firefox.launch({ headless: !adaptateur.avecTete })
+    : await chromium.launch({
     executablePath: CHROME || undefined,
     // Cloudflare refuse un Chromium sans tête devant certains RGS de démo.
     headless: !adaptateur.avecTete,
