@@ -36,7 +36,13 @@ l'écran ait **changé** après le clic, pas qu'un bouton porte le mot BUY.
 base quand son panneau écrit « Simulated maximum payout is 6925 times the
 bet ». Corrigé à 6 925.
 
-Tous quatre corrigés, sauvegardes dans `sauvegardes-betsrank/`.
+**Un cinquième, et c'est le plus gros** : Dead Men Walking était décrit en base
+comme « 6 rouleaux, variable » quand son panneau dit **« A 5-reel, 3-row video
+slot »** et **« 17 win lines »** — la capture du jeu de base confirme cinq
+colonnes, la sixième bande étant le couloir du condamné, pas un rouleau.
+Corrigé.
+
+Tous cinq corrigés, sauvegardes dans `sauvegardes-betsrank/`.
 
 **Deux captures « The base game » ne montrent pas le jeu de base** : Brick Snake
 2000 photographié sur son écran d'intro, Brute Force: Alien Onslaught sur un sas
