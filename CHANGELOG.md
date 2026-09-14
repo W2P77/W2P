@@ -2,6 +2,29 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-14 — Nolimit City : 135 publiées, six taux alignés sur le DOM
+
+La campagne Nolimit City a publié **135 fiches sur 142**, un échec, le
+meilleur taux de tous les studios — le RTP est lu dans le DOM du panneau
+(`li.rtp`), en texte exact, pas en OCR. Sept écarts avec la base ont été
+signalés sans être écrits, comme le runner le fait toujours.
+
+**Six sont alignés sur le panneau**, parce qu'ici la lecture n'est pas une
+lecture : c'est la phrase du studio, au caractère près. Deux bases portaient
+une **variante réduite** (East Coast vs West Coast à 94 pour un panneau à
+96,04, San Quentin xWays à 94,11 pour 96,03 — les taux officiels par défaut) ;
+les quatre autres diffèrent au centième, le panneau étant plus précis (96 →
+96,01) ou simplement autre (96,03 → 95,99). Sauvegarde des valeurs d'avant
+dans `sauvegardes-betsrank/`, source notée « panneau de règles (DOM, li.rtp) ».
+
+**Misery Mining reste à 96,09** : le panneau rend « 96 », un entier face à des
+décimales — le même signal de troncature que Wolf Gold la veille, et la règle
+vaut aussi pour une lecture DOM tant qu'on n'a pas vu la ligne à l'écran.
+
+`scripts/resoudre-ecarts.ts` ne voit pas ces écarts-là : il retrouve un
+écart par la légende qui porte le taux lu à l'OCR, et Nolimit ne passe pas
+par là. À garder en tête pour les studios lus au DOM.
+
 ## 2026-09-14 — TaDa : capturable sous Firefox, mais sa démo n'affiche aucun RTP
 
 `src/lib/captures/adaptateur-tada.ts`, et une capacité nouvelle du runner :
