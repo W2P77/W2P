@@ -32,7 +32,17 @@ l'écran ait **changé** après le clic, pas qu'un bouton porte le mot BUY.
   décrit en 6 rouleaux × 4 rangées : 4⁶ = **4 096**, ce que le panneau écrit.
   6 561 était arithmétiquement impossible.
 
-Tous trois corrigés, sauvegardes dans `sauvegardes-betsrank/`.
+**Un quatrième, trouvé sur le second lot** : Bonus Bunnies annonçait 6 950× en
+base quand son panneau écrit « Simulated maximum payout is 6925 times the
+bet ». Corrigé à 6 925.
+
+Tous quatre corrigés, sauvegardes dans `sauvegardes-betsrank/`.
+
+**Deux captures « The base game » ne montrent pas le jeu de base** : Brick Snake
+2000 photographié sur son écran d'intro, Brute Force: Alien Onslaught sur un sas
+fermé pendant le chargement. Les agents ne les ont pas écrites plutôt que
+d'inventer une grille ; leur `demoUrl` est à recapturer avec un délai plus long.
+Un troisième cas, Beheaded, avait été signalé au premier lot.
 
 **Et un piège que les agents ont évité seuls** : les menus d'achat de Hacksaw
 affichent une volatilité — « High », « Very high », « Medium » — qui qualifie
