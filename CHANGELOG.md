@@ -2,6 +2,38 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-15 — Un doublon de catalogue, et la première 301 du site
+
+**`east-vs-west` et `east-coast-vs-west-coast` sont le même jeu Nolimit City**,
+sur le même lanceur : quatre captures identiques image pour image, même RTP
+96,04, même plafond 30 618×, prises à deux minutes d'écart. Deux pages
+indexables pour un seul jeu — la règle des doublons du projet dit d'en garder
+une seule.
+
+**Et c'est la première fois qu'on ne peut pas simplement supprimer.** Tant que
+rien n'était indexé, retirer une fiche ne coûtait rien ; depuis la soumission à
+Search Console le 12/09, une URL supprimée devient une 404 que Google met des
+semaines à digérer. La fiche appauvrie est donc dépubliée (ses captures
+retirées, sauvegardées) **et une 301 posée dans les trois langues** vers celle
+qu'on garde — la seule des deux à porter grille, volatilité et mécaniques. Le
+`next.config.js` du site n'avait aucune redirection jusqu'ici : la liste des
+doublons y est désormais un tableau, prêt pour les suivants.
+
+**Trois corrections de plus, toutes vérifiées par OCR verbatim avant écriture :**
+
+| fiche | en base | réel |
+|---|---|---|
+| Dragon Tribe | 27 000× | **26 914×** (deux captures) |
+| Dungeon Quest | 450× | **454×** |
+| Duck Hunters | grille 5×5 | **6 rouleaux × 5 rangées** |
+
+Les deux premiers sont le même défaut : un chiffre arrondi vers le rond, comme
+les plafonds Pragmatic à 10 000× documentés chez BetsRank. Le troisième est le
+second cas de grille fausse en deux jours, après Dead Men Walking.
+
+Un record au passage : **Duck Hunters 2 aligne vingt retours théoriques** sur
+une seule page de son panneau, dont neuf fourchettes. Aucun n'a été republié.
+
 ## 2026-09-15 — Second tour : 52 fiches de plus, et quatre corrections vérifiées
 
 Cinq agents, un studio chacun. **429 légendes écrites à la main** sur ce tour,
