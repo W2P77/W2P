@@ -227,9 +227,17 @@ export async function fermerLeLecteur(): Promise<void> {
  * panneau. Élargir une alternance ne peut que faire correspondre davantage :
  * la recherche d'icône de Pragmatic ne lit que la bande haute (y 30–220), où
  * cette phrase ne figure jamais.
+ *
+ * « RETURN TO PLAYER » est là pour Amusnet, qui n'écrit ni RTP ni GAME RULES
+ * ni PAYTABLE, et dont la clause de nullité se **replie sur deux lignes** au
+ * milieu du panneau : l'OCR intercale le bruit des boutons latéraux entre ses
+ * deux moitiés (« voids (= all »), et la phrase ne correspond jamais. Le titre
+ * « Return to Player », lui, ferme chaque panneau du studio, sur sa propre
+ * ligne, dans la dernière vue. Un mot-témoin n'est fiable que sur une ligne à
+ * lui.
  */
 export const EN_TETE_PANNEAU =
-  /RTP|GAME RULES|PAYTABLE|MALFUNCTION VOIDS ALL PAYS/i;
+  /RTP|GAME RULES|PAYTABLE|MALFUNCTION VOIDS ALL PAYS|RETURN TO PLAYER/i;
 
 /**
  * La barre de commandes de l'habillage **historique** de Pragmatic.
@@ -428,10 +436,21 @@ export function extraireLesFaits(texte: string, pages: FaitsLus['pages'] = []): 
     'i',
   ).exec(t);
 
+  /*
+   * Amusnet : « The average return to Player of the game is 96.17%. », sans le
+   * sigle — et la variante Wazdan exige « Game average… ». La ligne voisine du
+   * même panneau, « The average return to Player when using <feature> is … »,
+   * est le taux d'un achat : « of the game » suffit à l'écarter.
+   */
+  const formulationAmusnet =
+    new RegExp(`average\\s+return\\s+to\\s+player\\s+of\\s+the\\s+game\\s+is\\s*:?\\s*${CHIFFRE}\\s?%`, 'i').exec(t)?.[1] ??
+    null;
+
   let brutHaut =
     lire('theoretical') ??
     lire('maximum') ??
     formulationWazdan ??
+    formulationAmusnet ??
     bandeauEvoplay ??
     bandeau1spin4win ??
     formulationNolimit ??

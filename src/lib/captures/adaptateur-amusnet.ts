@@ -36,28 +36,49 @@
  * un `<canvas>` d'un autre domaine : aucun sélecteur n'y est interrogeable,
  * d'où des coordonnées pour tout ce qui suit l'ouverture.
  *
- * ── Amusnet n'écrit jamais « RTP », et ça bloque la publication ────────────
+ * ── Amusnet n'écrit jamais « RTP », et un seul témoin sauve la publication ─
  *
  * Le panneau d'information se termine par une section « Return to Player » :
  * « The average return to Player of the game is 96.17% » (10 Bulky Fruits,
- * conforme au 96,17 de la base ; 95,79 sur 20 Super Hot, 96,25 sur Cavemen and
- * Dinosaurs, tous conformes). Le sigle `RTP` n'y figure **nulle part**, pas
- * plus que « GAME RULES » ou « PAYTABLE » — compté : **0 vue sur les 26** du
- * panneau, du titre à la dernière ligne.
+ * conforme au 96,17 de la base ; 95,94 sur 10 Burning Heart, 96,07 sur 10
+ * Glossy Hot, tous conformes). Le sigle `RTP` n'y figure **nulle part**, pas
+ * plus que « GAME RULES » ou « PAYTABLE ».
  *
  * Or `capturer-jeux.ts` refuse de publier un jeu dont aucune capture ne porte
- * `EN_TETE_PANNEAU` (`/RTP|GAME RULES|PAYTABLE/i`), et `extraireLesFaits` ne
- * connaît pas cette formulation-là — la variante Wazdan qu'il sait lire est
- * « **Game** average return to player: 96.15% », pas « The average return to
- * Player **of the game** is ». Tant que ces deux points de `lecture-regles.ts`
- * n'ont pas été élargis, les fiches de l'habillage machine — tout le catalogue
- * moins une poignée — repartiront en file au lieu d'être publiées, et leur taux
- * restera `null`. Curiosité utile : les fiches de table et de vidéo poker,
- * elles, passeraient — leur page d'aide écrit « Payouts are displayed on the
- * Paytable ».
+ * `EN_TETE_PANNEAU`. De ses quatre alternances, une seule existe dans ce
+ * panneau : « Malfunction voids all pays and plays. », dernière phrase du
+ * paragraphe de la section « PAYLINES AND RULES », au milieu de la descente.
+ * Vérifié sur le gabarit HTML du panneau, `prod.cdn.amusnet.io/paytable/<id>/
+ * en.html`, pour tous les identifiants existants entre 504 et 640.
  *
- * Ce n'est pas réparable ici : `lecture-regles.ts` est un fichier partagé, et
- * cet adaptateur n'a pas à mentir sur ce qu'il a vu pour passer un contrôle.
+ * C'est ce témoin-là qui a fait « 1 jeu sur 3 » à la première campagne — et
+ * ce n'était pas le hasard. Le paragraphe mesure 384 px dans une fenêtre de
+ * 570, la molette descend de 500 par cran, et on ne photographiait qu'un cran
+ * sur quatre : 10 Glossy Hot l'avait entier sur sa vue 4, 10 Burning Heart
+ * s'arrêtait au titre de la section (la phrase 30 px sous la coupe), 10 Bulky
+ * Fruits ne l'a jamais eu. Le panneau était ouvert et lu jusqu'au taux dans
+ * les trois cas ; deux fiches repartaient en file pour une question de
+ * cadence. D'où la vue hors cadence de `feuilleter`, guidée par le DOM.
+ *
+ * Cette vue ne suffit pas partout, et il faut le savoir : `lireLesRegles`
+ * recadre sur x 130–1150, ce qui prend les boutons du jeu de part et d'autre
+ * du panneau, et l'OCR colle leur bruit en bout de ligne. Quand la phrase se
+ * replie — « Malfunction voids | all pays and plays. » sur 10 Bulky Fruits,
+ * dont le paragraphe a une phrase de plus — le bouton des pièces s'y
+ * intercale (« voids (= all ») et le témoin ne correspond plus, à n'importe
+ * quelle position de défilement. Le remède durable est dans
+ * `lecture-regles.ts` : ajouter « RETURN TO PLAYER » à `EN_TETE_PANNEAU`. Ce
+ * titre-là ferme chaque panneau du studio, sur sa propre ligne, et c'est la
+ * dernière vue — celle qu'on prend toujours — qui le porte.
+ *
+ * Le chiffre, lui, reste `null` : `extraireLesFaits` ne connaît pas « The
+ * average return to Player **of the game** is » — la variante Wazdan qu'il sait
+ * lire est « **Game** average return to player: ». La fiche se publie quand
+ * même, sur le RTP déjà en base, mais sans confirmation par le panneau. C'est
+ * une ligne dans `lecture-regles.ts`, fichier partagé, hors de ce fichier. À
+ * savoir le jour où on l'ajoute : le même panneau porte une seconde ligne,
+ * « The average return to Player when using <feature> is … », qui est le taux
+ * d'un achat — « of the game » suffit à l'écarter.
  *
  * Ce qu'il ne fera pas non plus : rendre `SANS_PANNEAU`. Le drapeau affirme
  * qu'un jeu n'a **par conception** rien à documenter et le retire
@@ -66,7 +87,7 @@
  * irréversible.
  */
 import sharp from 'sharp';
-import type { Page } from 'playwright';
+import type { Frame, Page } from 'playwright';
 import type { Adaptateur } from './adaptateurs';
 
 /** Le bandeau de cookies, premier des deux portails. */
@@ -94,6 +115,67 @@ const BOUTON_DEMO = '#play-demo-btn';
  * pendant 15 s une page marketing parfaitement immobile.
  */
 const CADRE_DU_JEU = 'iframe[src*="games.amusnet.io"]';
+
+/**
+ * Le panneau d'information est du HTML, pas du canvas.
+ *
+ * Le jeu est peint dans un `<canvas>`, mais son panneau est un second iframe,
+ * `prod.cdn.amusnet.io/paytable/<id>/en.html`, chargé dès l'ouverture du
+ * menu et affiché par l'onglet « i ». Playwright y entre malgré l'origine
+ * étrangère (`page.frames()`), et c'est le seul endroit du jeu où l'on peut
+ * lire une position au lieu de deviner un pixel. Le cadre n'est cherché qu'à
+ * ce prix : s'il manque, on redescend à la cadence seule, comme avant.
+ */
+const CADRE_DU_PANNEAU = '/paytable/';
+
+/**
+ * La phrase qui prouve au runner que le panneau a été atteint.
+ *
+ * C'est la seule alternance d'`EN_TETE_PANNEAU` que ce studio écrit, et elle
+ * ferme le paragraphe de la section « PAYLINES AND RULES ». Elle doit figurer
+ * entière sur une vue, lisible par l'OCR : à la cadence d'un cran sur quatre
+ * ça n'arrivait qu'un jeu sur trois (voir l'en-tête). Et sur une seule ligne
+ * de texte : repliée, elle prend le bruit des boutons du jeu entre ses deux
+ * moitiés, et rien ici ne peut y remédier.
+ */
+const TEMOIN = 'malfunction voids all pays';
+
+/**
+ * L'espace laissé sous le témoin quand on l'aligne dans la fenêtre.
+ *
+ * La phrase est la dernière du paragraphe : c'est le **bas** du paragraphe
+ * qu'il faut dans la fenêtre, pas son haut. Trente pixels suffisent à ce que
+ * la ligne ne touche pas le bord, où l'OCR la perdrait.
+ */
+const MARGE_TEMOIN = 30;
+
+/** Le cadre du panneau, ou `null` s'il n'existe pas (habillage table). */
+function cadreDuPanneau(page: Page): Frame | null {
+  return page.frames().find((f) => f.url().includes(CADRE_DU_PANNEAU)) ?? null;
+}
+
+/**
+ * Où en est le paragraphe témoin dans la fenêtre du cadre.
+ *
+ * `haut` et `bas` sont relatifs au bord haut de la fenêtre, `fenetre` en est
+ * la hauteur : le témoin est entièrement visible quand `haut >= 0` et
+ * `bas <= fenetre`. `null` si le cadre n'a pas ce paragraphe — un gabarit
+ * inconnu, ou un cadre pas encore rendu — et on n'y touche pas.
+ */
+async function positionDuTemoin(
+  cadre: Frame,
+): Promise<{ haut: number; bas: number; fenetre: number } | null> {
+  return cadre
+    .evaluate((motif) => {
+      const el = [...document.querySelectorAll('p, li, div, span')].find(
+        (e) => e.children.length === 0 && (e.textContent ?? '').toLowerCase().includes(motif),
+      );
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return { haut: r.top, bas: r.bottom, fenetre: window.innerHeight };
+    }, TEMOIN)
+    .catch(() => null);
+}
 
 /**
  * Le bouton « menu » de la barre du bas : la seule porte du panneau.
@@ -259,20 +341,52 @@ function ecartMoyen(a: Buffer, b: Buffer): number {
  * table (sept). La dernière vue est prise **après** la boucle, hors cadence et
  * hors plafond : c'est celle qui porte le taux de retour, et la manquer
  * viderait la capture de sa raison d'être.
+ *
+ * ── La vue du témoin, hors cadence elle aussi ────────────────────────────
+ *
+ * Quand `cadre` est donné, chaque cran demande au DOM où en est le paragraphe
+ * témoin. Dès qu'il entre par le bas de la fenêtre, on l'aligne — son bas à
+ * `MARGE_TEMOIN` du bord — et on le photographie, une fois. Aligner plutôt
+ * qu'attendre le bon cran n'est pas un confort : 384 px de paragraphe dans
+ * 570 px de fenêtre, par pas de 500, c'est une fenêtre de 186 px que la
+ * molette peut enjamber ; 10 Bulky Fruits ne l'a eu entier qu'au cran 13, et
+ * seulement par chance. Ce petit défilement s'ajoute à la descente en cours,
+ * il n'en change ni l'ordre des vues ni l'arrêt sur immobilité.
+ *
+ * Cette vue peut porter le compte à `PRISES_MAX + 1`, et c'est voulu : elle
+ * est la raison pour laquelle la fiche sera publiée, on ne la sacrifie pas à
+ * une limite de confort. Elle remplace la vue de cadence du même cran quand
+ * les deux tombent ensemble, pour ne pas publier deux images d'un même écran.
  */
 async function feuilleter(
   page: Page,
   cliche: (nom: string) => Promise<void>,
   unCranSur: number,
+  cadre: Frame | null = null,
 ): Promise<number> {
   // La molette agit là où est le curseur, que le clic d'ouverture a laissé
   // dans la barre du bas.
   await page.mouse.move(CORPS.x, CORPS.y);
 
   let prises = 0;
+  let temoinPris = false;
   let precedente = await empreinte(page);
   for (let cran = 0; cran < CRANS_MAX; cran++) {
-    if (cran % unCranSur === 0 && prises < PRISES_MAX - 1) {
+    let priseCeCran = false;
+    if (cadre && !temoinPris) {
+      const pos = await positionDuTemoin(cadre);
+      if (pos && pos.haut < pos.fenetre && pos.bas > 0) {
+        if (pos.bas > pos.fenetre - MARGE_TEMOIN) {
+          const dy = pos.bas - (pos.fenetre - MARGE_TEMOIN);
+          await cadre.evaluate((d) => window.scrollBy(0, d), dy).catch(() => {});
+          await page.waitForTimeout(1_200);
+        }
+        await cliche(`regles-${++prises}`);
+        temoinPris = true;
+        priseCeCran = true;
+      }
+    }
+    if (!priseCeCran && cran % unCranSur === 0 && prises < PRISES_MAX - 1) {
       await cliche(`regles-${++prises}`);
     }
     await page.mouse.wheel(0, 500);
@@ -431,7 +545,7 @@ export const AMUSNET: Adaptateur = {
       // L'onglet n'a pas répondu : on ne feuillette pas les réglages du son.
       if (!EN_TETE_INFO.test(await lireLEcran())) return 0;
 
-      const prises = await feuilleter(page, cliche, 4);
+      const prises = await feuilleter(page, cliche, 4, cadreDuPanneau(page));
       // Vérifié à l'image sur les trois habillages machine : cette croix-là
       // referme le panneau **et** le menu, et rend le jeu de base.
       await page.mouse.click(FERMER.x, FERMER.y);

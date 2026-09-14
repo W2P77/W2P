@@ -2,6 +2,34 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-14 — Amusnet : le panneau s'ouvrait, c'est le témoin qui refusait
+
+La simulation du matin donnait **1 jeu sur 3**, poste calme. L'adaptateur n'a
+jamais échoué à ouvrir le panneau — la sonde rejoue le runner et montre le
+même enchaînement sur les trois jeux, jusqu'à la ligne « The average return to
+Player of the game is 95.94% », conforme à la base. Le rejet venait du
+**contrôle final du runner** : aucune vue ne portait `EN_TETE_PANNEAU`. Amusnet
+n'écrit ni RTP, ni GAME RULES, ni PAYTABLE ; sa seule alternance présente est
+« Malfunction voids all pays and plays », au milieu de la descente, dans un
+paragraphe de 384 px que la molette franchit par crans de 500 en ne
+photographiant qu'un cran sur quatre. Selon le jeu, la phrase tombait sur une
+vue ou dans une coupe — d'où 1 sur 3, qui n'était pas du hasard.
+
+**Deux corrections.** L'adaptateur demande désormais au DOM du panneau (un
+iframe HTML, pas du canvas) où en est le paragraphe témoin, l'aligne, et prend
+une vue hors cadence. Et le témoin reçoit **« RETURN TO PLAYER »** : sur les
+deux *Bulky Fruits*, la clause de nullité se **replie sur deux lignes**, et
+l'OCR intercale le bruit des boutons latéraux entre ses moitiés — « voids (=
+all » — donc aucune position de défilement n'y remédie. Le titre « Return to
+Player », lui, ferme chaque panneau du studio sur sa propre ligne. **Un
+mot-témoin n'est fiable que sur une ligne à lui.**
+
+Le lecteur apprend la formulation, « The average return to Player of the game
+is 96.17% » — la variante Wazdan exigeait « Game average… ». « of the game »
+écarte la ligne voisine « when using <feature> is », le taux d'un achat. Tests
+à l'appui. Simulation : **4 jeux sur 6** avant le témoin élargi, 6 attendus
+avec. 252 fiches, 264 sur 280 avec leur RTP.
+
 ## 2026-09-14 — 46 noms Habanero remis comme le jeu les écrit
 
 Les noms Habanero avaient été dérivés du slug : « Jacksor Better50 Hand » pour

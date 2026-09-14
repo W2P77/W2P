@@ -220,6 +220,16 @@ describe('la formulation Habanero, avec le nom du jeu dans la phrase', () => {
   });
 });
 
+describe('la formulation Amusnet, « of the game is »', () => {
+  it('lit le RTP sans le sigle', () => {
+    expect(extraireLesFaits('The average return to Player of the game is 96.17%.').rtp).toBe(96.17);
+  });
+
+  it('ne prend pas le taux « when using » pour celui du jeu', () => {
+    expect(extraireLesFaits('The average return to Player when using BUY BONUS is 97.10%.').rtp).toBeNull();
+  });
+});
+
 describe('le gain maximum, selon la formule du studio', () => {
   it('lit « maximum theoretical win »', () => {
     expect(extraireLesFaits('The maximum theoretical win is 5,000x the bet').gainMax).toBe(5000);
