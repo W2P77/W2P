@@ -2,6 +2,45 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-15 — Ce que les légendes écrites à la main ont trouvé
+
+Quatre agents ont écrit à la main les légendes de 21 fiches — 173 captures,
+trois langues chacune. Le travail lui-même tient la cadence : **cinq à sept
+minutes par fiche**, l'essentiel passé à regarder les images. Mais ce qu'ils
+ont vu en regardant vaut plus que les légendes.
+
+**29 captures « Buying the feature » étaient l'image du jeu de base.** Le
+bouton « BUY FREE SPINS » est peint en permanence dans l'habillage Pragmatic,
+même sur les jeux qui ne vendent rien : le contrôle `/BUY/i` de l'adaptateur
+passait partout, le clic n'ouvrait rien, et le runner photographiait le jeu de
+base une seconde fois. Comparaison d'images sur les **556 fiches publiées** qui
+ont une capture d'achat : 29 doublons (écart de luminance < 3 sur 255), toutes
+chez Pragmatic, dont **22 sur des jeux sans achat de bonus du tout**. Deux fois
+faux pour le visiteur — la même image deux fois sur la page, la seconde
+légendée « la confirmation d'achat ». Les 29 captures sont retirées
+(`scripts/retirer-achats-fantomes.ts`), et l'adaptateur exige désormais que
+l'écran ait **changé** après le clic, pas qu'un bouton porte le mot BUY.
+
+**Trois chiffres faux en base, trouvés en lisant les panneaux :**
+
+- **5 Lions Gold** — la fiche annonçait un jackpot Major à 250× ; le panneau
+  dit **150×**, et l'arithmétique du bandeau le confirme (270 $ pour 1,80 $ de
+  mise). Les deux autres jackpots, eux, correspondaient exactement.
+- **5 Lions Megaways** — 200 704 ways en base, **117 649** au panneau, et
+  7⁶ = 117 649 pour six rouleaux de sept symboles.
+- **Beam Boys** — 6 561 ways en base pour une grille que **notre propre fiche**
+  décrit en 6 rouleaux × 4 rangées : 4⁶ = **4 096**, ce que le panneau écrit.
+  6 561 était arithmétiquement impossible.
+
+Tous trois corrigés, sauvegardes dans `sauvegardes-betsrank/`.
+
+**Et un piège que les agents ont évité seuls** : les menus d'achat de Hacksaw
+affichent une volatilité — « High », « Very high », « Medium » — qui qualifie
+**l'achat**, pas le jeu, et qui diverge de la fiche cinq fois sur cinq. Aucune
+légende ne l'a reprise. Même discipline sur les retours d'achat de Nolimit City
+et de Hacksaw : toujours nommés « retour d'achat », jamais confondus avec le
+RTP du jeu, qui vient de la fiche.
+
 ## 2026-09-15 — Les légendes écrites à la main, en base et par langue
 
 La légende générée dit de quoi une page **parle** — c'est vrai, jamais faux, et

@@ -22,7 +22,37 @@
  * pourquoi `verifierLaCapture` existe — on compare les captures entre elles,
  * et deux images identiques trahissent un clic qui n'a rien fait.
  */
+import sharp from 'sharp';
 import type { Page } from 'playwright';
+
+/**
+ * L'écran réduit à 64×64 niveaux de gris — assez pour savoir s'il a changé.
+ *
+ * Comparer deux captures pleine taille coûterait le prix d'un téléversement à
+ * chaque clic ; une vignette suffit à distinguer une boîte de dialogue ouverte
+ * d'un jeu de base inchangé.
+ */
+async function empreinte(page: Page): Promise<Buffer> {
+  const png = await page.screenshot({ type: 'png' });
+  return sharp(png).grayscale().resize(64, 64, { fit: 'fill' }).raw().toBuffer();
+}
+
+/** L'écart moyen de luminance entre deux empreintes, sur 255. */
+function ecartDEmpreinte(a: Buffer, b: Buffer): number {
+  let somme = 0;
+  for (let i = 0; i < a.length; i++) somme += Math.abs(a[i] - b[i]);
+  return somme / a.length;
+}
+
+/**
+ * Au-dessous, l'écran n'a pas bougé et le clic n'a rien ouvert.
+ *
+ * Mesuré sur les captures publiées : les 29 doublons avérés sont tous sous 3,
+ * les quarante premières sous 8 ; une vraie boîte d'achat, qui assombrit le
+ * fond et pose un panneau, dépasse largement. Six laisse la marge d'un
+ * bandeau défilant sans laisser passer un doublon.
+ */
+const ECRAN_A_CHANGE = 6;
 
 /** Le jeu n'a pas de panneau de règles, et n'en aura jamais : c'est acquis. */
 export const SANS_PANNEAU = -1;
@@ -270,8 +300,23 @@ export const PRAGMATIC: Adaptateur = {
    */
   async capturerLAchat(page, cliche, lireLEcran) {
     if (!/BUY/i.test(await lireLEcran())) return false;
+    /*
+     * Le mot BUY ne prouve rien : il est peint en permanence.
+     *
+     * « BUY FREE SPINS » est un bouton de l'habillage Pragmatic, présent même
+     * sur les jeux qui ne vendent rien. Le contrôle ci-dessus passait donc
+     * partout, le clic n'ouvrait rien, et le runner photographiait le jeu de
+     * base une seconde fois — publiée sous le titre « Buying the feature ».
+     * Comparaison faite le 15/09/2026 sur les 556 fiches publiées qui ont une
+     * capture d'achat : **29 étaient l'image du jeu de base**, et 22 d'entre
+     * elles appartenaient à des jeux sans achat de bonus du tout.
+     *
+     * La seule preuve qui vaille est que l'écran ait **changé**.
+     */
+    const avant = await empreinte(page);
     await page.mouse.click(100, 165); // « BUY FREE SPINS », en haut à gauche
     await page.waitForTimeout(3500);
+    if (ecartDEmpreinte(avant, await empreinte(page)) < ECRAN_A_CHANGE) return false;
     await cliche('achat');
     return true;
   },
