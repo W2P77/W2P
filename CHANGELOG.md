@@ -2,6 +2,22 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-14 — 46 noms Habanero remis comme le jeu les écrit
+
+Les noms Habanero avaient été dérivés du slug : « Jacksor Better50 Hand » pour
+Jacks or Better, « Queen of Queens1024 » pour Queen of Queens II, « Zeus2 »,
+« Sos » pour S.O.S!, « dr Feelgood ». Ces noms partent dans le titre de la
+page, dans la recherche et dans les données structurées — c'est ce que Google
+affiche.
+
+La reconnaissance de l'adaptateur a relevé, pour les 222 lanceurs, **le nom
+tel que le jeu l'affiche à l'écran** (scratchpad `hab/noms.tsv`). Là où il
+diffère du nom en base et n'est pas vide, la base l'adopte : 46 fiches, slug
+inchangé, donc aucune URL ne bouge. Sauvegarde des 46 valeurs d'avant dans
+`sauvegardes-betsrank/`. Les fiches dont le lanceur n'affichait pas de nom
+(Azlands Gold, Caribbean Holdem…) restent telles quelles : on ne corrige que ce
+qu'on a lu.
+
 ## 2026-09-14 — Habanero branché, et un audit de chaque fiche publiée
 
 **Habanero** — `src/lib/captures/adaptateur-habanero.ts`. 222 fiches avec démo,
