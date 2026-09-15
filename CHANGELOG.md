@@ -2,6 +2,48 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-15 — Deux marques de plus, et leurs studios établis sans les supposer
+
+Spin Million et Slotaza rejoignent le catalogue (ids 149 et 150, alignés sur
+ceux de BetsRank). Deals PayKassma Partners, 250 € de CPA chacun, dépôt minimum
+20 € et 15 €.
+
+**Le champ `providers` décide sur quelles fiches de jeu un casino apparaît.**
+Le laisser vide l'aurait rendu invisible ; le remplir de mémoire l'aurait
+affiché sur des jeux qu'il ne propose pas. Leur API range pourtant ses jeux par
+`supplier` — un entier maison, sans nom : 77, 91, 141…
+
+On a donc rapproché les titres qu'ils affichent de **notre propre table `Jeu`**,
+11 658 jeux dont on connaît le studio. Chaque entier s'est fait identifier par
+le consensus de ses jeux :
+
+| supplier | jeux reconnus | studio |
+|---|---|---|
+| 91 | 19 / 19 | Spinoro |
+| 141 | 7 / 7 | Turbogames |
+| 88 | 5 / 5 | Spinomenal |
+| 45 | 5 / 5 | BGaming |
+| 70 | 4 / 4 | Platipus |
+| 39 | 3 / 3 | Reevo |
+| 140 | 3 / 4 | TaDa Gaming |
+
+**Felix est écarté malgré deux concordances** : ses fichiers portent le préfixe
+`FG`, qui désigne Fugaso. Deux signaux qui se contredisent ne font pas une
+certitude.
+
+**Le clickId de ce réseau serait parti à la poubelle en silence.** PayKassma
+livre ses liens avec `aff_click_id=YOURCLICKID` écrit en clair — un placeholder
+qui ressemble à une macro sans en être une. Sans la branche ajoutée à
+`url-partenaire.ts`, notre identifiant serait parti en `sub4` et le partenaire
+aurait reçu « YOURCLICKID » pour chaque lead. Rien n'aurait cassé, rien n'aurait
+alerté : c'est le mode d'échec déjà payé deux fois chez BetsRank.
+
+**Note de géo, vérifiée avant publication.** `spinmillion.com` résout sur
+`offre-illegale.anj.fr` chez les FAI français — blocage DNS du régulateur, qu'un
+navigateur en DNS-over-HTTPS ne voit pas. Notre lien n'est pas concerné : le
+tracker atterrit sur `spinmillion757.com`, qui répond sur tous les résolveurs.
+Ne pas « corriger » le `playUrl` vers le domaine de marque.
+
 ## 2026-09-15 — Le vrai gisement n'est pas les erreurs, c'est les trous
 
 `frkn-bananas` était en base comme une grille **5×4 à 14 lignes** ; son panneau

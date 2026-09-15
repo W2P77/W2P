@@ -40,6 +40,23 @@ export interface FaitsLus {
   gainMax: number | null;
   /** 1 chance sur N d'atteindre le gain maximum, quand le studio le publie. */
   frequenceGainMax: number | null;
+  /**
+   * Ce que le panneau dit du **nombre de lignes**, tel qu'il l'écrit.
+   *
+   * Texte libre et pas un entier : « 25 fixed lines » et « 243 ways (All
+   * Ways) » sont deux réponses valides à la même question, et forcer un nombre
+   * effacerait la seconde. Chaque studio a sa phrase, on ne retient que celles
+   * relevées mot pour mot sur des captures nommées.
+   */
+  lignes: string | null;
+  /**
+   * Ce que le panneau dit de la **grille**, quand il l'écrit en toutes lettres.
+   *
+   * Rare : la plupart des studios la montrent sans la dire. On n'accepte donc
+   * que la formule qui donne rouleaux **et** rangées ensemble — un nombre de
+   * rouleaux seul laisserait deviner la hauteur, et deviner est interdit.
+   */
+  grille: string | null;
   /** Le texte brut, conservé pour pouvoir vérifier une lecture douteuse. */
   brut: string;
   /**
@@ -562,6 +579,75 @@ export function extraireLesFaits(texte: string, pages: FaitsLus['pages'] = []): 
     gainMax: dansPlage(gainLu ? nombre(gainLu[1]) : null, 10, 1_000_000),
     frequenceGainMax: dansPlage(freqLu ? nombre(freqLu[1]) : null, 1000, 100_000_000_000),
     brut: t.slice(0, 4000),
+    lignes: lireLesLignes(t),
+    grille: lireLaGrille(t),
     pages,
   };
+}
+
+/*
+ * Le nombre de lignes, studio par studio.
+ *
+ * ── Pourquoi une liste fermée de phrases ──────────────────────────────────
+ *
+ * Un panneau de règles répète le mot « line » vingt fois — « Wins on different
+ * lines are added », « Line wins are multiplied by bet per line », « Highest
+ * win only on each line ». Une formule large attraperait ces phrases-là et
+ * publierait le premier nombre venu. On ne retient donc que les tournures qui
+ * **annoncent** le nombre, relevées mot pour mot sur des captures nommées :
+ *
+ * · Spinomenal (412 fiches) « The game is set to 50 fixed lines. »
+ *   — demi-gods-v-a-moonlit-oath, demi-gods-v-hold-hit
+ * · Amusnet (214) « 10 Bulky Fruits video slot is a 5-reel, 10-line fixed game. »
+ *   — 10-bulky-fruits, 10-burning-heart, 10-glossy-hot
+ * · Habanero (198) « Lines are fixed at 88. » — 5-lucky-lions, dont la fiche
+ *   portait déjà 88 : la formule se vérifie contre une valeur connue.
+ * · 1spin4win (219) « 243 ways (All Ways) » — all-ways-egypt.
+ *
+ * Les bornes disent le reste : une ligne se compte entre 1 et 100, un nombre
+ * de façons de gagner monte à 250 000 (117 649 chez Megaways, 262 144 ailleurs)
+ * mais ne descend pas sous 20. Hors de là, c'est qu'on a lu autre chose.
+ */
+function lireLesLignes(t: string): string | null {
+  const lignesFixes =
+    /\bThe game is set to\s+(\d{1,3})\s+fixed lines/i.exec(t) ??
+    /\bLines are fixed at\s+(\d{1,3})\b/i.exec(t) ??
+    /\bis a\s+\d{1,2}-reel,\s*(\d{1,3})-line fixed game/i.exec(t);
+  if (lignesFixes) {
+    const n = Number(lignesFixes[1]);
+    if (n >= 1 && n <= 100) return `${n} fixed lines`;
+  }
+
+  /*
+   * Le séparateur de milliers est la virgule, **jamais l'espace**.
+   *
+   * Sur 5 Lions Slot, un panneau qui publie « 243 ways to win » a été lu
+   * « 3,243 ways » : le chiffre d'avant, séparé par une espace, s'était
+   * agrégé au nombre. L'OCR sème des espaces partout, donc les accepter comme
+   * séparateur revient à laisser n'importe quel chiffre voisin multiplier la
+   * valeur par dix. Une virgule, elle, ne s'invente pas.
+   */
+  const facons = /\b(\d{1,3}(?:,\d{3})+|\d{2,6})\s+ways(?:\s+to win|\s*\(All Ways\))/i.exec(t);
+  if (facons) {
+    const n = Number(facons[1].replace(/[,\s]/g, ''));
+    if (n >= 20 && n <= 250_000) return `${n.toLocaleString('en-GB')} ways to win`;
+  }
+  return null;
+}
+
+/*
+ * La grille, uniquement quand le panneau donne rouleaux **et** rangées.
+ *
+ * Hacksaw l'écrit dans son bloc « ABOUT THE GAME » : « join these unruly
+ * fruits in a 6-reel, 5-row paylines game ». C'est cette phrase qui a permis
+ * de corriger frkn-bananas, en base comme une grille 5×4. Amusnet écrit
+ * « a 5-reel, 10-line fixed game » — des rouleaux et des lignes, pas de
+ * rangées : cette forme-là est refusée ici, elle est lue par `lireLesLignes`.
+ */
+function lireLaGrille(t: string): string | null {
+  const m = /\b(\d{1,2})-reel,\s*(\d{1,2})-row\b/i.exec(t);
+  if (!m) return null;
+  const [rouleaux, rangees] = [Number(m[1]), Number(m[2])];
+  if (rouleaux < 3 || rouleaux > 9 || rangees < 2 || rangees > 9) return null;
+  return `${rouleaux} reels × ${rangees} rows`;
 }

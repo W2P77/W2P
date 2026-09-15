@@ -118,6 +118,15 @@ export function buildAffiliateRedirectUrl(playUrl: string, clickId: string): str
       // ("The payload value you may have used when referring the customer"),
       // renvoyée telle quelle dans les 3 postbacks (Registration/FTD/Qualified player).
       u.searchParams.set('payload', clickId);
+    } else if (playUrl.toLowerCase().includes('scaletrk.com') || playUrl.toLowerCase().includes('paykassma')) {
+      // PayKassma Partners (tracker scaletrk.com), arrivé le 2026-09-15 avec
+      // Spin Million et Slotaza. Leur lien est livré avec
+      // `aff_click_id=YOURCLICKID` écrit en clair : un placeholder, pas une
+      // macro `{clickid}`. Sans cette branche le clickId partirait en `sub4`
+      // et le placeholder arriverait tel quel chez le partenaire — le postback
+      // renverrait « YOURCLICKID » pour chaque lead, sans rien casser ni rien
+      // signaler. Même correctif que côté BetsRank.
+      u.searchParams.set('aff_click_id', clickId);
     } else if (playUrl.toLowerCase().includes('metriciumplatform.com')) {
       // Algo Affiliates : macro confirmée par le manager (2026-07-24) = aff_click_id,
       // renvoyée telle quelle dans leur postback vers /api/postback/algo-affiliates.

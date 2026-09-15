@@ -274,3 +274,80 @@ describe('la volatilité, dans les deux sens de lecture', () => {
     expect(extraireLesFaits('Bets from 0.10 to 250').volatilite).toBeNull();
   });
 });
+
+/*
+ * Les lignes et la grille : chaque cas est une phrase relevée mot pour mot sur
+ * une capture nommée, pas une formulation plausible. Le risque n'est pas de
+ * rater une lecture, c'est d'en inventer une — un panneau répète le mot
+ * « line » vingt fois sans jamais annoncer le compte.
+ */
+describe('le nombre de lignes, studio par studio', () => {
+  it('lit Spinomenal — « The game is set to 50 fixed lines. »', () => {
+    expect(extraireLesFaits('* The game is set to 50 fixed lines.').lignes).toBe('50 fixed lines');
+  });
+
+  it('lit Habanero — « Lines are fixed at 88. »', () => {
+    expect(extraireLesFaits('Lines are fixed at 88.').lignes).toBe('88 fixed lines');
+  });
+
+  it('lit Amusnet, où la phrase porte aussi les rouleaux', () => {
+    const t = '10 Bulky Fruits video slot is a 5-reel, 10-line fixed game.';
+    expect(extraireLesFaits(t).lignes).toBe('10 fixed lines');
+  });
+
+  it('lit 1spin4win — « 243 ways (All Ways) »', () => {
+    expect(extraireLesFaits('| 243 ways (All Ways) |').lignes).toBe('243 ways to win');
+  });
+
+  it('lit un nombre de façons écrit avec ses séparateurs', () => {
+    expect(extraireLesFaits('117,649 ways to win').lignes).toBe('117,649 ways to win');
+  });
+
+  /*
+   * Le vrai danger : ces trois phrases sont sur tous les panneaux du site, et
+   * une formule large en tirerait « 1 ligne », « 5 lignes », « 2 lignes ».
+   */
+  it('ne prend pas un nombre dans une phrase qui ne compte pas les lignes', () => {
+    expect(extraireLesFaits('Wins on different lines are added.').lignes).toBeNull();
+    expect(extraireLesFaits('Line wins are multiplied by bet per line.').lignes).toBeNull();
+    expect(extraireLesFaits('If any 5 symbols appear on a line, pays are left to right only.').lignes).toBeNull();
+    expect(extraireLesFaits('Free games are played at the lines and bet of the triggering game.').lignes).toBeNull();
+  });
+
+  it('refuse un compte hors des bornes du plausible', () => {
+    expect(extraireLesFaits('The game is set to 500 fixed lines.').lignes).toBeNull();
+    expect(extraireLesFaits('12 ways to win').lignes).toBeNull();
+  });
+});
+
+describe('la grille, seulement quand le panneau la dit en entier', () => {
+  it('lit Hacksaw — la phrase qui a corrigé Frkn Bananas', () => {
+    const t = "join these unruly fruits in a 6-reel, 5-row paylines game with a max win of 10,000 times your bet!";
+    expect(extraireLesFaits(t).grille).toBe('6 reels × 5 rows');
+  });
+
+  /* Des rouleaux sans rangées laisseraient deviner la hauteur. On se tait. */
+  it('refuse la forme Amusnet, qui donne des rouleaux et des lignes', () => {
+    expect(extraireLesFaits('video slot is a 5-reel, 10-line fixed game').grille).toBeNull();
+  });
+
+  it('ne devine rien quand le panneau montre la grille sans l\'écrire', () => {
+    expect(extraireLesFaits('All symbols pay left to right from the leftmost reel.').grille).toBeNull();
+  });
+});
+
+/*
+ * Le cas qui a failli passer : 5 Lions Slot publie « 243 ways to win », et la
+ * lecture rendait « 3,243 » — le chiffre d'à côté, collé par une espace. La
+ * fiche portait déjà la bonne valeur, c'est elle qui a arrêté l'erreur ; sur
+ * les quatre cents fiches muettes, rien ne l'aurait arrêtée.
+ */
+describe('le chiffre d\'à côté ne doit pas grossir le nombre', () => {
+  it('ne prend pas l\'espace pour un séparateur de milliers', () => {
+    expect(extraireLesFaits('Only 3 243 ways to win').lignes).toBe('243 ways to win');
+  });
+
+  it('accepte la virgule, qui ne s\'invente pas', () => {
+    expect(extraireLesFaits('117,649 ways to win').lignes).toBe('117,649 ways to win');
+  });
+});
