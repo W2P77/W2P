@@ -461,3 +461,21 @@ describe('Habanero fixe ses façons comme ses lignes', () => {
     expect(extraireLesFaits('Ways are fixed at 707.').lignes).toBe('707 ways');
   });
 });
+
+/*
+ * Aztec Smash est en base comme une grille 5×3 à 20 lignes de paiement. Son
+ * panneau dit « The game is played on a 7x7 grid of symbols » et « All symbols
+ * pay in blocks of minimum 5 symbols ». Sans cette formule, la confrontation
+ * n'avait rien à comparer et la fiche passait pour concordante.
+ */
+describe('Pragmatic annonce sa grille d\'un bloc', () => {
+  it('lit « played on a 7x7 grid of symbols »', () => {
+    expect(extraireLesFaits('The game is played on a 7x7 grid of symbols.').grille)
+      .toBe('7 reels × 7 rows');
+  });
+
+  it('accepte le signe multiplié que rend parfois l\'OCR', () => {
+    expect(extraireLesFaits('The game is played on a 6×5 grid of symbols.').grille)
+      .toBe('6 reels × 5 rows');
+  });
+});

@@ -749,6 +749,18 @@ function lireLaGrille(t: string): string | null {
   const dentelee = /\b(\d{1,2})-reel,\s*((?:\d-){2,7}\d)\s*row setup\b/i.exec(t);
   if (dentelee) return `${dentelee[1]} reels, rows ${dentelee[2]}`;
 
+  /*
+   * Pragmatic annonce sa grille d'un bloc : « The game is **played on a 7x7
+   * grid** of symbols. » Sans cette formule, Aztec Smash — en base comme une
+   * grille 5×3 à 20 lignes alors qu'il se joue en 7×7 par blocs — passait pour
+   * concordant, faute d'avoir quoi que ce soit à comparer.
+   */
+  const dUnBloc = /\bplayed on a\s+(\d{1,2})\s*[x×]\s*(\d{1,2})\s+grid\b/i.exec(t);
+  if (dUnBloc) {
+    const [r, h] = [Number(dUnBloc[1]), Number(dUnBloc[2])];
+    if (r >= 3 && r <= 9 && h >= 2 && h <= 9) return `${r} reels × ${h} rows`;
+  }
+
   const m = /\b(\d{1,2})-reel,\s*(\d{1,2})-row\b/i.exec(t);
   if (!m) return null;
   const [rouleaux, rangees] = [Number(m[1]), Number(m[2])];

@@ -2,6 +2,40 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-15 (fin de journée) — Pragmatic décrit d'autres jeux que les siens
+
+**Neuf fiches Pragmatic sur dix contredisent leur propre panneau**, et pas sur
+des détails. Deux vérifiées à la main, mot pour mot :
+
+- **Aztec Smash** — base : grille `5×3`, `20` lignes. Panneau : « The game is
+  **played on a 7x7 grid** of symbols » et « All symbols pay in **blocks** of
+  minimum 5 symbols connected horizontally or vertically ».
+- **Argonauts** — base : `6x5`, `Pay Anywhere`, achat de bonus `non`. Panneau :
+  « **1024 ways to win** », gains de gauche à droite, et « can be instantly
+  triggered from the base game by **buying it for 60x** ».
+
+Le lot entier a aussi donné des nombres de tours gratuits faux (8 au lieu de 5
+sur Asgard), des cascades annoncées sur des jeux qui n'en ont pas, et des
+achats déclarés absents alors qu'ils existent.
+
+**584 fiches Pragmatic affirment une description de jeu — 95 % du studio,
+presque un quart du catalogue publié.**
+
+Ce qui désigne l'origine : les studios à 100 % qui tiennent la route — BGaming,
+Play'n GO, Hacksaw, Nolimit City — ont été remplis **par nos propres campagnes
+de capture**, qui lisent le panneau. Pragmatic vient du même import que les 27
+noms cassés en « Apos » et que « Pirates Riches Slot 23 May 2019 ».
+
+Le lecteur apprend au passage la formulation de grille de ce studio (« played
+on a 7x7 grid »). Sans elle la confrontation n'avait **rien à comparer** sur
+Aztec Smash, et la fiche passait pour concordante : un outil de contrôle qui
+ignore la langue du panneau ne trouve aucune erreur, et ce silence ressemble à
+un bon résultat. Même piège que les 45 panneaux Nolimit comptés « muets ».
+
+**Décision en attente** : la confrontation des 584 n'a pas encore tourné.
+Trois voies — vider ces champs sur les fiches non vérifiées, les garder le temps
+de reprendre le studio, ou lancer une campagne de vérification dédiée.
+
 ## 2026-09-15 (suite) — Des noms de jeux cassés à l'import, et deux chiffres faux
 
 ### 27 noms portaient une entité HTML à moitié décodée
