@@ -609,13 +609,51 @@ export function extraireLesFaits(texte: string, pages: FaitsLus['pages'] = []): 
  * mais ne descend pas sous 20. Hors de là, c'est qu'on a lu autre chose.
  */
 function lireLesLignes(t: string): string | null {
+  /*
+   * La fourchette d'abord, la valeur unique ensuite.
+   *
+   * Christmas Gift Rush publie « Lines are fixed at **1 - 3**. » : le nombre de
+   * lignes change d'un tour à l'autre. Une formule qui ne cherche qu'un nombre
+   * y lit « 1 », et la fiche annonce une ligne de paiement pour un jeu qui peut
+   * en avoir trois. C'est le même piège que les paliers de RTP chez Nolimit
+   * City, et il se règle pareil : on lit la plage telle qu'elle est écrite.
+   */
+  const plage =
+    /\bLines are fixed at\s+(\d{1,3})\s*[-–]\s*(\d{1,3})\b/i.exec(t) ??
+    /\bThe game is set to\s+(\d{1,3})\s*[-–]\s*(\d{1,3})\s+fixed lines/i.exec(t);
+  if (plage) {
+    const [bas, haut] = [Number(plage[1]), Number(plage[2])];
+    if (bas >= 1 && haut <= 100 && bas < haut) return `${bas} to ${haut} fixed lines`;
+  }
+
+  /*
+   * Le joueur choisit lui-même son nombre de lignes.
+   *
+   * Spinomenal écrit « The amount of lines ranges between **10-100**. » sur ses
+   * jeux « 100 xxx » — et la démo s'ouvre réglée sur 10, pas sur 100. Écrire
+   * « 100 lignes » parce que le titre dit 100 serait faux deux fois : ce n'est
+   * ni fixe, ni la valeur par défaut. Le même piège existe chez 1spin4win, où
+   * Booming Fruits 100 s'ouvre à 20 lignes.
+   */
+  const choisies = /\bamount of lines ranges between\s*(\d{1,3})\s*[-–]\s*(\d{1,3})/i.exec(t);
+  if (choisies) {
+    const [bas, haut] = [Number(choisies[1]), Number(choisies[2])];
+    if (bas >= 1 && haut <= 100 && bas < haut) return `${bas} to ${haut} selectable lines`;
+  }
+
   const lignesFixes =
     /\bThe game is set to\s+(\d{1,3})\s+fixed lines/i.exec(t) ??
     /\bLines are fixed at\s+(\d{1,3})\b/i.exec(t) ??
     /\bis a\s+\d{1,2}-reel,\s*(\d{1,3})-line fixed game/i.exec(t);
   if (lignesFixes) {
     const n = Number(lignesFixes[1]);
-    if (n >= 1 && n <= 100) return `${n} fixed lines`;
+    /*
+     * Une seule ligne de paiement existe, mais c'est si rare qu'un « 1 » isolé
+     * est presque toujours une fourchette mal lue ou un chiffre attrapé
+     * ailleurs. On préfère se taire : un champ vide se remplit plus tard, une
+     * fiche fausse se publie tout de suite.
+     */
+    if (n >= 3 && n <= 100) return `${n} fixed lines`;
   }
 
   /*
@@ -627,6 +665,20 @@ function lireLesLignes(t: string): string | null {
    * séparateur revient à laisser n'importe quel chiffre voisin multiplier la
    * valeur par dix. Une virgule, elle, ne s'invente pas.
    */
+  /*
+   * Nolimit City compte à l'envers : « 1024 **win ways** by default », l'adjectif
+   * devant le nom. La formule d'en dessous cherche « ways to win » et rendait
+   * donc `null` sur les 134 fiches du studio — 45 panneaux annoncés « muets »
+   * alors qu'ils publient tous leur compte. « by default » est important : ces
+   * jeux montent plus haut en cours de partie, et le nombre annoncé est celui
+   * du jeu de base.
+   */
+  const faconsNolimit = /\b(\d{1,3}(?:,\d{3})+|\d{2,6})\s+win\s+ways/i.exec(t);
+  if (faconsNolimit) {
+    const n = Number(faconsNolimit[1].replace(/,/g, ''));
+    if (n >= 20 && n <= 250_000) return `${n.toLocaleString('en-GB')} win ways by default`;
+  }
+
   const facons = /\b(\d{1,3}(?:,\d{3})+|\d{2,6})\s+ways(?:\s+to win|\s*\(All Ways\))/i.exec(t);
   if (facons) {
     const n = Number(facons[1].replace(/[,\s]/g, ''));
@@ -645,6 +697,26 @@ function lireLesLignes(t: string): string | null {
  * rangées : cette forme-là est refusée ici, elle est lue par `lireLesLignes`.
  */
 function lireLaGrille(t: string): string | null {
+  /*
+   * Une grille qui respire se dit « A 5-reel, **up to** 6-row video slot » —
+   * la hauteur varie en cours de partie. L'écrire « 5 × 6 » serait faux : on
+   * garde le « jusqu'à », qui est ce que le studio annonce.
+   */
+  const variable = /\b(\d{1,2})-reel,\s*up to\s*(\d{1,2})-row\b/i.exec(t);
+  if (variable) {
+    const [r, h] = [Number(variable[1]), Number(variable[2])];
+    if (r >= 3 && r <= 9 && h >= 2 && h <= 9) return `${r} reels × up to ${h} rows`;
+  }
+
+  /*
+   * Et une grille en dents de scie se dit rouleau par rouleau : « A 5-reel,
+   * 3-3-3-3-1 row setup ». Punk Toilet a son cinquième rouleau à une seule
+   * case — c'est ce qui donne 81 façons et non 243, et une fiche qui annonçait
+   * « 20 paylines » ne décrivait pas ce jeu.
+   */
+  const dentelee = /\b(\d{1,2})-reel,\s*((?:\d-){2,7}\d)\s*row setup\b/i.exec(t);
+  if (dentelee) return `${dentelee[1]} reels, rows ${dentelee[2]}`;
+
   const m = /\b(\d{1,2})-reel,\s*(\d{1,2})-row\b/i.exec(t);
   if (!m) return null;
   const [rouleaux, rangees] = [Number(m[1]), Number(m[2])];

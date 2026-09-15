@@ -351,3 +351,74 @@ describe('le chiffre d\'à côté ne doit pas grossir le nombre', () => {
     expect(extraireLesFaits('117,649 ways to win').lignes).toBe('117,649 ways to win');
   });
 });
+
+/*
+ * Christmas Gift Rush publie « Lines are fixed at 1 - 3. » — le nombre de
+ * lignes varie d'un tour à l'autre. La première version de la formule y lisait
+ * « 1 » et l'a écrit en base : une fiche qui annonçait une seule ligne pour un
+ * jeu qui peut en avoir trois.
+ */
+describe('une fourchette de lignes se lit comme une fourchette', () => {
+  it('lit « Lines are fixed at 1 - 3 »', () => {
+    expect(extraireLesFaits('Lines are fixed at 1 - 3.').lignes).toBe('1 to 3 fixed lines');
+  });
+
+  it('lit le tiret demi-cadratin que rend parfois l\'OCR', () => {
+    expect(extraireLesFaits('Lines are fixed at 10 – 20.').lignes).toBe('10 to 20 fixed lines');
+  });
+
+  it('se tait sur un compte isolé trop bas pour être vrai', () => {
+    expect(extraireLesFaits('Lines are fixed at 1.').lignes).toBeNull();
+  });
+
+  it('accepte toujours un compte ordinaire', () => {
+    expect(extraireLesFaits('Lines are fixed at 25.').lignes).toBe('25 fixed lines');
+  });
+});
+
+/*
+ * Nolimit City : 45 panneaux avaient été comptés « muets » alors qu'ils
+ * publient tous leur grille et leur compte de façons. Ils l'écrivent
+ * simplement autrement — « win ways » plutôt que « ways to win », « up to
+ * 6-row » plutôt qu'une hauteur fixe, et parfois rouleau par rouleau.
+ */
+describe('Nolimit City énonce sa grille autrement', () => {
+  it('lit « 1024 win ways by default »', () => {
+    const t = '1024 win ways by default (see pay table for more info).';
+    expect(extraireLesFaits(t).lignes).toBe('1,024 win ways by default');
+  });
+
+  it('garde le « jusqu\'à » d\'une hauteur variable', () => {
+    expect(extraireLesFaits('A 5-reel, up to 6-row video slot with 16 symbols.').grille)
+      .toBe('5 reels × up to 6 rows');
+  });
+
+  it('lit une grille en dents de scie', () => {
+    expect(extraireLesFaits('A 5-reel, 3-3-3-3-1 row setup.').grille)
+      .toBe('5 reels, rows 3-3-3-3-1');
+  });
+
+  it('lit une hauteur fixe comme avant', () => {
+    expect(extraireLesFaits('A 5-reel, 3-row video slot with 16 symbols.').grille)
+      .toBe('5 reels × 3 rows');
+  });
+});
+
+/*
+ * Le nombre du titre n'est pas le nombre de lignes.
+ *
+ * Spinomenal 100 Juicy Fruits et 1spin4win Booming Fruits 100 portent tous deux
+ * « 100 » dans leur nom, un sélecteur de lignes, et une démo qui s'ouvre à 10 et
+ * 20 respectivement. Deux agents l'ont relevé le même jour sur deux studios
+ * différents : c'est un piège de famille, pas un cas isolé.
+ */
+describe('des lignes que le joueur choisit ne sont pas des lignes fixes', () => {
+  it('lit « The amount of lines ranges between 10-100 »', () => {
+    const t = 'The player can choose how many lines to have active. The amount of lines ranges between 10-100.';
+    expect(extraireLesFaits(t).lignes).toBe('10 to 100 selectable lines');
+  });
+
+  it('ne confond pas avec un compte fixe', () => {
+    expect(extraireLesFaits('The game is set to 10 fixed lines.').lignes).toBe('10 fixed lines');
+  });
+});

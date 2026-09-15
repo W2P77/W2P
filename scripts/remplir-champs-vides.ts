@@ -81,7 +81,12 @@ async function main() {
   });
   const aLire = jeux
     .filter((j) => ((j.captures as unknown as Capture[] | null) ?? []).some((c) => /regles/.test(c.fichier)))
-    .filter((j) => (VERIFIER ? j.grille != null && j.lignesPaiement != null : j.grille == null || j.lignesPaiement == null))
+    /*
+     * En vérification on relit tout ce qui porte **au moins une** des deux
+     * valeurs : exiger les deux écartait justement les fiches qu'on vient de
+     * remplir, c'est-à-dire celles qu'on veut contrôler.
+     */
+    .filter((j) => (VERIFIER ? j.grille != null || j.lignesPaiement != null : j.grille == null || j.lignesPaiement == null))
     .slice(0, LIMITE);
 
   console.log(

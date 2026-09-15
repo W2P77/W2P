@@ -2,6 +2,57 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-15 (suite) — Les panneaux publiaient déjà ce qui manquait aux fiches
+
+**Les légendes écrites à la main passent de 189 à 326 fiches** (13 % du
+catalogue, ~2 470 captures en trois langues). Quatre studios sont amorcés qui
+ne l'étaient pas : Spinomenal, Amusnet, 1spin4win, Habanero.
+
+### Le second chantier rapporte plus que la chasse aux erreurs
+
+57 % des fiches publiées n'ont ni grille ni nombre de lignes. Or leur panneau
+le publie, et on l'a déjà photographié. `remplir-champs-vides.ts` relit les
+captures en base et n'écrit que dans un champ **vide** ; sur une fiche déjà
+renseignée il compare, ce qui valide la formule à l'échelle plutôt que par
+raisonnement. Habanero : 28 fiches. 1spin4win : 43.
+
+### Quatre formulations apprises, une erreur arrêtée à temps
+
+Une seule valeur fausse est passée, et c'est la validation croisée qui l'a
+trouvée : `christmas-gift-rush` a reçu « 1 fixed lines » alors que son panneau
+dit « Lines are fixed at **1 - 3** » — une fourchette dont la formule ne gardait
+que le premier nombre. Corrigée. Le lecteur sait désormais lire :
+
+| formulation | studio | ce qu'elle donne |
+|---|---|---|
+| `Lines are fixed at 1 - 3` | Habanero | une fourchette, pas son premier terme |
+| `1024 win ways by default` | Nolimit City | l'adjectif est devant le nom |
+| `A 5-reel, up to 6-row video slot` | Nolimit City | une hauteur qui varie |
+| `A 5-reel, 3-3-3-3-1 row setup` | Nolimit City | une grille en dents de scie |
+| `The amount of lines ranges between 10-100` | Spinomenal | des lignes **choisies**, pas fixes |
+
+Cette dernière est le piège le plus cher : Spinomenal « 100 Juicy Fruits » et
+1spin4win « Booming Fruits 100 » portent 100 dans leur nom, ouvrent leur démo à
+10 et 20 lignes, et un sélecteur laisse le joueur choisir. Deux agents l'ont
+relevé le même jour sur deux studios différents.
+
+Les formules Nolimit City ont aussi débloqué la confrontation sur ce studio :
+45 panneaux comptés « muets » publiaient en réalité tous leur grille. Résultat,
+**23 accords et 5 écarts** — dont `das-xboot`, 576 ways en base contre 75 712 au
+panneau.
+
+### Trois défauts d'outil, tous signalés par les agents
+
+- **Un `lot.json` partagé** : un agent a vu le lot d'un autre studio apparaître
+  au milieu du sien, entre son écriture et sa relecture. La consigne impose
+  maintenant un nom par studio.
+- **Une sauvegarde qui s'écrasait** : repasser sur une fiche le même jour
+  remplaçait la sauvegarde de son état d'origine par celle du premier jet — on
+  perdait exactement ce à quoi on voulait pouvoir revenir. Une seconde écriture
+  va désormais dans un fichier numéroté.
+- Le mode vérification n'examinait que les fiches dont les **deux** champs
+  étaient remplis : il écartait donc précisément celles qu'on venait d'écrire.
+
 ## 2026-09-15 — Deux marques de plus, et leurs studios établis sans les supposer
 
 Spin Million et Slotaza rejoignent le catalogue (ids 149 et 150, alignés sur

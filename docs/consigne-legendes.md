@@ -30,6 +30,12 @@ non) :
 L'outil sauvegarde tout seul avant d'écrire. Tu n'écris **jamais** dans
 `/tmp` toi-même, tu ne commites pas, tu ne pousses pas.
 
+**Nomme ton fichier de lot avec ton studio et le slug** — `nolimit-owls.json`,
+`amusnet-100-cats.json` — jamais `lot.json`. Plusieurs agents travaillent en
+parallèle sur ce chantier : un `lot.json` partagé s'est déjà fait écraser par
+un autre studio entre l'écriture et la relecture. Un nom unique coûte trois
+caractères et supprime le risque.
+
 ## Ce qu'une légende dit
 
 Elle décrit **ce que la capture montre** : la grille et ses rouleaux, le bouton

@@ -33,7 +33,7 @@
  * sinon. On ne juge pas le jeu, on ne le compare pas, on ne parle jamais d'un
  * partenaire.
  */
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 
@@ -117,8 +117,20 @@ async function ecrire(chemin: string) {
   const jeu = await charger(lot.slug);
   const captures = (jeu.captures as unknown as CaptureEnBase[]) ?? [];
 
+  /*
+   * La sauvegarde garde l'état **d'origine**, pas le dernier en date.
+   *
+   * Le nom ne portait que le jour : repasser sur une fiche déjà légendée dans
+   * la journée écrasait la sauvegarde de son état initial par celle du premier
+   * jet. On perdait donc exactement ce à quoi on voulait pouvoir revenir. Une
+   * seconde écriture le même jour va maintenant dans un fichier numéroté, et
+   * la première reste intacte.
+   */
   mkdirSync(SAUVEGARDES, { recursive: true });
-  const sauvegarde = join(SAUVEGARDES, `w2p-legendes-${lot.slug}-avant-${new Date().toISOString().slice(0, 10)}.json`);
+  const jour = new Date().toISOString().slice(0, 10);
+  const base = join(SAUVEGARDES, `w2p-legendes-${lot.slug}-avant-${jour}`);
+  let sauvegarde = `${base}.json`;
+  for (let n = 2; existsSync(sauvegarde); n++) sauvegarde = `${base}-${n}.json`;
   writeFileSync(sauvegarde, JSON.stringify(captures, null, 2));
 
   const connus = new Set(captures.map((c) => c.fichier));
