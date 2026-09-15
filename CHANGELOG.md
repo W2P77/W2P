@@ -2,6 +2,43 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-15 — Book of Cats a six rouleaux et vend son bonus
+
+**Deux erreurs sur la même fiche, et la seconde faisait mentir le site.**
+`book-of-cats` était en base comme une grille **5×3 sans achat de bonus**. Son
+panneau consacre une fonction entière au sixième rouleau — « In the main game
+the 6th reel is locked except for one cell », « Then the symbol expands to
+cover 3 positions on the 6th reel », « The game is played with the unlocked 6th
+reel » — et sa table de gains porte une colonne « 6× ». Grille corrigée en
+**6×3**, quatrième du chantier.
+
+Et il vend bien son bonus : « There is a possibility to buy a bonus: round of
+free spins », « RTP in the Buy Bonus feature is 96.83% », bouton « Buy bonus
+9.70 FUN » visible sur la capture du jeu de base. Le drapeau passe à vrai et la
+fiche gagne un **retour d'achat à 96,83 %** qu'elle n'avait pas.
+
+**Deux jeux voisins qui n'en sont pas un seul**, vérifiés plutôt que supposés :
+`book-of-cats` et `book-of-cats-megaways` ont des décors, des tables, des RTP
+et une mécanique de gamble différents — deux fiches légitimes. Même conclusion
+chez Hacksaw pour `donny-and-danny` et `donny-dough`, qui ne partagent qu'un
+personnage. **Savoir quand ne pas supprimer vaut autant que trouver un
+doublon.**
+
+**Trois signalements laissés en l'état, faute de preuve suffisante** :
+- `big-atlantis-frenzy` affiche un achat à 80× la mise et un Chance à +100 %
+  quand la fiche annonce 50× et +50 % — mais le panneau ne chiffre ni l'un ni
+  l'autre, et un prix d'écran a déjà été démenti par son propre règlement sur
+  ce studio.
+- `candy-monsta` : le panneau parle d'une « maximum exposure of x1000 », qui
+  **n'est pas un gain maximum**. La fiche a probablement raison avec ses
+  2 077× ; c'est noté pour que personne ne l'aligne sur le x1000 plus tard.
+- `burning-chilli-x` publie **cinq** RTP selon le nombre de lignes choisi, la
+  fiche n'en garde qu'un. Juste mais incomplet : un `rtpPaliers` le dirait
+  mieux.
+
+Lot BGaming : **102 légendes sur 103 captures**, la seule omise étant une
+capture « Buying the feature » qui ne montre aucune fenêtre d'achat.
+
 ## 2026-09-15 — Troisième tour : 154 fiches écrites, quatre corrections de plus
 
 **1 143 captures écrites à la main, 6 % du site.** Deux lots de plus : Nolimit
