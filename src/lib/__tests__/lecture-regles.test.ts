@@ -422,3 +422,42 @@ describe('des lignes que le joueur choisit ne sont pas des lignes fixes', () => 
     expect(extraireLesFaits('The game is set to 10 fixed lines.').lignes).toBe('10 fixed lines');
   });
 });
+
+/*
+ * Das xBoot : « From 576 ways up to 75712 win ways. » La grille se transforme
+ * en cours de partie. La formule attrapait 75 712 et signalait la fiche — qui
+ * disait 576, la bonne valeur — comme fausse. Le lecteur avait tort, pas la
+ * base : c'est le sens de l'erreur qui compte, et seule la règle « on n'écrit
+ * que dans un champ vide » a évité d'écraser du juste par du faux.
+ */
+describe('une grille qui se transforme annonce deux nombres', () => {
+  it('garde le départ et le maximum', () => {
+    const t = 'From 576 ways up to 75712 win ways.';
+    expect(extraireLesFaits(t).lignes).toBe('576 ways, up to 75,712');
+  });
+
+  it('lit toujours un compte simple quand il n\'y a pas de plage', () => {
+    expect(extraireLesFaits('1024 win ways by default.').lignes).toBe('1,024 win ways by default');
+  });
+});
+
+/*
+ * Habanero compte ses façons comme ses lignes, et colle la mise dans la même
+ * phrase : « Ways are fixed at 178 with total bet in coins fixed at 25. »
+ * Ramasser le second nombre donnerait « 25 façons » sur un jeu qui en a 178.
+ */
+describe('Habanero fixe ses façons comme ses lignes', () => {
+  it('lit « Ways are fixed at 178 »', () => {
+    const t = 'Ways are fixed at 178 with total bet in coins fixed at 25.';
+    expect(extraireLesFaits(t).lignes).toBe('178 ways');
+  });
+
+  it('ne confond pas avec le nombre de lignes', () => {
+    const t = 'Lines are fixed at 10. Total bet in coins is 15 multiplied by the bet level.';
+    expect(extraireLesFaits(t).lignes).toBe('10 fixed lines');
+  });
+
+  it('lit un compte de façons à quatre chiffres', () => {
+    expect(extraireLesFaits('Ways are fixed at 707.').lignes).toBe('707 ways');
+  });
+});

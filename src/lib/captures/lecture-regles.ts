@@ -673,10 +673,42 @@ function lireLesLignes(t: string): string | null {
    * jeux montent plus haut en cours de partie, et le nombre annoncé est celui
    * du jeu de base.
    */
+  /*
+   * « From 576 ways **up to** 75712 win ways. »
+   *
+   * Das xBoot change de grille en cours de partie : 576 façons au départ,
+   * 75 712 au maximum. La formule d'en dessous attrapait le second nombre et
+   * signalait la fiche — pourtant juste — comme fausse. C'est mon propre outil
+   * qui avait tort, et seule la règle « on n'écrit que dans un champ vide » a
+   * empêché d'écraser une bonne valeur par une mauvaise. On lit donc la plage
+   * entière, et le départ vient en premier.
+   */
+  const deTelleATelle =
+    /\bFrom\s+(\d{1,3}(?:,\d{3})+|\d{2,6})\s+ways\s+up to\s+(\d{1,3}(?:,\d{3})+|\d{2,6})\s+win\s+ways/i.exec(t);
+  if (deTelleATelle) {
+    const [debut, max] = [deTelleATelle[1], deTelleATelle[2]].map((x) => Number(x.replace(/,/g, '')));
+    if (debut >= 20 && max <= 250_000 && debut < max) {
+      return `${debut.toLocaleString('en-GB')} ways, up to ${max.toLocaleString('en-GB')}`;
+    }
+  }
+
   const faconsNolimit = /\b(\d{1,3}(?:,\d{3})+|\d{2,6})\s+win\s+ways/i.exec(t);
   if (faconsNolimit) {
     const n = Number(faconsNolimit[1].replace(/,/g, ''));
     if (n >= 20 && n <= 250_000) return `${n.toLocaleString('en-GB')} win ways by default`;
+  }
+
+  /*
+   * Habanero compte ses façons comme ses lignes : « **Ways are fixed at 178**
+   * with total bet in coins fixed at 25. » Le studio distingue bien les deux
+   * — « Lines are fixed at N » ailleurs — et la seconde moitié de la phrase
+   * porte un autre nombre, la mise, qu'il ne faut surtout pas ramasser. D'où
+   * la capture bornée au premier nombre.
+   */
+  const faconsFixes = /\bWays are fixed at\s+(\d{1,3}(?:,\d{3})*)\b/i.exec(t);
+  if (faconsFixes) {
+    const n = Number(faconsFixes[1].replace(/,/g, ''));
+    if (n >= 20 && n <= 250_000) return `${n.toLocaleString('en-GB')} ways`;
   }
 
   const facons = /\b(\d{1,3}(?:,\d{3})+|\d{2,6})\s+ways(?:\s+to win|\s*\(All Ways\))/i.exec(t);

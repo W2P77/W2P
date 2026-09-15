@@ -2,6 +2,53 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-15 (suite) — Des noms de jeux cassés à l'import, et deux chiffres faux
+
+### 27 noms portaient une entité HTML à moitié décodée
+
+Un agent a remarqué que `Buffalos Wealth` s'appelle **Buffalo's Wealth** sur son
+enseigne. Vérifié à l'image, puis creusé : le catalogue portait **27 noms où
+`&apos;` avait fondu en « Apos »** — « That Apos s Rich » pour *That's Rich*,
+« Free Reelin Apos Joker » pour *Free Reelin' Joker*, « Pandora Apos s Box of
+Evil ».
+
+**Aucun n'est publié**, donc rien n'est indexé de travers — mais la prochaine
+campagne les aurait mis en ligne tels quels. Tous réparés, plus sept noms
+vérifiés un par un dont **`Azlands Gold`, qui s'appelle `Aztlan's Gold`** : deux
+lettres et une apostrophe d'écart sur un titre servi en h1. Le slug n'a pas
+bougé, donc aucune URL ne change.
+
+Détail de méthode : la réparation automatique produisait « Casino Hold' em ».
+« Hold'em » se soude, « Reelin' Joker » garde son espace. Corrigé avant
+écriture — une faute d'orthographe publiée vaut mieux évitée que corrigée.
+
+### Fire in the Hole 2 décrivait le premier épisode
+
+La fiche annonçait **486 façons** et une grille démarrant en **6×3**. Son
+panneau dit « From **64** ways up to 46656 win ways » et « a 6-reel, **up to
+6-row** ». L'arithmétique tranche : 64 = 2⁶, le jeu démarre à deux rangées ; une
+grille 6×3 donnerait 729 façons. C'étaient les valeurs de *Fire in the Hole*,
+recopiées sur sa suite.
+
+### Le lecteur avait tort, pas la fiche
+
+Sur `das-xboot`, l'outil signalait 576 ways contre 75 712. Le panneau dit « From
+576 ways **up to** 75712 win ways » : la grille se transforme, et la fiche avait
+raison. Seule la règle **« on n'écrit que dans un champ vide »** a empêché
+d'écraser du juste par du faux. Le lecteur sait désormais lire une plage, et
+deux formulations de plus : `Ways are fixed at 178` (Habanero, où la mise suit
+dans la même phrase et ne doit pas être ramassée) et les grilles qui se
+transforment.
+
+### Où en est le remplissage
+
+Le nombre de lignes manquait sur 1 415 fiches publiées ; il en reste **1 269**
+(57 % → 51 %). Habanero, 1spin4win, Spinomenal et Amusnet sont passés.
+
+La **grille**, elle, reste à 57 % : les panneaux d'Amusnet et d'Habanero donnent
+les rouleaux mais **jamais les rangées** — il faut les compter à l'image. C'est
+la limite de l'OCR sur ce chantier, et ça restera du travail d'agent.
+
 ## 2026-09-15 (suite) — Les panneaux publiaient déjà ce qui manquait aux fiches
 
 **Les légendes écrites à la main passent de 189 à 326 fiches** (13 % du
