@@ -2,6 +2,38 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-15 — Les dates de sortie : 65 % manquent, et la source est chez le studio
+
+**1 622 fiches publiées sur 2 483 n'ont aucune date de sortie.** Quatre studios
+n'en ont pas une seule — Spinomenal 412, 1spin4win 219, Stakelogic 107 — et
+Amusnet, Habanero, Wazdan dépassent 95 % de manques. Ce sont les catalogues
+importés sans date. Conséquence directe : la page des nouvelles sorties, celle
+dont le contenu bouge et qui vaut donc le plus au référencement, **tourne sur un
+tiers du stock** ; un jeu paru cette semaine chez Spinomenal ne peut pas y
+apparaître.
+
+**La source est le studio lui-même.** `nolimitcity.com/games/<slug>` porte un
+`__NEXT_DATA__` dont
+`props.pageProps.initialState.cmsApi.queries['getPopulatedGameBySlugV2(…)'].data`
+donne `name` et **`releaseDate`** en ISO. Mesuré : Duck Hunters 2 →
+`2026-09-10`. La page `/games` expose en plus `latestGame`, la dernière
+parution du studio — de quoi savoir quand un catalogue bouge sans le sonder
+entier.
+
+**Deux impasses vérifiées, notées pour qu'on ne les refouille pas** : les pages
+produit de Spinomenal (`spinomenal.com/<slug>/`) et d'Amusnet
+(`amusnet.com/games/online-casino/<slug>`) ne portent aucune date dans leur HTML
+servi. Les panneaux de règles des jeux n'en portent jamais.
+
+**Deux règles pour ce chantier.** Jamais d'agrégateur concurrent : leurs dates
+ne sont ni vérifiables ni à nous, et le projet a déjà payé d'avoir pointé 590
+boutons de démo vers l'un d'eux. Et **une date de build de CDN n'est pas une
+date de sortie** — les horodatages qui traînent dans les URL de bundles sont
+celles du dernier déploiement.
+
+Première date posée à la main : Duck Hunters 2, sur la foi du `releaseDate` du
+studio.
+
 ## 2026-09-15 — Un doublon de catalogue, et la première 301 du site
 
 **`east-vs-west` et `east-coast-vs-west-coast` sont le même jeu Nolimit City**,
