@@ -2,6 +2,36 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-15 — Cinq corrections d'un coup, dont une fiche qui se contredisait
+
+Lot Nolimit City : **40 captures sur 40**, une minute par fiche. Et cinq
+erreurs de base, toutes confirmées au mot près avant écriture.
+
+| fiche | en base | réel | preuve |
+|---|---|---|---|
+| Immortal Fruits | 2 787× | **2 878×** | chiffres transposés ; la ligne est répétée sur deux pages |
+| Kitchen Drama: Sushi Mania | 697× | **758×** | « Simulated maximum payout is 758 times the bet » |
+| Infectious 5 xWays | **6 rouleaux, 20 lignes** | **5 rouleaux jusqu'à 8 rangées, 1 024 ways** | « A 5-reel, up to 8-row video slot » ; 5 colonnes comptées à l'image, plaque « 1024 WAYS » |
+| Karen Maneater | 2-2-3-3-3-3 | **2-3-3-3-3-3** | la fiche annonçait elle-même 486 ways, or sa grille en donne 324 |
+
+**Infectious 5 xWays cumulait deux erreurs de nature différente** : un rouleau
+de trop, et surtout une **mécanique fausse** — le jeu paie en *ways*, pas en
+lignes. C'est la cinquième grille corrigée du chantier.
+
+**Karen Maneater est le second cas de fiche qui se contredit elle-même**, après
+Beam Boys : elle publiait 486 ways et une disposition qui n'en donne que 324.
+L'arithmétique tranche sans qu'on ait besoin du panneau — 2×3×3×3×3×3 = 486, le
+compte exact de ce que le jeu décrit.
+
+**Un signalement non tranché, honnêtement** : Jingle Balls annonce une grille
+3-3-4-4-5-5 qui donnerait 3 600 ways quand son panneau dit « 144 win ways by
+default ». La chaîne de décoration du jeu de base empêche de compter les
+colonnes de façon fiable, et l'agent ne l'a pas tranché. À rouvrir avec une
+capture propre.
+
+Record du studio battu : **douze retours théoriques d'affilée** sur Kill 'Em
+All. Aucun republié.
+
 ## 2026-09-15 — Book of Cats a six rouleaux et vend son bonus
 
 **Deux erreurs sur la même fiche, et la seconde faisait mentir le site.**
