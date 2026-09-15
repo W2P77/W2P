@@ -2,6 +2,31 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-15 — Misery Mining a deux RTP, pas un — et mon garde-fou avait raison par hasard
+
+**Milky Ways** annonçait 5 664× en base ; son panneau dit **5 410×**, deux fois,
+sur deux pages. Corrigé.
+
+**Et une leçon sur la vérification elle-même.** Le 14/09, la campagne Stakelogic
+avait signalé un écart sur Misery Mining — panneau « 96 » contre 96,09 en base —
+que `resoudre-ecarts.ts` a classé « lecture tronquée » et que j'ai refusé
+d'écrire : un entier là où la base a des décimales. **Le refus était bon, la
+raison était fausse.** Le panneau publie en réalité une **plage** :
+
+> « The theoretical return to the player for this game is 96.00% - 96.09%.
+> 96.00%: achieved with Rat Mode, 96.09%: achieved with Mouse Mode. »
+
+L'OCR lisait le **premier** nombre de la plage, pas une troncature de 96,09. La
+fiche n'était donc pas fausse — elle gardait le mode optimal — mais
+**incomplète** : un joueur qui choisit le Rat Mode joue à 96,00 %. La fiche
+reçoit ses deux paliers et la mention des deux modes. C'est exactement la
+précision qui fait la promesse du site.
+
+**Deux captures « The base game » qui n'en sont pas**, portant à cinq le compte
+depuis le début : Munchies photographié sur son **écran de choix de mode** (1 /
+2 / 4 rouleaux, aucune grille), et Nine to Five sur un **chargement raté** — du
+JSON de sprites brut affiché à l'écran. Toutes deux à recapturer.
+
 ## 2026-09-15 — Quatre de plus chez Hacksaw, et deux trous comblés
 
 | fiche | en base | réel | preuve |
