@@ -2,6 +2,30 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-15 — Quatre de plus chez Hacksaw, et deux trous comblés
+
+| fiche | en base | réel | preuve |
+|---|---|---|---|
+| Duel at Dawn | 11 064× | **15 000×** | annoncé deux fois : ABOUT THE GAME et la section MAX WIN |
+| Duel at Dawn | 50 lignes | **19** | « The number of possible lines in this game is 19. » |
+| Dynasty of Death | *vide* | **12 500×** | « The maximum achievable win in this game is 12 500 times your bet » |
+| Eternal Duel | *vide* | **15 000×** | « a max win of 15 000 times your bet » |
+
+Les deux derniers ne corrigent rien : ils **comblent des trous** que la base
+admettait, avec un chiffre que le jeu publie lui-même. C'est le gisement le
+plus simple du chantier — la section ABOUT THE GAME de ce studio donne la
+grille et le plafond en une phrase, et il suffit de la lire.
+
+**`epic-bullets-and-bounty` n'est pas un doublon de `bullets-and-bounty`**, et
+c'est le panneau qui le dit : « This is the Epic version of Bullets and
+Bounty… », avec quatre différences annoncées. Les maths diffèrent réellement —
+RTP 96,24 % contre 96,27 %, et le barillet du Gamble n'a pas la même
+répartition. Deux fiches légitimes.
+
+Lot : **82 captures sur 82**, aucune omise, sept minutes par fiche. Et la
+volatilité des menus d'achat a encore divergé de la fiche trois fois sur trois :
+elle qualifie l'achat, jamais le jeu, et n'apparaît dans aucune légende.
+
 ## 2026-09-15 — Cinq corrections d'un coup, dont une fiche qui se contredisait
 
 Lot Nolimit City : **40 captures sur 40**, une minute par fiche. Et cinq
