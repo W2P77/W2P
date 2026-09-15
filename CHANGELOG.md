@@ -2,6 +2,44 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-15 — Troisième tour : 154 fiches écrites, quatre corrections de plus
+
+**1 143 captures écrites à la main, 6 % du site.** Deux lots de plus : Nolimit
+City à 4 minutes la fiche — quatre fois l'estimation, la lecture des images
+étant le poste incompressible — et Stakelogic à 1 min 30, **87 captures sur 87**
+sans une omission.
+
+**Quatre corrections, chacune vérifiée avant écriture :**
+
+| fiche | en base | réel | preuve |
+|---|---|---|---|
+| Dice Runner Megaways | RTP **96** | **95,99 %** | lu à l'image : « The theoretical minimum payback percentage (RTP) is 95.99% » |
+| Golden Genie | 9 583× | **9 584×** | « Simulated maximum payout is 9584 times the bet » |
+| Golden Genie | lignes « Not confirmed » | **20 win lines** | « 20 win lines (see pay table for more info) » |
+| Hot Nudge | lignes « Fixed (number not confirmed) » | **40 bet lines** | idem |
+
+Le premier est le plus parlant : **96 tout rond est un arrondi d'import**, et
+c'est le chiffre sur lequel repose toute la promesse du site. Les deux derniers
+comblent des trous que la base admettait elle-même.
+
+**Deux pistes non retenues, faute de preuve** : un agent annonçait 5 lignes de
+gain chez Gaelic Gold contre « Up to 9 » en base, mais la page de règles de
+cette fiche est capturée à une position où le texte n'apparaît pas — rien à
+lire. Et il soupçonnait Hot 4 Cash de déclarer un achat de bonus inexistant,
+parce que son panneau n'aligne qu'un seul retour théorique là où les jeux à
+achat de ce studio en listent un par achat : c'est un indice sérieux, pas une
+preuve, et le drapeau reste tel quel.
+
+**Un outil affûté au passage** : l'extracteur OCR de vérification groupait mal
+son alternance (`a|b|c` au lieu de `(?:a|b|c)`), ce qui coupait la phrase avant
+le chiffre — il rendait « win lines » au lieu de « 20 win lines ». Corrigé, il a
+confirmé trois valeurs dans la foulée.
+
+**Deux coquilles de studio relevées, décrites sans commentaire** : chez
+Stakelogic, la ligne SINGLE WIN LIMIT de deux jeux recopie mot pour mot le texte
+de LOSS LIMIT et parle donc de pertes au lieu d'un gain ; et Dynamite Strike
+imprime deux fois la même règle sur une page.
+
 ## 2026-09-15 — Les dates de sortie : 65 % manquent, et la source est chez le studio
 
 **1 622 fiches publiées sur 2 483 n'ont aucune date de sortie.** Quatre studios
