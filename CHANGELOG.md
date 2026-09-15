@@ -2,6 +2,47 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-15 — Le vrai gisement n'est pas les erreurs, c'est les trous
+
+`frkn-bananas` était en base comme une grille **5×4 à 14 lignes** ; son panneau
+dit « a **6-reel, 5-row** paylines game » et « The number of possible lines in
+this game is **19** ». Sa table de gains publie un palier à **6 symboles**, ce
+qu'une grille à cinq rouleaux ne peut pas avoir. Sixième grille corrigée du
+chantier.
+
+**Mais le lot Hacksaw a ouvert autre chose, et c'est plus gros que les
+erreurs.** Quatre fiches sur huit décrivent **moins** que ce que leur jeu
+publie : Eye of the Panda et Fire My Laser ont chacune un **second bonus** que
+la base ignore ; Fred's Food Truck ne connaît ni ses rangées ni sa **cascade**,
+pourtant décrite au panneau ; Get the Cheese résume ses bonus en une ligne
+quand le jeu les nomme, les chiffre et publie un barème scatter entier.
+
+**Mesuré sur les 2 484 fiches publiées :**
+
+| champ | vide | part |
+|---|---|---|
+| volatilité | 1 494 | **60 %** |
+| grille | 1 414 | 57 % |
+| lignes ou ways | 1 415 | 57 % |
+| mécaniques | 1 414 | 57 % |
+| gain maximum | 1 291 | 52 % |
+
+Et c'est le même classement que pour les dates : **Spinomenal, 1spin4win,
+Wazdan, Amusnet, Habanero et Stakelogic** concentrent tout, quand Nolimit City
+et Pragmatic sont à 93 champs vides chacun. Ce sont les catalogues importés
+sans données — les mêmes qui n'ont aucune date de sortie.
+
+Ces champs-là, **le panneau du jeu les publie**, et on les photographie déjà :
+6 700 captures de règles dorment en base avec ces chiffres dedans. C'est le
+chantier suivant, et il est plus rentable que la chasse aux erreurs — corriger
+une fiche fausse répare une page, remplir une fiche vide en crée une.
+
+**Une piste de nommage inventé à l'import**, à vérifier avant d'y toucher :
+Feel the Beat annonce des « Spreading mystery symbols », terme que son panneau
+n'emploie jamais — il décrit un symbole d'enceinte et un multiplicateur global.
+Si c'est confirmé ailleurs, le défaut n'est pas dans une fiche mais dans la
+méthode qui les a importées.
+
 ## 2026-09-15 — Misery Mining a deux RTP, pas un — et mon garde-fou avait raison par hasard
 
 **Milky Ways** annonçait 5 664× en base ; son panneau dit **5 410×**, deux fois,
