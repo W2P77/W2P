@@ -36,6 +36,45 @@ parallèle sur ce chantier : un `lot.json` partagé s'est déjà fait écraser p
 un autre studio entre l'écriture et la relecture. Un nom unique coûte trois
 caractères et supprime le risque.
 
+## La règle qui sépare une bonne légende d'une tiède
+
+**Toute légende doit contenir au moins une chose qu'on ne peut savoir qu'en
+regardant l'image.** Une position, une valeur affichée, une couleur, ce qui est
+allumé, ce qui est grisé. Sans ça, tu as écrit un résumé du règlement — vrai,
+mais que n'importe qui pouvait écrire sans ouvrir la capture.
+
+Mesuré le 16/09/2026 sur les 3 346 légendes déjà écrites : **47 % n'en
+contiennent aucune**. C'est le principal défaut du chantier.
+
+L'étalon, Gates of Olympus, capture du jeu de base :
+
+> *« Six reels, five rows, and no paylines: symbols pay anywhere on the screen,
+> and the count of matching symbols sets the win. **The free spins purchase sits
+> top left, priced at 100× the current bet.** »*
+
+La seconde phrase est celle qui vaut : elle situe le bouton et lit son prix.
+
+Deux exemples réels du chantier, même studio, même type de page :
+
+**Au niveau** — Christmas Gift Rush, jeu de base :
+> *« Trois rouleaux sur trois rangées, mais **une seule ligne active au départ —
+> la guirlande lumineuse encadre la rangée centrale, seule allumée**. En haut à
+> gauche, le bouton Buy Feature est affiché à ‡30,00 pour la mise de ‡1,00 en
+> cours ; à droite, le compteur Jackpot Race™ marque 1 305,19 €. »*
+
+**En dessous** — 20 Super Hot, page 1 :
+> *« L'introduction du panneau : « 20 Super Hot video slot is a 5-reel, 20-line
+> fixed game. » Huit symboles, deux d'entre eux spéciaux… »*
+
+La seconde recopie le texte. Elle est juste, et elle n'apporte rien : le lecteur
+a la capture sous les yeux, il voit déjà cette phrase. Ce qu'il ne voit pas tout
+seul, c'est **où** se trouve ce qui compte et **quels chiffres** sont affichés à
+cet instant.
+
+Donc, à chaque capture, demande-toi : *qu'est-ce que je vois que le texte ne dit
+pas ?* Et si la réponse est « rien », dis-le dans ton rapport plutôt que de
+meubler.
+
 ## Ce qu'une légende dit
 
 Elle décrit **ce que la capture montre** : la grille et ses rouleaux, le bouton

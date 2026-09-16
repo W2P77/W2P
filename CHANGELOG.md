@@ -2,6 +2,56 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-16 — « C'est pas toujours ouf » : ce que 47 % des légendes ne faisaient pas
+
+BetsRank a relu quelques légendes et les a trouvées tièdes. Mesure sur les
+3 346 déjà écrites : la recopie du panneau est rare (**1 %**), mais **47 % ne
+contiennent aucun élément visuel** — ni position, ni valeur affichée, ni
+couleur. Elles sont vraies, et quelqu'un qui n'a jamais ouvert la capture aurait
+pu les écrire.
+
+L'écart se voit sur deux légendes du chantier, même studio, même type de page.
+Au niveau, Christmas Gift Rush :
+
+> « Trois rouleaux sur trois rangées, mais **une seule ligne active au départ —
+> la guirlande lumineuse encadre la rangée centrale, seule allumée**. En haut à
+> gauche, le bouton Buy Feature est affiché à ‡30,00 pour la mise de ‡1,00. »
+
+En dessous, 20 Super Hot :
+
+> « L'introduction du panneau : « 20 Super Hot video slot is a 5-reel, 20-line
+> fixed game. » »
+
+La seconde recopie un texte que le lecteur a déjà sous les yeux.
+
+**La consigne porte désormais une règle dure** : toute légende contient au moins
+une chose qu'on ne peut savoir qu'en regardant. Avec l'étalon et ces deux
+exemples en regard — une règle abstraite ne se transmet pas.
+
+Premier lot écrit sous la nouvelle règle : Pragmatic passe de 49 % à 57 % de
+légendes visuelles, ce qui place **les 81 nouvelles autour de 90 %**.
+
+### La vérification gratuite des Megaways
+
+Trouvée par un agent en comptant les grilles : le compteur affiché à l'écran
+**est** le produit des hauteurs. 45 360 sur Bandit Megaways = 6·7·6·6·6·5.
+S'il ne tombe pas juste, c'est qu'on a mal compté — et c'est arrivé, le
+comptage à l'œil nu donnait faux avant recadrage.
+
+### Deux corrections
+
+`beware-the-deep-megaways` annonçait « Multipliers x500 » ; son panneau borne à
+×25 en jeu de base et ×100 en tours gratuits. Le ×500 appartient à
+`bandit-megaways`, du même lot — deux jeux voisins confondus.
+
+`anaconda-gold` : le panneau publie 96,54 % et **96,47 % à l'achat**, le second
+manquait en base.
+
+Une alerte s'est dégonflée à la mesure : un agent soupçonnait le générateur
+automatique de poser « RTP distinct pour la partie achetée » à tort sur beaucoup
+de fiches. Il ne la porte que sur **une**, et elle y est vraie. Compter avant
+d'ouvrir un chantier.
+
 ## 2026-09-15 (fin de journée) — Pragmatic décrit d'autres jeux que les siens
 
 **Neuf fiches Pragmatic sur dix contredisent leur propre panneau**, et pas sur
