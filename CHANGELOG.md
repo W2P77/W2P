@@ -2,6 +2,66 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-17 — Un contrôle appris ailleurs peut mentir
+
+Lot 1spin4win, famille Cash'n Fruits : **10 fiches, 71 captures**.
+**562 fiches légendées, 4 391 captures sur 20 291 (22 %).**
+
+### Le contrôle Hacksaw ne se transporte pas
+
+Le contrôle appris chez Hacksaw — *le studio dessine le symbole autant de fois
+qu'il en faut pour déclencher* — **ne marche pas chez 1spin4win**.
+`cashn-fruits-256-regles-2` dessine **une seule pièce** sous un texte qui dit
+« If 3 or more coins appear » : là-bas, l'illustration est parfois un portrait
+de symbole et non un décompte.
+
+C'est la leçon la plus utile du lot, et elle est maintenant dans la consigne :
+**avant d'appliquer un contrôle appris ailleurs, vérifier qu'il tombe juste sur
+deux ou trois cas de CE studio.** Un contrôle qui se trompe est pire que pas de
+contrôle — il donne l'assurance sans la preuve.
+
+### Une quatrième vérification gratuite, celle-là valable
+
+Chez 1spin4win, **les pièces du Megapot sont exactement la grille** : 9 en 3×3,
+15 en 5×3, 16 en 4×4, 20 en 5×4, et le texte le confirme (« Hold all 20 coins »).
+Cinq fois sur cinq. Un contrôle de grille de plus, indépendant de la page
+« ways ».
+
+### Deux façons dont l'analogie de grille ment
+
+`cashn-fruits-fortune` a la **même grille 3×3** que `cashn-fruits-27` et ne paie
+que sur **5 lignes** — dessinées une par une, numérotées 1 à 5, page 5/5. Écrire
+« 27 façons » par ressemblance aurait été faux.
+
+Et le nombre du titre n'est pas toujours des façons : `27`, `243` et `256`
+annoncent bien 3³, 3⁵ et 4⁴, chacun confirmé par sa page « ways » — mais `100`
+annonce des **lignes**. Sa grille 5×4 donnerait 1 024 façons, et le panneau
+dessine cent tracés numérotés jusqu'à 100. **Quand le produit des hauteurs ne
+tombe pas sur le nombre du titre, ce n'est pas une erreur, c'est un autre
+système de gains.**
+
+### Le bilan honnête du contrôle
+
+**8 accords, 0 écart** sur les façons de gagner : les sept fiches qui portaient
+« N ways » en base le portent exactement là où le panneau l'annonce.
+
+Mais sur le RTP : **4 accords, 0 écart, 6 muets.** Six de ces dix panneaux
+n'impriment aucun RTP — leurs valeurs en base ne sont ni confirmées ni
+contredites. Le « 0 écart » de ce lot est à moitié un silence, et l'agent a eu
+raison de le dire.
+
+Dix grilles écrites, trois nombres de lignes. **Aucun `gainMaxMultiple` :** les
+71 pages ne portent aucun titre de plafond. Les seuls grands nombres titrés sont
+des jackpots que les compteurs confirment — et un jackpot n'est pas un plafond,
+le jeu de base paie en plus.
+
+### Une phrase à ne jamais recopier
+
+La barre défilante de `cashn-fruits-243-x` annonce « 3 Jackpot symbols win Lucky
+Jackpot » — dans un jeu qui **n'a aucun compteur de jackpot** et dont le panneau
+de trois pages n'en décrit aucun. C'est un message rotatif du châssis, partagé
+entre plusieurs jeux du studio. Signalé, jamais utilisé.
+
 ## 2026-09-16 (nuit, 6) — Un plafond arithmétiquement solide qu'on n'écrit pas
 
 Troisième lot Wazdan : **10 fiches, 116 captures**. **552 fiches légendées,

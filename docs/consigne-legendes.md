@@ -175,6 +175,39 @@ par la mise totale donne le plafond de la fiche. À 60,00 de mise : 30 000 → 5
 45 000 → 750×. Sept `gainMaxMultiple` vérifiés d'un coup le 16/09/2026, sans
 ouvrir une seule page de règles.
 
+## Une quatrième vérification gratuite, et une leçon sur les trois autres
+
+**Chez 1spin4win, les pièces du Megapot sont exactement la grille.** Quand le
+panneau dessine les pièces à collecter, leur nombre est le nombre de cases :
+9 en 3×3, 15 en 5×3, 16 en 4×4, 20 en 5×4 — et le texte le confirme (« Hold all
+20 coins », « win all 15 coins »). Cinq fois sur cinq le 17/09/2026. C'est un
+contrôle de grille de plus, indépendant de la page « ways ».
+
+**Et voici la leçon qui compte : un contrôle ne se transporte pas d'un studio à
+l'autre.** Le contrôle Hacksaw — *le studio dessine le symbole autant de fois
+qu'il en faut pour déclencher* — ne marche PAS chez 1spin4win :
+`cashn-fruits-256-regles-2` dessine **une seule pièce** sous un texte qui dit
+« If 3 or more coins appear ». Là-bas, l'illustration est parfois un portrait de
+symbole, pas un décompte.
+
+Avant d'appliquer un contrôle appris ailleurs, **vérifie qu'il tombe juste sur
+deux ou trois cas de CE studio.** Un contrôle qui se trompe est pire que pas de
+contrôle : il donne l'assurance sans la preuve.
+
+## Deux cas où l'analogie de grille ment
+
+**Même grille ne veut pas dire même compte.** `cashn-fruits-fortune` a la même
+grille 3×3 que `cashn-fruits-27` et ne paie que sur **5 lignes**, dessinées une
+par une sur sa page 5/5. Écrire « 27 façons » par ressemblance aurait été faux.
+
+**Et le nombre du titre n'est pas toujours des façons.** Dans la même famille,
+`27`, `243` et `256` annoncent bien des façons (3³, 3⁵, 4⁴, chacune confirmée par
+sa page « ways »), mais `100` annonce des **lignes** : sa grille 5×4 donnerait
+1 024 façons, et le panneau dessine cent tracés numérotés jusqu'à 100. Quand le
+produit des hauteurs ne tombe pas sur le nombre du titre, **ce n'est pas une
+erreur, c'est un autre système de gains** — cherche la page qui le dit avant de
+conclure.
+
 ## Les règles qui ne bougent pas
 
 - **On n'invente rien.** Un doute = on n'écrit pas ce point.
