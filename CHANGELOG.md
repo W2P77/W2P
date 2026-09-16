@@ -2,6 +2,62 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-16 (nuit, 6) — Un plafond arithmétiquement solide qu'on n'écrit pas
+
+Troisième lot Wazdan : **10 fiches, 116 captures**. **552 fiches légendées,
+4 320 captures sur 20 291 (21 %).**
+
+### Le lot le plus propre du chantier
+
+Aucun écart. Les dix RTP concordent au centième, et **tous les comptages
+dessinés tombent sur le nombre annoncé** : 20 tracés pour les quatre jeux à
+20 lignes, 10 pour `book-of-faith`, 16 cases pour « played on 16 reels »,
+12 pour « played on 12 reels », 9 pour la grille 3×3 de `burning-stars-3`.
+
+Et un accord vaut d'être noté autant qu'un écart :
+`black-horse-cash-out-edition` portait déjà 2 500× en base. Le compteur GRAND
+le confirme tout seul — 150 000,00 pour une mise de 60,00. Le contrôle n'est
+pas muet : quand la fiche est juste, il le dit.
+
+### Le plafond refusé
+
+Le compteur GRAND de `burning-stars-3` donne **2 187×** à deux mises
+différentes — 131 220 / 60 et 4 374 / 2 — et 2 187 = **3⁷**, l'échelle des
+jackpots triplant à chaque cran. C'est arithmétiquement imparable.
+
+Et ça ne suffit pas. Cette aide **n'a pas de page Disclaimer**, et aucune
+phrase n'y écrit que le GRAND est le gain maximum du jeu — alors que
+`burning-sun` et `bumba-meu-boi-coin`, eux, l'écrivent. Le champ reste vide.
+
+La règle se précise, et c'est la formulation à retenir : **le compteur GRAND
+confirme un plafond publié, il n'en crée pas.**
+
+### Trois jeux, pas trois habillages
+
+`black-horse` → Cash Out Edition → Deluxe : 3×3 à 5 lignes, puis **5×3 à 20
+lignes**, puis **6×3 à 20 lignes**. Trois grilles différentes sous un même nom.
+Le piège de `black-hawk-deluxe` — texte à 54 lignes, bannière à 27 — ne se
+reproduit pas : le Deluxe se confirme trois fois, dont « The game has 6 reels,
+3 rows and 20 paylines ».
+
+`burning-stars` et `burning-stars-3` n'ont **aucun rapport** : un 5×3 à
+20 lignes sans le moindre tour gratuit, et un 3×3 à neuf rouleaux indépendants
+qui paie « at least 4 symbols of a kind anywhere ». Seul le nom les relie.
+
+`burning-sun-extremely-light` confirme ce qu'on avait vu sur 9 Coins :
+**« Extremely Light » est un rendu, pas une variante.** Les 14 captures
+comparées une à une donnent la même grille, la même table ligne pour ligne, les
+mêmes jackpots, le même RTP et le même Disclaimer. Seuls changent le dessin et
+deux valeurs d'illustration.
+
+### Un avertissement de lecture
+
+Trois jeux anciens — `burning-reels`, `burning-stars`, `captain-shark` —
+affichent **deux tables de gains à des barèmes différents sans le dire** : celle
+du panneau est 150 fois plus petite que celle de l'écran, et aucun « Paytable
+shows the win for minimal bet » n'apparaît nulle part. Les légendes le disent
+explicitement pour que personne ne convertisse de travers.
+
 ## 2026-09-16 (nuit, 5) — Deux RTP « faux » qui ne l'étaient pas
 
 Second lot Wazdan écrit (10 fiches, 82 captures). **542 fiches légendées,
