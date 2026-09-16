@@ -2,6 +2,50 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-16 (soir) — Neuf corrections, et deux façons de compter qui ne mentent pas
+
+Les lots écrits sous la règle du « au moins un élément visuel » rapportent
+davantage que les précédents, et pour une raison mécanique : **on ne trouve que
+ce qu'on regarde**.
+
+### Big Bass — une valeur recopiée d'un jeu voisin, trois fois sur le même
+
+`big-bass-bonanza-megaways` était faux sur trois champs à la fois :
+
+| champ | fiche | panneau |
+|---|---|---|
+| façons de gagner | 117 649 (= 7⁶) | **46 656** (= 6⁶) |
+| relances | illimitées | **trois maximum** |
+| achat de bonus | oui | **aucun bloc d'achat, un seul RTP** |
+
+Et `big-bass-christmas-frozen-lake` disait l'inverse — achat à « non » quand son
+panneau en publie **deux**, à 100× et 270×, et que son propre champ
+`mecaniques` portait déjà « Bonus buy 100x ». La fiche se contredisait
+elle-même.
+
+### Hacksaw — un gain maximum annoncé au double
+
+`ronin-stackways` promettait **10 000×**. Son panneau dit « The max win in this
+game is **5,000** times your bet! », et le répète en section MAX WIN. C'est le
+pire sens d'erreur : on promet deux fois ce que le jeu rend.
+
+Deux grilles fausses aussi — `reign-of-rome` (5x4 pour un « 5-reel, 5-row game »)
+et `shaolin-master` (5x5 pour un « 5-reel, 6-row game ») — et deux noms de bonus
+inexacts sur `pray-for-three` et `rad-maxx`.
+
+### Les deux contrôles, versés à la consigne
+
+**Le compteur d'un Megaways est le produit des hauteurs.** 2 400 affiché =
+2 × 4 × 4 × 5 × 5 × 3 compté. Si le produit ne tombe pas juste, c'est le
+comptage qui est faux — un agent s'est rattrapé ainsi avant d'écrire.
+
+**Hacksaw dessine le scatter autant de fois qu'il en faut** pour déclencher un
+bonus. Trois exemplaires empilés = trois scatters. C'est ce qui a montré que
+`pray-for-three` annonçait à « 5+ » un bonus qui s'obtient à trois.
+
+La règle générale : quand un jeu **affiche** un nombre et le **dessine** aussi,
+les deux doivent concorder. Le désaccord est toujours une information.
+
 ## 2026-09-16 — « C'est pas toujours ouf » : ce que 47 % des légendes ne faisaient pas
 
 BetsRank a relu quelques légendes et les a trouvées tièdes. Mesure sur les

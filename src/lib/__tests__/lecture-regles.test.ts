@@ -479,3 +479,33 @@ describe('Pragmatic annonce sa grille d\'un bloc', () => {
       .toBe('6 reels × 5 rows');
   });
 });
+
+/*
+ * Crystopia publie « Ways are fixed at 27 - 1,728 » : ses symboles se scindent
+ * en deux ou quatre, d'où 12 symboles par rouleau et 12³ = 1 728. La formule
+ * n'a gardé que 27 et l'a écrit en base — la fiche décrivait le jeu à son état
+ * le plus pauvre. La leçon des fourchettes avait été apprise sur les lignes et
+ * ne s'était pas propagée aux façons.
+ */
+describe('une fourchette de façons se lit comme une fourchette', () => {
+  it('lit « Ways are fixed at 27 - 1,728 »', () => {
+    const t = 'Ways are fixed at 27 - 1,728 with total bet in coins fixed at 9.';
+    expect(extraireLesFaits(t).lignes).toBe('27 to 1,728 ways');
+  });
+
+  it('lit toujours un compte unique', () => {
+    expect(extraireLesFaits('Ways are fixed at 243.').lignes).toBe('243 ways');
+  });
+});
+
+/*
+ * L'OCR rogne le dernier mot de la phrase d'Amusnet : « …20-line fixed yo » au
+ * lieu de « fixed game ». Exiger « game » laissait le champ vide sur une phrase
+ * parfaitement lisible à l'image.
+ */
+describe('la phrase d\'Amusnet survit à un mot rogné', () => {
+  it('lit la phrase même quand « game » est mangé', () => {
+    const t = '20 Golden Coins - Christmas Edition video slot is a 5-reel, 20-line fixed yo';
+    expect(extraireLesFaits(t).lignes).toBe('20 fixed lines');
+  });
+});

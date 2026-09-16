@@ -92,6 +92,30 @@ Les trois langues disent la même chose. L'allemand et l'anglais ne sont pas des
 traductions mot à mot du français, mais aucun des trois ne porte un fait que
 les deux autres n'ont pas.
 
+## Deux vérifications gratuites, trouvées en chemin
+
+Elles ne coûtent rien et elles ont chacune attrapé une erreur le 16/09/2026.
+
+**Sur un Megaways, le compteur affiché est le produit des hauteurs.** Big Bass
+Bonanza Megaways affiche 2 400 en haut à droite, et ses rouleaux mesurent
+2-3-3-4-4-3 avec une rangée horizontale de 4 : 2 × 4 × 4 × 5 × 5 × 3 = 2 400.
+Si ton comptage ne tombe pas sur le nombre affiché, **c'est ton comptage qui est
+faux** — recadre avec `sharp` et recompte. C'est comme ça qu'une grille mal lue
+a été rattrapée avant d'être écrite.
+
+Le même contrôle a montré que la fiche de ce jeu annonçait 117 649 façons, soit
+7⁶, alors que son panneau publie 46 656, soit 6⁶ : la valeur d'un autre Megaways,
+recopiée.
+
+**Chez Hacksaw, le seuil d'un bonus se compte dans l'illustration.** Le studio
+dessine le symbole scatter exactement autant de fois qu'il en faut pour
+déclencher — trois exemplaires empilés pour trois scatters. C'est un contrôle
+arithmétique sur un champ que personne ne vérifiait, et c'est ce qui a montré
+que `pray-for-three` annonçait « 5+ scatters » un bonus qui s'obtient à trois.
+
+De façon générale : **quand un jeu affiche un nombre et le dessine aussi, les
+deux doivent concorder.** Le désaccord est toujours une information.
+
 ## Les règles qui ne bougent pas
 
 - **On n'invente rien.** Un doute = on n'écrit pas ce point.

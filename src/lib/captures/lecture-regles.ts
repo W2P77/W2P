@@ -644,7 +644,14 @@ function lireLesLignes(t: string): string | null {
   const lignesFixes =
     /\bThe game is set to\s+(\d{1,3})\s+fixed lines/i.exec(t) ??
     /\bLines are fixed at\s+(\d{1,3})\b/i.exec(t) ??
-    /\bis a\s+\d{1,2}-reel,\s*(\d{1,3})-line fixed game/i.exec(t);
+    /*
+     * « …is a 5-reel, 20-line fixed **game** » — sauf que l'OCR rend souvent
+     * « fixed yo » ou « fixed ga », le mot final rogne par le cadre. Sur
+     * 20 Golden Coins Christmas Edition, exiger « game » laissait le champ vide
+     * alors que la phrase etait parfaitement lisible a l'image. « fixed » suffit
+     * a lever l'ambiguite.
+     */
+    /\bis a\s+\d{1,2}-reel,\s*(\d{1,3})-line fixed\b/i.exec(t);
   if (lignesFixes) {
     const n = Number(lignesFixes[1]);
     /*
@@ -705,6 +712,25 @@ function lireLesLignes(t: string): string | null {
    * porte un autre nombre, la mise, qu'il ne faut surtout pas ramasser. D'où
    * la capture bornée au premier nombre.
    */
+  /*
+   * La fourchette avant la valeur unique, ici aussi.
+   *
+   * Crystopia publie « Ways are fixed at **27 - 1,728** » : ses symboles se
+   * scindent en deux ou quatre, d'ou douze symboles par rouleau et 12³ = 1 728.
+   * La formule ne gardait que le 27 et l'a ecrit en base — la fiche decrivait
+   * le jeu a son etat le plus pauvre. Meme piege que « Lines are fixed at
+   * 1 - 3 », corrige pour les lignes et pas pour les facons : une lecon apprise
+   * sur une formule ne se propage pas toute seule aux autres.
+   */
+  const faconsEnPlage =
+    /\bWays are fixed at\s+(\d{1,3}(?:,\d{3})*)\s*[-–]\s*(\d{1,3}(?:,\d{3})*)/i.exec(t);
+  if (faconsEnPlage) {
+    const [bas, haut] = [faconsEnPlage[1], faconsEnPlage[2]].map((x) => Number(x.replace(/,/g, '')));
+    if (bas >= 20 && haut <= 250_000 && bas < haut) {
+      return `${bas.toLocaleString('en-GB')} to ${haut.toLocaleString('en-GB')} ways`;
+    }
+  }
+
   const faconsFixes = /\bWays are fixed at\s+(\d{1,3}(?:,\d{3})*)\b/i.exec(t);
   if (faconsFixes) {
     const n = Number(faconsFixes[1].replace(/,/g, ''));
