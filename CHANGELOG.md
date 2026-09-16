@@ -2,6 +2,53 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-16 (nuit, 4) — L'apostrophe manque à des studios entiers
+
+Second lot Spinomenal écrit (10 fiches, 41 captures). **532 fiches légendées,
+4 122 captures sur 20 291 (20 %).**
+
+### Un nom faux, et une classe de noms à surveiller
+
+La fiche `1-reel-gladiators-rising` s'appelait « 1 Reel Gladiators Rising ».
+Deux sources à l'écran disent autre chose, et elles sont d'accord :
+
+- le logo du jeu, sur la capture de base : « 1 REEL **GLADIATOR'S** RISING » ;
+- l'en-tête des trois pages de règles : « 1 Reel - **Gladiator's** Rising ».
+
+Un pluriel là où le studio écrit un possessif. Corrigé — le slug ne bouge pas,
+il est en ligne et le renommer casserait l'URL pour rien.
+
+**Et le comptage qui suit est plus intéressant que la correction.** Sur les
+11 658 fiches du catalogue, 140 portent une apostrophe dans leur nom (1 %), mais
+elles sont **concentrées sur quelques studios** — Pragmatic 36, Play'n GO 38,
+PG Soft 13, Hacksaw 11, BGaming 10. Des studios entiers sont à **zéro** :
+Spinomenal 0/648, Yggdrasil 0/574, Amusnet 0/280, Evoplay 0/269, Wazdan 0/262,
+Microgaming 0/214, Stakelogic 0/206.
+
+Zéro sur 648 n'est pas crédible pour un catalogue de cette taille, et on vient
+d'en vérifier un à l'image. C'est donc un **défaut de la voie d'import**, pas un
+hasard : les noms de ces studios sont arrivés sans leurs apostrophes.
+
+On ne corrige rien en masse — deviner où une apostrophe manque, c'est inventer.
+Mais la piste est réparable sans deviner : **le logo du jeu est dans la capture
+de base de chaque fiche**, et il porte le titre exact. Une passe d'OCR sur cette
+seule zone rendrait les vrais noms, fiche par fiche, sans supposition.
+
+### Le contrôle était muet, et l'agent l'a dit
+
+Les dix fiches du lot n'ont que le RTP et ses paliers ; grille, mécaniques,
+plafond, volatilité, achat de bonus sont vides, et le panneau de ces jeux n'en
+publie aucun. Il n'y avait donc rien à confronter : « 0 écart » ne vaut rien ici.
+
+La règle du 16/09 a par ailleurs tenu sa première épreuve toute seule : le lot a
+**refusé** d'écrire un plafond à partir du compteur `JACKPOT 50` affiché pour une
+mise de 0,10, soit 500× — parce que le panneau dit que le jackpot **s'ajoute** à
+la banque et aux gains directs, et qu'aucune page ne publie de plafond sous un
+titre qui en est un.
+
+`1-reel-golden-piggy` n'a aucun RTP en base, et son panneau n'en publie pas :
+c'est un trou, pas un écart, et il reste ouvert.
+
 ## 2026-09-16 (nuit, 3) — Trois plafonds refusés, sept confirmés par une division
 
 Lots Spinomenal (10 fiches, 40 captures) et Wazdan (10 fiches, 123 captures)
