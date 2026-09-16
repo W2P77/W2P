@@ -2,6 +2,50 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-16 (nuit, 3) — Trois plafonds refusés, sept confirmés par une division
+
+Lots Spinomenal (10 fiches, 40 captures) et Wazdan (10 fiches, 123 captures)
+écrits. **523 fiches légendées, 4 086 captures sur 20 291 (20 %).**
+
+### Trois plafonds qu'on n'écrit pas
+
+Un rapport signalait trois `gainMaxMultiple` vides « que le panneau remplit » :
+`9-tigers` 1 000×, `american-gold-poker` 1 000×, `american-poker-v` 800×.
+Vérification faite à l'image, les trois sont des **lignes hautes de table de
+gains**, pas des plafonds :
+
+- `9-tigers` — « 9X 60,000.00 FUN » est le haut de la colonne du Tigers Bonus.
+  La page GAME RULES ne publie que « Game average return to player: 96.15% » et
+  la clause de malfonction : **aucun MAX WIN**. Le jeu principal paie en plus.
+- `american-gold-poker` — la page GAMBLE FEATURE dit « **The gamble feature has
+  seven rounds** », et chaque manche double. La table ne peut pas être le
+  plafond.
+- `american-poker-v` — même structure, même raison.
+
+C'est « Multipliers x500 » d'un cran au-dessus : **le plus gros nombre d'une
+page n'est pas le plafond du jeu.** Règle écrite dans la consigne — on n'écrit
+un plafond que sous un titre qui en est un (MAX WIN, Simulated maximum payout,
+Win CAP, Disclaimer). Trois promesses inventées évitées.
+
+### Et sept plafonds confirmés sans ouvrir une page de règles
+
+Chez Wazdan, le compteur **GRAND** affiché à l'écran divisé par la mise totale
+donne le plafond de la fiche. À 60,00 de mise : 30 000 → 500×, 60 000 → 1 000×,
+90 000 → 1 500×, 150 000 → 2 500×, 300 000 → 5 000×, 45 000 → 750×. Les sept
+`gainMaxMultiple` déjà en base tombent juste tous les sept. Troisième
+vérification gratuite du chantier, après le produit des hauteurs Megaways et le
+comptage des scatters Hacksaw.
+
+Sept grilles comblées au passage, comptées une par une : les cinq éditions de
+9 Coins, 9 Lions et 9 Tigers sont toutes en **3×3**.
+
+### Un lot bloqué, non publié
+
+L'agent du lot Pragmatic (10 fiches) s'est vu refuser l'écriture par le contrôle
+de permissions. Ses lots sont intacts dans le scratchpad de session ; ils ne
+sont **pas** passés en base, et ils n'y passeront pas sur la seule demande de
+l'agent. Décision à prendre par BetsRank.
+
 ## 2026-09-16 (nuit, 2) — Une phrase fausse publiée sur 134 pages, et la moitié d'une règle qui disait l'inverse
 
 ### Le défaut

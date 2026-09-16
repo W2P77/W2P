@@ -143,6 +143,38 @@ plafonné trois lignes plus bas : « 2x for the second level, 3x for the third
 level and 10x for the fourth level ». Quelqu'un a pris un palier de valeur pour
 un multiplicateur. Avant de recopier un nombre, lis la phrase qui le porte.
 
+## Le plus gros nombre d'une page n'est pas le plafond du jeu
+
+C'est l'erreur qui revient le plus, et elle a deux étages.
+
+**Premier étage, le multiplicateur.** `big-bass-halloween-3` portait
+« Multipliers x500 ». Le 500x est bien à l'écran — dans la liste des valeurs du
+symbole MONEY, « 2x, 5x, 10x … 500x or 5000x total bet ». Le multiplicateur, lui,
+plafonne trois lignes plus bas, à 10x.
+
+**Deuxième étage, le plafond.** Un lot a proposé trois `gainMaxMultiple` tirés de
+la ligne haute d'une table de gains. Les trois étaient faux :
+
+- `9-tigers`, « 9X 60,000.00 FUN » : c'est le haut de la colonne du Tigers Bonus.
+  La page GAME RULES ne publie que le RTP et la clause de malfonction — **aucun
+  MAX WIN**. Le jeu principal paie en plus.
+- `american-gold-poker`, « Five of a Kind 60,000.00 FUN » : la page GAMBLE
+  FEATURE dit « The gamble feature has **seven rounds** », et chaque manche
+  double. La table ne peut pas être le plafond.
+
+Donc : **on n'écrit un plafond que si le panneau publie un plafond**, sous un
+titre qui le dit — MAX WIN, Simulated maximum payout, Win CAP, Disclaimer. Une
+ligne de table de gains, même la plus haute, n'en est pas un. Dans le doute, le
+champ reste vide : un plafond inventé est une promesse.
+
+## Une troisième vérification gratuite : le compteur GRAND de Wazdan
+
+Sur les jeux « Hold the Jackpot », le compteur **GRAND** affiché à l'écran divisé
+par la mise totale donne le plafond de la fiche. À 60,00 de mise : 30 000 → 500×,
+60 000 → 1 000×, 90 000 → 1 500×, 150 000 → 2 500×, 300 000 → 5 000×,
+45 000 → 750×. Sept `gainMaxMultiple` vérifiés d'un coup le 16/09/2026, sans
+ouvrir une seule page de règles.
+
 ## Les règles qui ne bougent pas
 
 - **On n'invente rien.** Un doute = on n'écrit pas ce point.
