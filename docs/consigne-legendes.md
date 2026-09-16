@@ -116,6 +116,33 @@ que `pray-for-three` annonçait « 5+ scatters » un bonus qui s'obtient à troi
 De façon générale : **quand un jeu affiche un nombre et le dessine aussi, les
 deux doivent concorder.** Le désaccord est toujours une information.
 
+## Mais un désaccord n'accuse pas toujours la fiche
+
+Le contrôle ci-dessus a tourné six fois le 16/09/2026 et il est tombé juste cinq
+fois. La sixième mérite d'être connue, parce que c'est le piège inverse.
+
+**Ta capture « jeu de base » n'est pas toujours l'état de base.** Sur
+`stockholm-syndrome`, la grille dessinée donne 3-4-4-4-3, soit 576 façons ; le
+panneau dit 3-4-3-4-3 et 432. Les deux chiffres du panneau se confirment l'un
+l'autre (3×4×3×4×3 = 432), le comptage n'en confirme aucun : la capture a été
+prise avec le rouleau central déjà étendu. Même chose sur `supersized`, photographié
+à dix colonnes en cinq paires CLONE / CLONED alors que le jeu en a cinq, et sur
+`joker-drop-popwins`, dont la plaque annonce 2 048 façons quand la grille ouverte
+en donne 1 024.
+
+La règle : **si le panneau se confirme lui-même et que ton comptage est seul de
+son côté, c'est l'image qui montre un état transitoire.** Tu le signales, tu
+écris ta légende sur ce que tu vois sans affirmer de compte de rangées, et tu ne
+demandes pas de correction.
+
+**Et un chiffre n'est un multiplicateur que si le panneau l'appelle ainsi.** La
+fiche de `big-bass-halloween-3` portait « Multipliers x500 ». Le 500x existe bien
+à l'écran, mais dans la liste des valeurs du symbole MONEY — « 2x, 5x, 10x, 15x,
+20x, 25x, 50x, 100x, 200x, 500x or 5000x total bet ». Le multiplicateur, lui, est
+plafonné trois lignes plus bas : « 2x for the second level, 3x for the third
+level and 10x for the fourth level ». Quelqu'un a pris un palier de valeur pour
+un multiplicateur. Avant de recopier un nombre, lis la phrase qui le porte.
+
 ## Les règles qui ne bougent pas
 
 - **On n'invente rien.** Un doute = on n'écrit pas ce point.

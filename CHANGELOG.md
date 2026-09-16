@@ -2,6 +2,68 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-16 (nuit) — Trente fiches de plus, et le piège inverse du contrôle par le produit
+
+Trois lots rendus : la suite des Big Bass (10 fiches, 80 captures), Nolimit City
+(10 / 41) et Stakelogic (10 / 85). **503 fiches légendées, 3 923 captures sur
+20 291 (19 %).**
+
+### La même erreur, deux fois, dans les deux sens
+
+`big-bass-halloween-3` annonçait « achat de bonus : non » alors que son panneau
+en vend deux — « Pay 100x total bet to trigger the FREE SPINS feature… Pay 300x
+total bet to trigger the SUPER FREE SPINS feature » — et que son propre champ
+`mecaniques` portait déjà « Bonus buy 100x ». Exactement le défaut trouvé hier
+sur `big-bass-christmas-frozen-lake` : **une fiche qui se contredit elle-même**.
+Ce n'est pas un hasard de saisie, c'est un motif ; le champ booléen et le champ
+texte ont été remplis par deux passes qui ne se parlaient pas.
+
+### Un palier de valeur pris pour un multiplicateur
+
+La même fiche portait « Multipliers x500 ». Le 500x est bien à l'écran, mais
+dans la liste des valeurs du symbole MONEY : « 2x, 5x, 10x, 15x, 20x, 25x, 50x,
+100x, 200x, 500x or 5000x total bet ». Le multiplicateur, lui, est plafonné
+trois lignes plus bas : « 2x for the second level, 3x for the third level and
+10x for the fourth level ». **Un nombre n'est un multiplicateur que si la phrase
+qui le porte le dit.**
+
+### Le piège inverse : la capture n'est pas toujours l'état de base
+
+Le contrôle « le nombre affiché = le produit des hauteurs » a tourné six fois et
+n'est tombé juste que cinq. La sixième est instructive. Sur
+`stockholm-syndrome`, la grille dessinée donne 3-4-4-4-3 (576 façons) là où le
+panneau dit 3-4-3-4-3 et 432. Deux chiffres du panneau se confirment l'un
+l'autre ; le comptage n'en confirme aucun. **La capture avait été prise avec le
+rouleau central déjà étendu.** Même chose sur `supersized`, photographié à dix
+colonnes en cinq paires CLONE / CLONED, et sur `joker-drop-popwins`, dont la
+plaque annonce 2 048 façons quand la grille ouverte en donne 1 024.
+
+D'où la règle ajoutée à la consigne : **si le panneau se confirme lui-même et
+que le comptage est seul de son côté, c'est l'image qui montre un état
+transitoire.** On le signale, on n'écrit rien.
+
+### Dix fiches Stakelogic sortent du vide
+
+Les dix étaient à `null` sur grille, lignes, achat de bonus, plafond et
+volatilité. Huit grilles et cinq nombres de lignes sont désormais écrits, tous
+lus à l'image : la page GAME RULES du studio ouvre par une phrase invariante
+(« a highly animated ten (10) win line, five (5) reel, three (3) row video slot
+game ») qui donne les trois en une fois. Trois achats de bonus sont écrits parce
+que leur écran d'achat est au dossier — hot-chilli-fest à 200,00 pour 2,00,
+joker-drop-popwins à 80,00 pour 1,00, jaws-of-fortune dont le bouton BUY BONUS
+est visible sur l'écran de jeu.
+
+`hold4timer` et `joker-drop-popwins` gardent leur grille vide **exprès** : l'une
+va de trois à six rouleaux selon le nombre de GAMES activés, l'autre monte à
+sept rangées. Y figer un « 5×4 » serait faux la plupart du temps. L'achat de
+bonus reste `null` partout où aucun écran ne le prouve : l'absence de bouton sur
+une capture n'est pas une preuve d'absence.
+
+### Aussi
+
+`space-donkey` : le panneau liste cinq fonctions, la fiche en portait quatre.
+« Safe Word » ajouté.
+
 ## 2026-09-16 (soir) — Neuf corrections, et deux façons de compter qui ne mentent pas
 
 Les lots écrits sous la règle du « au moins un élément visuel » rapportent
