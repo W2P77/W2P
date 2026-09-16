@@ -361,6 +361,19 @@ interface Enonce {
   /** Combien de fois le motif doit apparaître. Sert aux preuves de structure. */
   occurrences?: number;
   /**
+   * Ce qui doit être **absent** du panneau pour que l'énoncé tienne.
+   *
+   * Un motif lit une phrase ; il ne lit pas celle d'avant. « After the fourth
+   * level, the feature cannot be retriggered anymore » est la **fin** d'une
+   * règle qui commence par « Every 4th MAN WILD symbol collected retriggers
+   * the feature » : prise seule, la seconde moitié dit l'inverse de la règle.
+   *
+   * C'est la même classe d'erreur que « Lines are fixed at 1 - 3 » lu comme
+   * « 1 ligne ». Une leçon apprise sur une formule ne se propage pas toute
+   * seule aux autres : ce champ est là pour qu'elle puisse l'être.
+   */
+  interdits?: RegExp[];
+  /**
    * Ce que l'énoncé pèse dans le choix du sujet. Un énoncé faible (un mot
    * isolé, « paylines ») ne suffit jamais seul ; un énoncé signature, oui.
    */
@@ -547,11 +560,25 @@ const ENONCES: Enonce[] = [
     sujet: 'toursGratuits',
     poids: 2,
     motifs: [/feature\s+cannot\s+be\s+retriggered/i],
-    dit: {
-      en: 'The feature cannot be retriggered once it has started.',
-      fr: 'La fonction ne peut pas être relancée une fois commencée.',
-      de: 'Die Funktion kann nach dem Start nicht erneut ausgelöst werden.',
-    },
+    interdits: [/retriggers?\s+the\s+feature/i, /\bcan\s+be\s+retriggered/i],
+    /*
+     * Cet énoncé situe la page, il ne dit plus rien.
+     *
+     * Il publiait « La fonction ne peut pas être relancée une fois commencée »
+     * sur **134 pages** sans légende à la main. Or chez Pragmatic la phrase qui
+     * le déclenche est la fin d'une règle qui accorde la relance : vérifié à
+     * l'image le 16/09/2026 sur `big-bass-raceday-repeat-regles-3.webp`, page
+     * 3/8 — « Every 4th MAN WILD symbol collected retriggers the feature,
+     * awards 10 more free spins... After the fourth level, the feature cannot
+     * be retriggered anymore. » La fonction se relance donc trois fois.
+     *
+     * `interdits` répare les lectures **à venir**. Les 134 déjà figées en base
+     * ne portent que le code de l'énoncé, pas le texte OCR qui l'a produit : on
+     * ne peut plus distinguer le panneau qui nie vraiment de celui qui limite.
+     * Retirer `dit` est la seule réparation qui les couvre toutes — et une
+     * affirmation négative invérifiable est justement celle qu'on ne publie
+     * pas. La phrase reviendra quand les captures garderont leur texte.
+     */
   },
   {
     code: 'gain-verse-en-fin-de-serie',
@@ -1677,6 +1704,9 @@ export function lirePageDeRegles(texte: string | null | undefined): LectureDePag
       return [...t.matchAll(global)].length >= e.occurrences;
     });
     if (!trouve) continue;
+    // Un motif lit une phrase, pas celle d'avant : une phrase interdite ailleurs
+    // dans la page suffit à retourner le sens de celle qu'on vient de lire.
+    if (e.interdits?.some((interdit) => interdit.test(t))) continue;
     const entree = parSujet.get(e.sujet) ?? { poids: 0, enonces: [] };
     entree.poids += e.poids;
     entree.enonces.push(e.code);

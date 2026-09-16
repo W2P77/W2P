@@ -2,6 +2,54 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-16 (nuit, 2) — Une phrase fausse publiée sur 134 pages, et la moitié d'une règle qui disait l'inverse
+
+### Le défaut
+
+L'outil publiait « **La fonction ne peut pas être relancée une fois commencée** »
+sur 134 captures sans légende à la main, dans les trois langues. La règle qui la
+déclenche est `/feature cannot be retriggered/`. Or chez Pragmatic, cette phrase
+est la **fin** d'une règle qui accorde la relance. Vérifié à l'image sur
+`big-bass-raceday-repeat`, page 3/8 :
+
+> « Every 4th MAN WILD symbol collected **retriggers the feature**, awards 10
+> more free spins and the multiplier for MONEY symbol collection increases to 2x
+> for the second level, 3x for the third level and 10x for the fourth level.
+> **After the fourth level, the feature cannot be retriggered anymore.** »
+
+La fonction se relance donc trois fois. Le site disait qu'elle ne se relance
+jamais.
+
+C'est la **même classe d'erreur** que « Lines are fixed at 1 - 3 » lu comme
+« 1 ligne » : un motif lit une phrase, il ne lit pas celle d'avant. La leçon
+apprise sur une formule ne s'était pas propagée aux autres — faute d'endroit où
+l'écrire.
+
+### La réparation
+
+Le type `Enonce` gagne un champ **`interdits`** : ce qui doit être absent de la
+page pour que l'énoncé tienne. Sur `sans-relance`, deux interdits — un panneau
+qui contient « retriggers the feature » ou « can be retriggered » n'est plus lu
+comme une négation. Les lectures à venir sont justes.
+
+Les 134 déjà en base, en revanche, **ne gardent que le code de l'énoncé, pas le
+texte OCR qui l'a produit** : impossible de distinguer après coup le panneau qui
+nie vraiment de celui qui limite. La seule réparation qui les couvre toutes est
+de retirer le `dit` de l'énoncé — il situe encore la page, il n'affirme plus
+rien. Une affirmation négative invérifiable est exactement celle qu'on ne publie
+pas. La phrase reviendra quand les captures garderont leur texte.
+
+Deux tests verrouillent les deux moitiés : la lecture ne retient plus
+« sans-relance » sur un panneau qui accorde une relance, et aucune des trois
+langues ne parle de relance même sur un panneau qui la nie vraiment.
+
+### Aussi, relu à l'image
+
+`big-bass-raceday-repeat` vend **trois** achats (100×, 160× et 1 250× la mise
+totale) ; la fiche n'en portait qu'un. Les deux autres sont écrits. Un joueur
+qui compare les Big Bass lisait un prix d'entrée sans savoir que le jeu en
+propose un à 1 250×.
+
 ## 2026-09-16 (nuit) — Trente fiches de plus, et le piège inverse du contrôle par le produit
 
 Trois lots rendus : la suite des Big Bass (10 fiches, 80 captures), Nolimit City

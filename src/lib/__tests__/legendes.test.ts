@@ -435,3 +435,41 @@ describe('légendes tirées du texte de la page', () => {
     });
   });
 });
+
+/*
+ * Une phrase lue hors de la phrase qui la précède peut dire l'inverse de la
+ * règle. Vérifié à l'image le 16/09/2026 sur `big-bass-raceday-repeat`, page
+ * 3/8 : le panneau accorde une relance tous les 4 MAN WILD et la ferme au
+ * quatrième palier — et l'outil publiait « la fonction ne peut pas être
+ * relancée » sur 134 pages.
+ */
+describe('une négation lue hors contexte', () => {
+  const RELANCE_LIMITEE =
+    'During the FREE SPINS feature each MAN WILD symbol also collects all the values from MONEY symbols on the screen. ' +
+    'Every 4th MAN WILD symbol collected retriggers the feature, awards 10 more free spins and the multiplier for MONEY ' +
+    'symbol collection increases to 2x for the second level, 3x for the third level and 10x for the fourth level. ' +
+    'After the fourth level, the feature cannot be retriggered anymore.';
+
+  it('ne retient pas « sans relance » quand la page accorde une relance', () => {
+    expect(lirePageDeRegles(RELANCE_LIMITEE)?.enonces ?? []).not.toContain('sans-relance');
+  });
+
+  it('ne publie plus de phrase sur la relance, même sur un panneau qui la nie', () => {
+    /*
+     * Tant que les captures ne gardent pas leur texte OCR, on ne peut pas
+     * distinguer le panneau qui nie vraiment de celui qui limite. Une
+     * affirmation négative invérifiable ne se publie pas.
+     */
+    const NIE_VRAIMENT =
+      'The FREE SPINS feature awards 10 free spins. Special reels are in play during the feature. ' +
+      'The feature cannot be retriggered. All wins are added to the balance when the round ends.';
+    for (const langue of ['fr', 'en', 'de'] as const) {
+      const legende = legendeDeCapture(
+        { titre: 'Game rules, page 3', lecture: lireCapture(NIE_VRAIMENT) },
+        FAITS,
+        langue,
+      );
+      expect(legende).not.toMatch(/relanc|retrigger|erneut ausgelöst/i);
+    }
+  });
+});
