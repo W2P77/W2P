@@ -2,6 +2,55 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-16 (nuit, 5) — Deux RTP « faux » qui ne l'étaient pas
+
+Second lot Wazdan écrit (10 fiches, 82 captures). **542 fiches légendées,
+4 204 captures sur 20 291 (21 %).**
+
+### La provenance change le verdict
+
+Un rapport signalait deux RTP faux : `bells-of-fortune` 96,10 en base contre
+96,13 au panneau, `beach-party` 96,37 contre 96,48. Les deux phrases sont bien
+à l'écran, relues à l'image.
+
+Mais la question n'était pas « que dit le panneau », c'était **d'où vient la
+valeur en base**. Les deux viennent de `wazdan.com/games/<slug>`, la page produit
+du studio. Le panneau du jeu est donc une **autre source du même studio** — et
+Wazdan livre ses jeux en plusieurs configurations de RTP selon l'opérateur.
+
+Deux sources valables, et le panneau est chaque fois **le plus généreux**.
+Arbitrer vers lui reviendrait à remplacer un chiffre publié par un chiffre plus
+flatteur sans savoir lequel le joueur rencontrera. La valeur est conservée, la
+divergence est écrite dans `rtpSource` pour qu'aucune passe suivante ne la
+« corrige » en silence. Même décision que sur Starburst XXXtreme.
+
+À retenir : **un écart n'est une erreur que si l'une des deux sources n'en est
+pas une.** Avant de corriger, lire `rtpSource`.
+
+### Ce qui a été écrit
+
+`bells-of-fortune` — plafond **1 000×**, et c'est le contre-exemple de la règle
+posée deux heures plus tôt : ici le nombre est sous un titre qui EST un plafond,
+la page **DISCLAIMER**, « The maximum win amount is 1000x bet. » Le compteur
+GRAND le confirme seul : 60 000,00 pour une mise de 60,00. Grille **4×4** —
+seize cases comptées, et le panneau parle de « all **16** Bonus symbols ».
+
+`beach-party` — grille **5×3**, **20 lignes** : les schémas sont numérotés
+jusqu'à 20 sans 21, et dessinés sur une matrice de cinq colonnes de trois.
+
+Aucun plafond écrit pour les huit autres : aucune ne publie de MAX WIN ni de
+Disclaimer, et leur Gamble double sept fois — leurs grosses lignes de table de
+gains ne sont pas des plafonds.
+
+### Une contradiction interne à signaler
+
+`black-hawk-deluxe` se contredit lui-même : son panneau dit « **54 win lines**
+are located on the three reels from the left side and on the three reels from
+the right side » et numérote ses schémas jusqu'à 54, alors que la bannière du
+jeu affiche « **27 WIN LINES** ». Le texte et les schémas du Deluxe semblent
+recopiés de Black Hawk, dont la bannière annonce bien 54. Rien n'est écrit en
+base : le champ reste vide tant que le jeu ne s'accorde pas avec lui-même.
+
 ## 2026-09-16 (nuit, 4) — L'apostrophe manque à des studios entiers
 
 Second lot Spinomenal écrit (10 fiches, 41 captures). **532 fiches légendées,

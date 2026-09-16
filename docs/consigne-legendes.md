@@ -194,6 +194,13 @@ jamais la fiche toi-même. Tu le signales dans ton rapport final avec :
 2. **le nom du fichier PNG** où elle se lit ;
 3. ce que la fiche dit, et ce que le panneau dit.
 
+**Et un écart n'est une erreur que si l'une des deux sources n'en est pas une.**
+Deux RTP signalés comme faux le 16/09/2026 ne l'étaient pas : la valeur en base
+venait de la page produit du studio, le panneau du jeu en affichait une autre —
+deux sources valables du même studio, Wazdan livrant plusieurs configurations de
+RTP selon l'opérateur. Signale toujours, c'est ton rôle ; mais écris ce que dit
+le panneau, pas « la fiche est fausse ».
+
 Sans ces trois éléments la piste est jetée. Un chiffre vu dans un journal OCR
 n'est pas une preuve : il faut l'avoir lu sur l'image.
 
