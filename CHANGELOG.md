@@ -2,6 +2,26 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-17 (2) — Pandibet remplace Vave
+
+Vave passe `actif: false`, Pandibet entre au catalogue sous l'**id 151**, le
+même qu'à BetsRank : les ids restent alignés entre les deux sites pour qu'un
+clic se recoupe sans table de correspondance.
+
+**Les studios ne sont pas devinés.** La page « Fournisseurs » du casino
+(`pandibet.com/fr/game-providers`) affiche 106 studios, chacun avec son nom :
+45 ont une clé chez nous, et ce sont les seules écrites. **Ni Pragmatic Play ni
+Hacksaw n'y figurent** — les deux plus gros pourvoyeurs de nos fiches. Les
+ajouter par habitude aurait affiché Pandibet sur des milliers de jeux qu'il ne
+propose pas, ce qui envoie le joueur dans le vide.
+
+Bonus relevé sur le site le même jour : 125 %, puis 75 %, puis 100 %, chacun
+plafonné à 500 €. Le détail des conditions est dans BetsRank,
+`docs/sources/pandibet-2026-09-17.md`.
+
+Vave garde sa ligne et ses 25 studios : un deal qui reprend n'aurait qu'un
+drapeau à rebasculer.
+
 ## 2026-09-17 — Un contrôle appris ailleurs peut mentir
 
 Lot 1spin4win, famille Cash'n Fruits : **10 fiches, 71 captures**.
