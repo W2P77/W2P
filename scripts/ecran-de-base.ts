@@ -24,6 +24,9 @@
  *
  *   npx tsx --env-file=.env.local scripts/ecran-de-base.ts --ecrire <lot.json> [--appliquer]
  *       { "<slug>": { "grille": "5×3", "lignes": "10" } }
+ *       `capture` et `ou` sont facultatifs : ils servent quand la valeur se lit
+ *       ailleurs que sur l'écran de base (« <slug>-regles-6.webp », « schéma
+ *       des 50 lignes »), pour que la preuve nomme la bonne image.
  *       `lignes` : le nombre nu pour des lignes (« 10 »), sinon le libellé
  *       anglais affiché (« 243 ways to win », « Cluster Pays »). `grille` ne
  *       se dit jamais en français : elle s'affiche telle quelle dans les trois
@@ -100,7 +103,10 @@ async function preparer() {
 
 async function ecrire(chemin: string) {
   const appliquer = process.argv.includes('--appliquer');
-  const lot = JSON.parse(readFileSync(chemin, 'utf-8')) as Record<string, { grille?: string; lignes?: string }>;
+  const lot = JSON.parse(readFileSync(chemin, 'utf-8')) as Record<
+    string,
+    { grille?: string; lignes?: string; capture?: string; ou?: string }
+  >;
   const jeux = await prisma.jeu.findMany({
     where: { slug: { in: Object.keys(lot) } },
     select: { id: true, slug: true, grille: true, lignesPaiement: true, demoUrl: true, captures: true },
@@ -129,14 +135,26 @@ async function ecrire(chemin: string) {
     if (!appliquer) { ecrits++; continue; }
 
     await prisma.jeu.update({ where: { id: jeu.id }, data });
-    const capture = ecranDeBase(jeu.captures as unknown as Capture[])?.fichier ?? null;
+    /*
+     * D'où vient la valeur. Par défaut l'écran de base, mais une capture prise
+     * pendant l'intro ne montre pas la grille : le schéma des lignes d'une page
+     * de règles la donne alors (the-wild-300 : 5×4 lu sur le schéma des 50
+     * lignes). Le relevé peut donc nommer sa propre capture — une preuve qui
+     * désigne la mauvaise image ne prouve rien.
+     */
+    const captures = jeu.captures as unknown as Capture[];
+    const capture = r.capture && captures.some((c) => c.fichier === r.capture)
+      ? r.capture
+      : ecranDeBase(captures)?.fichier ?? null;
+    if (r.capture && capture !== r.capture) console.log(`  ! ${jeu.slug} — capture « ${r.capture} » absente de la fiche, preuve posée sur l'écran de base`);
+    const ou = r.ou ?? 'écran de base';
     for (const [champ, valeur] of Object.entries(data)) {
       await prisma.preuve.create({
         data: {
           jeuId: jeu.id, champ, valeurBrute: valeur, type: 'REGLES_DU_JEU',
-          url: jeu.demoUrl, libelle: 'Écran de jeu de la démo officielle',
-          capture, reference: 'écran de base', verifieePar: AUTEUR,
-          note: 'Champ vide en base ; valeur lue sur l’écran de base (rouleaux et rangées comptés, compteur de lignes affiché).',
+          url: jeu.demoUrl, libelle: r.capture ? 'Panneau de règles du jeu' : 'Écran de jeu de la démo officielle',
+          capture, reference: ou, verifieePar: AUTEUR,
+          note: `Champ vide en base ; valeur lue sur ${ou} (rouleaux et rangées comptés, compteur de lignes affiché).`,
         },
       });
     }

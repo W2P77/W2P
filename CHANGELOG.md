@@ -2,6 +2,51 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-20 — 1 495 démos retrouvées, la couverture passe de 67 % à 91 %
+
+**Le vrai goulot n'était pas la capture, c'était la démo.** 2 017 fiches
+publiées n'avaient aucune URL de démo : pas de démo, pas de capture ; pas de
+capture, pas de jaquette ni de légende. Toute la chaîne bloquée à la source.
+
+Une recherche studio par studio a retrouvé le lanceur officiel de **1 495**
+d'entre elles. La méthode ne fabrique aucune URL : elle **lit** le bouton de
+démo sur la fiche produit du studio — et la base portait déjà cette fiche dans
+`rtp_source`, héritée de la campagne RTP de septembre. Aucun agrégateur : un
+lien vers un concurrent est proscrit, et tous les hôtes retenus sont ceux des
+studios ou de leurs plateformes (rgsmatrix pour Fantasma, the-rgs pour Caleta,
+rubyplay pour Koala).
+
+`scripts/adopter-demos-trouvees.ts` ne remplit que les fiches **sans** démo :
+une démo qui marche n'est jamais remplacée, parce que le paramètre porteur du
+jeu change d'un lanceur à l'autre.
+
+**Ce qu'on sait des limites, et qu'il faut garder en tête :**
+- **Endorphina (218 jeux) répond « 403 Forbidden For Your Region » depuis la
+  France.** L'URL est bonne, la capture depuis ce poste ne l'est pas.
+- Trois studios ne publient leur démo que sur un hôte de recette
+  (`staging.the-rgs.com` chez Caleta, `stage.clutchgamingcdn.com` chez
+  Backseat, `preprod.elaapi.com` chez Ela). C'est le lien que le studio
+  lui-même affiche ; il peut disparaître sans préavis.
+- Fugaso sert une coquille vide si deux pages sont demandées à moins de 3,5 s.
+- **Un 200 ne prouve rien** chez Gaming Corps, Peter & Sons, NetEnt/Red Tiger,
+  Stakelogic, Winspinity et 1spin4win : ils répondent 200 à l'octet près sur un
+  identifiant inventé. Pour ceux-là, la seule preuve est la donnée lue sur la
+  fiche produit, et c'est ce qui a été retenu.
+- 522 fiches restent sans démo, dont **PG Soft (151)** : l'hôte du lanceur est
+  connu, mais l'identifiant n'est publié que derrière une API que leur
+  robots.txt interdit. Playson (24) est derrière Cloudflare.
+
+**Le goulot se déplace vers les adaptateurs de capture.** Les 1 495 démos
+neuves appartiennent à une vingtaine de studios dont `capturer-jeux.ts` ne sait
+pas ouvrir le jeu. Sans adaptateur, la démo ne devient pas une capture.
+
+Au passage : l'export vers BetsRank fait maintenant voyager la grille et les
+lignes, mais **seulement quand une capture nommée les atteste** ; et un relevé
+de structure peut désigner sa propre capture, puisque la grille se lit parfois
+sur le schéma des lignes d'une page de règles plutôt que sur l'écran de jeu.
+
+État des 6 069 fiches en ligne : démo 91 %, visuel 54 %, captures 42 %.
+
 ## 2026-09-19 (4) — la structure se lit sur une seule image
 
 **1 391 fiches en ligne avaient leurs captures mais aucune grille**, 1 183

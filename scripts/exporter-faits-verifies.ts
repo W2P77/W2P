@@ -39,7 +39,19 @@ async function main() {
       volatilite: true,
       gainMaxMultiple: true,
       capturesLe: true,
+      grille: true,
+      lignesPaiement: true,
       studio: { select: { slug: true, nom: true } },
+      /*
+       * La structure ne voyage que si elle a été LUE à l'écran. Une grille
+       * héritée d'un import vaut ce que valait l'import : la faire traverser
+       * en la présentant comme vérifiée propagerait l'erreur au lieu de la
+       * corriger. D'où la preuve exigée, pas le champ seul.
+       */
+      preuves: {
+        where: { champ: { in: ['grille', 'lignesPaiement'] }, verifieePar: { startsWith: 'releve-ecran' } },
+        select: { champ: true, capture: true },
+      },
     },
     orderBy: { slug: 'asc' },
   });
@@ -59,6 +71,9 @@ async function main() {
       volatilite: j.volatilite,
       gainMaxMultiple: j.gainMaxMultiple,
       captureLe: j.capturesLe?.toISOString() ?? null,
+      grille: j.preuves.some((p) => p.champ === 'grille') ? j.grille : null,
+      lignesPaiement: j.preuves.some((p) => p.champ === 'lignesPaiement') ? j.lignesPaiement : null,
+      structureLue: j.preuves.map((p) => `${p.champ} : ${p.capture ?? '(capture non nommée)'}`),
     })),
   };
 
