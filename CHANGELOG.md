@@ -2,6 +2,37 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-19 (4) — la structure se lit sur une seule image
+
+**1 391 fiches en ligne avaient leurs captures mais aucune grille**, 1 183
+aucune ligne de paiement. Or les deux se lisent sur l'écran de base : un seul
+PNG par jeu, contre dix pour une fiche de légendes. `scripts/ecran-de-base.ts`
+ouvre ce chantier — il télécharge l'écran de base des fiches incomplètes, puis
+écrit **uniquement les champs vides**, sauvegarde l'état d'avant et pose une
+`Preuve` nommant la capture. Un champ déjà renseigné n'est jamais écrasé : un
+écart avec l'écran se traite fiche par fiche, à l'image, jamais en lot.
+
+111 fiches Spinomenal renseignées ce soir, chaque valeur inhabituelle
+recontrôlée à l'image avant d'être gardée.
+
+**Ce que les lots ont appris :**
+- **Le titre ment.** « 81 Fruits Craze » est en 4×3 (3⁴ = 81), « 100 Juicy
+  Fruits » n'a pas 100 lignes, et deux jeux nommés « aztec-spell » n'ont pas la
+  même grille. On compte sur l'image, jamais sur le nom.
+- **Tout badge chiffré n'est pas un compteur de lignes** : « JACKPOT 50 », les
+  panneaux GRAND/MAJOR/MINOR/MINI, « WILD BET ». Le contrôle : PER LINE ×
+  nombre = TOTAL BET affiché.
+- **Une capture prise pendant l'écran d'intro** montre une illustration pleine
+  hauteur par colonne : la grille ne se compte pas. Six fiches partent à la
+  recapture. Parfois une page de règles sauve la mise — the-wild-300 est en 5×4,
+  lu sur le schéma de ses 50 lignes.
+- La série « 1 Reel » (45 jeux en 1×1) n'affiche aucun compteur de lignes : un
+  jeu à un seul symbole n'en a pas. Le script ne la rappelle plus.
+
+Au passage : `_tmp-demos-formats.ts` portait une requête morte qui cassait le
+typecheck, et 33 fichiers de légendes traînaient à la racine du dépôt — rangés
+hors du dépôt, avec les sauvegardes.
+
 ## 2026-09-19 (3) — 1 170 jaquettes posées, et l'état réel du catalogue
 
 **1 170 fiches publiées n'avaient aucune jaquette** alors que leur jeu était
