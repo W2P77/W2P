@@ -69,7 +69,7 @@ async function main() {
   }
 
   writeFileSync(
-    '/Users/joris/Documents/GitHub/sauvegardes-betsrank/w2s-visuels-adoptes-2026-09-13.json',
+    `/Users/joris/Documents/GitHub/sauvegardes-betsrank/w2s-visuels-adoptes-${new Date().toISOString().slice(0, 10)}.json`,
     JSON.stringify({ poseLe: new Date().toISOString(), fiches: aPoser }, null, 2),
   );
   for (let i = 0; i < aPoser.length; i += 25) {

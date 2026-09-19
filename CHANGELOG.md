@@ -2,6 +2,26 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-19 (3) — 1 170 jaquettes posées, et l'état réel du catalogue
+
+**1 170 fiches publiées n'avaient aucune jaquette** alors que leur jeu était
+déjà photographié — Spinomenal, 1spin4win, Amusnet, Habanero, Stakelogic… Elles
+affichaient le repli textuel. `adopter-capture-en-jaquette.ts` leur pose la
+capture du jeu de base. Le script écrivait sa sauvegarde sous un nom figé
+(`…-2026-09-13.json`) et a écrasé celle du 13/09 : il date désormais le fichier.
+Rien d'essentiel perdu, une jaquette adoptée se reconnaît à son chemin
+`/captures/`.
+
+État mesuré sur les 5 994 fiches à RTP (hors tables live) : visuel 54 %, démo
+66 %, captures 41 %, légendes 10 %. Les trous par cause :
+- **démo présente, capture impossible depuis la France** : Red Tiger et NetEnt
+  (`fansite.evo-games.com` limite dès la première requête, Cloudflare 1015),
+  Push Gaming (CloudFront 403, géo-bloqué) ;
+- **démo présente et accessible** : Evoplay, campagne lancée ;
+- **aucune démo connue** : Endorphina, Fantasma, Caleta, Kingmidas, Gamingcorps,
+  Popiplay, PG Soft — ni capture ni jaquette possible sans elle ;
+- **Hacksaw** : les jeux restants pointent vers des pages produit retirées.
+
 ## 2026-09-19 (2) — Les clics « français » étaient un robot OVH
 
 Des dizaines de clics FR par jour sur les fiches de jeux, et personne dans
