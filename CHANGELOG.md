@@ -2,6 +2,41 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-19 — Les relevés d'écran de BetsRank, et 384 preuves sans fondement
+
+**513 jeux Pragmatic relus à l'écran.** BetsRank a relu, capture par capture,
+ses fiches Pragmatic — ce sont les mêmes captures que les nôtres, dans le même
+bucket. Reportés ici par `scripts/appliquer-releves-ecran.ts` : **152 grilles,
+243 lignes, 80 plafonds et 5 RTP** que l'écran contredisait. Chaque correction
+laisse une ligne `Preuve` qui nomme la capture et la page, avec l'ancienne
+valeur en note : le panneau fait autorité, mais rien n'est écrasé en silence.
+Les valeurs spectaculaires ont été revérifiées à l'image avant d'écrire
+(Mahjong Wins Super Scatter plafonne à 100 000x, Monster Superlanche à 5 000x,
+Chicken Chase à 210x). Le RTP n'a été touché que hors confiance STUDIO, et avec
+ses métadonnées : source du panneau, date, confiance. Les 20 grilles que le
+relevé libelle en français (« extensible », « rangée ») ne sont pas reportées,
+`grille` s'affichant telle quelle dans les trois langues.
+
+**Le piège : une preuve qui affirme avoir lu ce que sa capture ne montre pas.**
+`adopter-preuves.ts` attachait la volatilité et le plafond en base à la capture
+qui porte le RTP, en supposant qu'elle les montrait. Or 588 légendes
+automatiques n'énoncent **que** le RTP. Monster Superlanche portait une preuve
+de 20 000x adossée à une page où aucun 20 000 n'apparaît ; l'écran dit 5 000x.
+Bilan sur 1 256 preuves automatiques de volatilité et de plafond :
+- 67 plafonds contredits par l'écran : annotés, valeur corrigée ;
+- **384 sans fondement** (111 + 19 + 25 plafonds, 153 + 19 + 57 volatilités sur
+  Pragmatic, Hacksaw, BGaming) : la légende automatique d'origine de leur capture
+  n'énonce pas la valeur. Annotées, pas supprimées — la table garde l'historique.
+- Une légende **réécrite à la main** ne témoigne plus de ce que la chaîne de
+  capture a lu : son silence ne prouve rien, ces preuves-là ne sont pas jugées.
+
+`adopter-preuves.ts` n'adopte désormais une volatilité ou un plafond que si la
+légende de la capture l'énonce (`scripts/adopter-preuves-legende.ts`).
+
+Ces preuves ne s'affichent pas sur le site ; les **valeurs** si, et ce sont
+elles qui sont corrigées. Sauvegardes : `w2p-releves-ecran-avant-2026-09-19.json`
+et `w2p-preuves-auto-avant-2026-09-19.json` dans `sauvegardes-betsrank/`.
+
 ## 2026-09-17 (2) — Pandibet remplace Vave
 
 Vave passe `actif: false`, Pandibet entre au catalogue sous l'**id 151**, le

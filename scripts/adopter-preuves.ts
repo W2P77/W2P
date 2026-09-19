@@ -27,6 +27,7 @@
 
 import { prisma } from '@/lib/donnees/prisma';
 import type { TypeDeSource } from '@/generated/prisma/client';
+import { legendeEnonce } from './adopter-preuves-legende';
 
 const APPLIQUER = process.argv.includes('--appliquer');
 
@@ -67,6 +68,13 @@ function captureQuiProuve(captures: unknown): string | null {
   if (!Array.isArray(captures)) return null;
   const porteuse = (captures as Capture[]).find((c) => /Stated by the game itself/i.test(c?.legende ?? ''));
   return porteuse?.fichier ?? null;
+}
+
+/** La légende de la capture porteuse, telle que la chaîne de capture l'a écrite. */
+function captureLegende(captures: unknown, fichier: string | null): string {
+  if (!fichier || !Array.isArray(captures)) return '';
+  const c = (captures as Capture[]).find((x) => x?.fichier === fichier);
+  return typeof c?.legende === 'string' ? c.legende : '';
 }
 
 async function main() {
@@ -120,11 +128,21 @@ async function main() {
      * l'import : les rattacher à l'URL du panneau affirmerait qu'on les y a
      * lus, ce qui serait faux.
      */
+    /*
+     * 19/09/2026 — « la capture existe » ne voulait pas dire « la capture le
+     * montre ». La page du RTP ne porte souvent ni la volatilité ni le plafond :
+     * 588 légendes automatiques n'énoncent QUE le RTP. Ce script attachait
+     * pourtant la valeur en base à cette capture, et la présentait comme lue
+     * dans le panneau — 384 preuves sans fondement, dont des plafonds de gabarit
+     * que l'écran contredit (Monster Superlanche : 20 000x en base, 5 000x à
+     * l'écran). On n'adopte plus que ce que la légende énonce.
+     */
+    const legende = captureLegende(jeu.captures, capture);
     if (capture) {
-      if (jeu.volatilite && !faits.has('volatilite')) {
+      if (jeu.volatilite && !faits.has('volatilite') && legendeEnonce(legende, 'volatilite', jeu.volatilite)) {
         aEcrire.push({ champ: 'volatilite', valeur: jeu.volatilite });
       }
-      if (jeu.gainMaxMultiple != null && !faits.has('gainMaxMultiple')) {
+      if (jeu.gainMaxMultiple != null && !faits.has('gainMaxMultiple') && legendeEnonce(legende, 'gainMaxMultiple', String(jeu.gainMaxMultiple))) {
         aEcrire.push({ champ: 'gainMaxMultiple', valeur: String(jeu.gainMaxMultiple) });
       }
     }
