@@ -4,8 +4,8 @@ import { notFound, redirect } from 'next/navigation';
 import { prisma } from '@/lib/donnees/prisma';
 import { nouveauClickId } from '@/lib/tracking/click-id';
 import { buildAffiliateRedirectUrl, resolveCasinoPlayUrl } from '@/lib/tracking/url-partenaire';
-import { enregistrerClic } from '@/lib/tracking/clics';
-import { lireVisiteur } from '@/lib/tracking/visiteur';
+import { enregistrerClic, enregistrerPassageSuspect } from '@/lib/tracking/clics';
+import { estUnPassageSansParcours, lireVisiteur } from '@/lib/tracking/visiteur';
 import { notifierClicDiscord } from '@/lib/discord/notif-clic';
 import { LANGUE_DEFAUT, estUneLangue } from '@/i18n/langues';
 import { offreTraduite } from '@/lib/traduire-donnees';
@@ -56,13 +56,14 @@ export default async function PageDeSortie({
    * les remplit, et sans eux ni la géo ni l'antifraude n'ont de matière.
    */
   const visiteur = lireVisiteur(await headers());
+  const suspect = estUnPassageSansParcours(visiteur);
 
   const clickId = nouveauClickId();
   const playUrl = resolveCasinoPlayUrl({ playUrl: casino.playUrl, playUrlByCountry: undefined }, null);
 
   // Un enregistrement raté ne doit pas retenir le visiteur : on perd la trace,
   // pas le lead. La notification Discord est du même ordre — jamais bloquante.
-  await enregistrerClic({
+  const clic = {
     clickId,
     casinoId: casino.id,
     casinoSlug: casino.slug,
@@ -73,8 +74,12 @@ export default async function PageDeSortie({
     ip: visiteur.ip,
     userAgent: visiteur.userAgent,
     origine: visiteur.origine,
-  }).catch(() => {});
-  await notifierClicDiscord({
+  };
+  // Un passage sans parcours humain est consigné à part et ne notifie
+  // personne (cf. estUnPassageSansParcours) ; un vrai clic suit le chemin normal.
+  if (suspect) await enregistrerPassageSuspect(clic).catch(() => {});
+  else await enregistrerClic(clic).catch(() => {});
+  if (!suspect) await notifierClicDiscord({
     casinoNom: casino.nom,
     casinoSlug: casino.slug,
     clickId,
@@ -96,6 +101,7 @@ export default async function PageDeSortie({
       logo={casino.logo}
       bonus={offreTraduite(casino.bonusTexte, langue)}
       langue={langue}
+      sansRafraichissement={suspect}
     />
   );
 }

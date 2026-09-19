@@ -22,12 +22,21 @@ export function EcranDeSortie({
   logo,
   bonus,
   langue,
+  sansRafraichissement = false,
 }: {
   cible: string;
   nom: string;
   logo: string | null;
   bonus: string | null;
   langue: Langue;
+  /**
+   * Vrai pour un passage sans parcours humain. Le `<meta refresh>` de
+   * `<noscript>` sert les navigateurs sans JavaScript… et les robots, qui le
+   * suivent jusqu'au réseau affilié avec un de nos clickIds : du faux trafic
+   * chez un partenaire, qui peut sanctionner. On le retire pour eux ; la
+   * redirection JavaScript et le bouton restent, un humain passe toujours.
+   */
+  sansRafraichissement?: boolean;
 }) {
   const t = textes(langue);
   const [reste, setReste] = useState(SECONDES);
@@ -54,9 +63,11 @@ export function EcranDeSortie({
 
   return (
     <main className="grid min-h-screen place-items-center bg-fond px-6 py-12">
-      <noscript>
-        <meta httpEquiv="refresh" content={`${SECONDES};url=${cible}`} />
-      </noscript>
+      {!sansRafraichissement && (
+        <noscript>
+          <meta httpEquiv="refresh" content={`${SECONDES};url=${cible}`} />
+        </noscript>
+      )}
 
       <div className="w-full max-w-xl text-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}

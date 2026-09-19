@@ -171,3 +171,24 @@ export async function enregistrerClic(c: ClicSortant): Promise<boolean> {
     return false;
   }
 }
+
+/**
+ * Les passages sans parcours humain (voir `estUnPassageSansParcours`) ne vont
+ * PAS dans `bce:clicks:<jour>` : cette clé est partagée avec BetsRank, dont le
+ * tableau de bord compterait sinon un robot comme un visiteur. Ils sont gardés
+ * à part 30 jours — pour mesurer le robot, et pour qu'un vrai visiteur mal
+ * classé reste retrouvable par son clickId.
+ */
+export async function enregistrerPassageSuspect(c: ClicSortant): Promise<boolean> {
+  if (!redis) return false;
+  const cle = `w2p:clics-suspects:${new Date().toISOString().slice(0, 10)}`;
+  try {
+    const liste = lireClics(await redis.get(cle));
+    liste.push(entreeDeClic(c));
+    await redis.set(cle, JSON.stringify(liste.slice(-2000)), { ex: 60 * 60 * 24 * 30 });
+    return true;
+  } catch (erreur) {
+    console.error(`[clics] passage suspect ${c.clickId} non consigne :`, erreur);
+    return false;
+  }
+}

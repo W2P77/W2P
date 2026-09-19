@@ -61,3 +61,37 @@ export function lireVisiteur(h: Entetes): Visiteur {
     origine: viaDiscord ? 'discord' : 'web',
   };
 }
+
+/**
+ * Un appel de l'écran de sortie qui ne vient d'aucun parcours humain.
+ *
+ * ── Le cas qui l'a motivé (19/09/2026) ────────────────────────────────────
+ *
+ * 202 des 207 clics de la semaine étaient un robot : des serveurs OVH
+ * (141.94.x, 51.75.x, 149.202.x…) qui aspirent les fiches de jeux, suivent les
+ * liens `/go/<casino>?slot=<jeu>` — que `robots.txt` interdit pourtant — et
+ * repartent. Deux user-agents en tout (« Chrome 148 Windows », « iPhone iOS
+ * 13.2.3 »), aucun referer, deux casinos à une seconde d'écart depuis deux IP.
+ * Ils déclenchaient chacun un clic et une notification Discord, et Google
+ * Analytics ne voyait personne : un robot n'exécute pas le script de mesure.
+ *
+ * ── La règle ──────────────────────────────────────────────────────────────
+ *
+ * where2spin n'expose ses liens de sortie que sur ses propres pages et dans
+ * Discord. Un vrai clic porte donc un referer where2spin, ou vient de Discord.
+ * Sans l'un ni l'autre, c'est un appel direct — le robot. Les user-agents
+ * d'outils (curl, python…) sont écartés dans tous les cas.
+ *
+ * On ne bloque personne : un visiteur réel dont le navigateur masque le
+ * referer (rare) atteint quand même le casino. Seuls changent la comptabilité
+ * et le rafraîchissement automatique, que les robots suivent.
+ */
+export function estUnPassageSansParcours(v: Pick<Visiteur, 'referer' | 'origine' | 'userAgent'>): boolean {
+  if (!v.userAgent || /bot|crawl|spider|slurp|headless|python|curl|wget|axios|node-fetch|go-http|java\/|okhttp|scrapy|httpclient/i.test(v.userAgent)) return true;
+  if (v.origine === 'discord') return false;
+  try {
+    return !/(^|\.)where2spin\.com$/i.test(new URL(v.referer ?? '').hostname);
+  } catch {
+    return true;
+  }
+}

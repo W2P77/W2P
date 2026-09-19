@@ -2,6 +2,33 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-19 (2) — Les clics « français » étaient un robot OVH
+
+Des dizaines de clics FR par jour sur les fiches de jeux, et personne dans
+Google Analytics. **202 des 207 clics de la semaine venaient d'un robot** :
+des serveurs OVH (141.94.x, 51.75.x, 149.202.x, 57.129.x…) qui aspirent les
+fiches, suivent les liens `/go/<casino>?slot=<jeu>` — que `robots.txt` interdit
+déjà — et repartent. Deux user-agents en tout (« Chrome 148 Windows »,
+« iPhone iOS 13.2.3 »), aucun referer, 95 jeux parcourus dans l'ordre, deux
+casinos à une seconde d'écart depuis deux IP. Un robot n'exécute pas le script
+de mesure : d'où le silence d'Analytics. Les 5 vrais clics, eux, portaient un
+referer where2spin.
+
+L'écran de sortie enregistre le clic côté serveur, exprès (un bloqueur de
+scripts ne doit pas effacer un lead) : chaque passage du robot devenait donc un
+clic dans la clé partagée avec BetsRank, et une notification Discord. Et son
+`<meta refresh>` de repli l'envoyait jusqu'au réseau affilié avec un de nos
+clickIds — du faux trafic chez un partenaire, qui peut sanctionner.
+
+`estUnPassageSansParcours` : nos liens de sortie ne vivent que sur nos pages et
+dans Discord, donc un vrai clic porte un referer where2spin ou vient de Discord.
+Un appel direct est consigné à part (`w2p:clics-suspects:<jour>`, 30 jours,
+retrouvable par clickId), ne notifie personne, et perd le `<meta refresh>`. On
+ne bloque personne : la redirection JavaScript et le bouton restent, un humain
+passe toujours. Les 202 passages déjà inscrits dans `bce:clicks` sont laissés
+tels quels — les retirer imposerait de réécrire une clé partagée, pour une
+statistique passée.
+
 ## 2026-09-19 — Les relevés d'écran de BetsRank, et 384 preuves sans fondement
 
 **513 jeux Pragmatic relus à l'écran.** BetsRank a relu, capture par capture,
