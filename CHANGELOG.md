@@ -2,6 +2,54 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-20 (2) — le studio publie la structure, et ça vaut mieux que de la lire à l'écran
+
+**Ce qu'on a compris cette nuit.** Compter les lampes de part et d'autre d'une
+grille Wazdan ne dit pas le nombre de lignes : le studio utilise **trois
+conventions** et seuls les numéros les distinguent — 1→5 des deux côtés
+(miroir, 5 lignes), 1→10 à gauche et 11→20 à droite (20 lignes), impairs à
+gauche et pairs à droite (10 lignes). 33 valeurs lues « 10 » ont donc été
+**retirées** : dans la même série, `hot-slot-777-gold-crown` a 10 lignes et
+`hot-slot-777-rubies` en a 20. Les preuves sont annotées, pas supprimées.
+
+**La sortie n'était pas une meilleure lecture d'image, c'était une autre
+source.** Les studios publient la structure sur la fiche produit de chaque jeu,
+et la base porte déjà l'adresse de ces fiches dans `rtpSource`, héritée de la
+campagne RTP de septembre. `scripts/moissonner-specs-studio.ts` les relit :
+- **Endorphina** (`Reels and Rows: 5x3` + `Lines`) — **216 grilles et 217
+  lignes**, sur des jeux qu'on ne peut pas capturer depuis la France ;
+- **Wazdan** (`Reels / Lines`) — 172 lignes ;
+- **Amusnet** (`Reels` + `Reels position` + `Paylines`) ;
+- **Red Tiger et NetEnt**, qui partagent la plateforme d'Evolution et exposent
+  un bloc JSON `"rowsReels":"5x3"` / `"playLinesMax"` / `"winType"` — 537 fiches
+  dont aucune n'est capturable d'ici ;
+- **Spinomenal** (`<td>Paylines</td>`), qui complète les cabinets « hold & hit »
+  restés muets à l'écran.
+
+**La règle de priorité, payée deux fois :** la fiche produit ne remplit que les
+champs **vides**. Sur Black Hawk Deluxe, l'épée du décor affiche « 27 WIN
+LINES » quand la fiche produit dit 54 — **Wazdan recopie les specs du jeu de
+base sur ses variantes Deluxe**. Le panneau du jeu gagne, toujours.
+
+Deux autres pièges de lecture : sur la série « Coins », le studio écrit le
+nombre de **cases** là où on attend des rouleaux (« 12 Coins » = « 12 / 0 »
+pour une grille 4×3) ; et « Lines: 0 » n'est pas une donnée manquante, c'est un
+jeu **sans ligne de paiement** — toute la gamme Hold the Jackpot. Écrit
+« No paylines ».
+
+**`ecran-de-base.ts` ne fait plus travailler les lots pour rien.** Sur le lot
+W4, 30 % des fiches tirées ne pouvaient rien produire : des vidéo pokers, des
+bingos, un sic bo, et des fiches qui n'attendaient plus que des lignes désormais
+moissonnées. `--manque grille` ne sert que ce qui manque, et un relevé peut
+marquer une fiche **sans grille** (`"sansGrille": "raison"`) : elle sort du
+bassin pour de bon. 11 fiches marquées, dont trois grilles « à trous » qu'aucune
+notation ne décrit sans mentir — `magic-spins` est un anneau de 24 cases
+jouables dans un cadre 7×7 dont les coins et le centre sont morts.
+
+État : 6 070 fiches en ligne, **2 883 sans grille** (3 381 en début de nuit),
+2 845 sans lignes. Wazdan n'a plus que 2 fiches en attente, toutes deux à
+recapturer.
+
 ## 2026-09-20 — 1 495 démos retrouvées, la couverture passe de 67 % à 91 %
 
 **Le vrai goulot n'était pas la capture, c'était la démo.** 2 017 fiches

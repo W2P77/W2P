@@ -49,6 +49,8 @@ const arg = (nom: string) => {
 const ATELIER = arg('atelier') ?? '/tmp/atelier-base';
 const SAUVEGARDES = join(homedir(), 'Documents/GitHub/sauvegardes-betsrank');
 const AUTEUR = 'releve-ecran (lecture de chaque capture)';
+/** Marqueur des fiches qui n'ont pas de grille du tout : elles sortent du bassin. */
+const MARQUE_SANS_GRILLE = 'releve-ecran (jeu sans grille de rouleaux)';
 
 interface Capture { fichier: string; titre: string }
 
@@ -64,7 +66,15 @@ async function preparer() {
   const limite = Number(arg('limite') ?? 40);
   const jeux = await prisma.jeu.findMany({
     where: { rtpStudio: { not: null }, ...(studio ? { studio: { slug: studio } } : {}) },
-    select: { slug: true, nom: true, grille: true, lignesPaiement: true, captures: true },
+    select: {
+      slug: true, nom: true, grille: true, lignesPaiement: true, captures: true,
+      /*
+       * Les jeux sans rouleaux — video poker, bingo, sic bo — reviennent a
+       * chaque tirage et coutent une lecture pour rien. Un releve peut les
+       * marquer une fois pour toutes ; ce marqueur les sort du bassin.
+       */
+      preuves: { where: { champ: 'grille', verifieePar: MARQUE_SANS_GRILLE }, select: { id: true } },
+    },
     orderBy: { slug: 'asc' },
   });
 
@@ -76,11 +86,23 @@ async function preparer() {
    * chaque tirage. Un jeu à un seul symbole n'a d'ailleurs pas de ligne de
    * paiement à montrer : on ne le rappelle plus.
    */
-  const avecCaptures = jeux.filter((j) => Array.isArray(j.captures) && (j.captures as unknown as Capture[]).length > 0);
-  const candidats = [
-    ...avecCaptures.filter((j) => vide(j.grille)),
-    ...avecCaptures.filter((j) => !vide(j.grille) && vide(j.lignesPaiement) && String(j.grille) !== '1×1'),
-  ].slice(0, limite);
+  const avecCaptures = jeux
+    .filter((j) => j.preuves.length === 0)
+    .filter((j) => Array.isArray(j.captures) && (j.captures as unknown as Capture[]).length > 0);
+  /*
+   * `--manque grille` ne sert que les fiches sans grille. Chez les studios dont
+   * les lignes viennent desormais de la fiche produit (Wazdan, Endorphina,
+   * Red Tiger…), servir aussi celles qui n'attendent que des lignes fait
+   * travailler un lot pour rien : sur le lot W4, 30 % des fiches tirees ne
+   * pouvaient rien produire.
+   */
+  const manque = arg('manque');
+  const candidats = manque === 'grille'
+    ? avecCaptures.filter((j) => vide(j.grille)).slice(0, limite)
+    : [
+        ...avecCaptures.filter((j) => vide(j.grille)),
+        ...avecCaptures.filter((j) => !vide(j.grille) && vide(j.lignesPaiement) && String(j.grille) !== '1×1'),
+      ].slice(0, limite);
 
   mkdirSync(ATELIER, { recursive: true });
   console.log(`${candidats.length} fiches à relever${studio ? ` (studio ${studio})` : ''} — PNG dans ${ATELIER}\n`);
@@ -105,7 +127,7 @@ async function ecrire(chemin: string) {
   const appliquer = process.argv.includes('--appliquer');
   const lot = JSON.parse(readFileSync(chemin, 'utf-8')) as Record<
     string,
-    { grille?: string; lignes?: string; capture?: string; ou?: string }
+    { grille?: string; lignes?: string; capture?: string; ou?: string; sansGrille?: string }
   >;
   const jeux = await prisma.jeu.findMany({
     where: { slug: { in: Object.keys(lot) } },
@@ -121,9 +143,30 @@ async function ecrire(chemin: string) {
   }
 
   let ecrits = 0;
+  let marques = 0;
   const ignores: string[] = [];
   for (const jeu of jeux) {
     const r = lot[jeu.slug];
+    /*
+     * `sansGrille` marque un jeu qui n'a pas de rouleaux — video poker, bingo,
+     * sic bo, ou une grille « a trous » qu'aucune notation ne decrit. On ne
+     * remplit rien : on note pourquoi, et la fiche ne ressort plus des tirages.
+     */
+    if (r.sansGrille) {
+      console.log(`${jeu.slug} : marque sans grille — ${r.sansGrille}`);
+      marques++;
+      if (appliquer) {
+        await prisma.preuve.create({
+          data: {
+            jeuId: jeu.id, champ: 'grille', valeurBrute: '—', type: 'REGLES_DU_JEU',
+            url: jeu.demoUrl, libelle: 'Ecran de jeu de la demo officielle',
+            capture: ecranDeBase(jeu.captures as unknown as Capture[])?.fichier ?? null,
+            reference: 'ecran de base', verifieePar: MARQUE_SANS_GRILLE, note: r.sansGrille,
+          },
+        });
+      }
+      continue;
+    }
     const data: { grille?: string; lignesPaiement?: string } = {};
     if (r.grille && vide(jeu.grille)) data.grille = r.grille;
     else if (r.grille && String(jeu.grille) !== r.grille) ignores.push(`${jeu.slug} : grille en base « ${jeu.grille} », relevé « ${r.grille} » — non écrasée`);
@@ -162,7 +205,9 @@ async function ecrire(chemin: string) {
   }
 
   if (ignores.length) console.log(`\ncontredits, laissés en l'état (à traiter fiche par fiche) :\n  ${ignores.join('\n  ')}`);
-  console.log(appliquer ? `\nAPPLIQUÉ — ${ecrits} fiches` : `\nSIMULATION — ${ecrits} fiches ; relancer avec --appliquer`);
+  console.log(appliquer
+    ? `\nAPPLIQUÉ — ${ecrits} fiches${marques ? `, ${marques} marquées sans grille` : ''}`
+    : `\nSIMULATION — ${ecrits} fiches${marques ? `, ${marques} à marquer sans grille` : ''} ; relancer avec --appliquer`);
   await prisma.$disconnect();
 }
 
