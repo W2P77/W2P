@@ -2,6 +2,61 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-21 (2) — Play'n GO : 180 « demos » dont aucune n'etait jouable
+
+La campagne de captures Play'n GO a echoue **20 fois sur 20**. Le journal
+accusait l'adaptateur — « icone des regles introuvable », qui est le
+diagnostic d'un adaptateur casse. Il n'y etait pour rien : **aucune des 180
+`demoUrl` du studio ne menait a un jeu.**
+
+     150  www.playngo.com/games/<slug>/        la page PRODUIT, pas une demo
+      30  demo.playngo.com/RGSGameLaunch/...   hote qui ne resout plus
+
+D'ou les deux symptomes exactement : `ERR_NAME_NOT_RESOLVED` pour les 30,
+« icone des regles introuvable » pour les 150 — il n'y avait aucun jeu dans
+la page, donc aucune icone.
+
+**La lecon** : un echec de capture peut n'avoir aucun rapport avec la capture.
+Avant de retoucher un adaptateur, verifier que l'URL mene a un jeu. Vingt
+chargements ont ete payes pour l'apprendre.
+
+### Le lanceur vit, sur un troisieme hote
+
+La page produit expose un lanceur jouable :
+
+    asccw.playngonetwork.com/casino/ContainerLauncher?pid=2&gid=<gid>
+      &lang=en_GB&practice=1&channel=desktop&demo=2
+
+`released.playngonetwork.com` sert la meme chose pour certains titres.
+Verifie de bout en bout sur `animal-madness` : le jeu se charge, canvas
+rempli, ecran d'intro affiche.
+
+**L'identifiant ne se deduit pas.** `1001-mystery-genie-fortunes` donne
+`gid=geniefortunes` ; `24k-dragon` donne `twentyfourkdragon` ; l'ancienne URL
+morte, elle, ecrivait `DawnOfEgypt` en casse chameau. On **lit** donc chaque
+page produit, on ne fabrique aucune URL — la regle qui avait deja permis de
+retrouver 1 495 demos sans en inventer une seule.
+
+**Il faut un navigateur** : `www.playngo.com` rend **un octet** a un `curl`
+nu, et le lanceur est pose par JavaScript, absent du HTML d'origine.
+
+`scripts/trouver-demos-playngo.ts` traite les **434** fiches du studio, pas
+seulement les 180 qui portaient deja une URL : les 254 autres n'avaient
+aucune demo, et leur page produit se derive du slug. Sauvegarde prealable des
+434 lignes dans `sauvegardes-betsrank/`. Les pages produit absentes rendent un
+404 franc et sont comptees comme manques — un slug qui differe chez le studio
+est un manque honnete, pas une occasion d'inventer.
+
+### En attente
+
+`scripts/relever-config-gati.ts` est ecrit mais **pas encore execute** : il
+releve `gameData.slotConfig` des ~55 jeux Yggdrasil de la famille GATI
+recente. Il n'ecrit rien en base, volontairement — `slotConfig` porte `rtp`
+(un scalaire) **et** `RTP` (un tableau de seize entrees dont on ignore encore
+ce qu'il enumere). Le schema previent en en-tete qu'un jeu n'a pas « un » RTP
+et que quatre fiches Red Tiger ont deja porte le palier operateur a la place
+de la valeur studio. On lit le tableau avant de decider.
+
 ## 2026-09-21 — le detecteur de moteur nommait l'analytics, et GATI livre son RTP
 
 ### Un nom de moteur qui varie pour un meme moteur casse la mesure
