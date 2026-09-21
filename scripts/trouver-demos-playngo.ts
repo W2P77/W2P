@@ -108,22 +108,41 @@ async function main() {
   for (const [i, jeu] of jeux.entries()) {
     /* La page produit : soit la `demoUrl` actuelle l'est deja, soit on la
      * derive du slug — mais on ne derive JAMAIS l'URL du lanceur. */
-    const page = jeu.demoUrl && /www\.playngo\.com\/games\//.test(jeu.demoUrl)
-      ? jeu.demoUrl
-      : `https://www.playngo.com/games/${jeu.slug}/`;
+    /*
+     * Plusieurs pages produit a essayer, et c'est notre faute, pas celle du
+     * studio : 27 slugs portent « apos » — `mermaid-apos-s-diamond` pour
+     * « Mermaid's Diamond ». L'apostrophe est arrivee echappee en `&apos;`
+     * puis a ete slugifiee telle quelle.
+     *
+     * On ne corrige PAS le slug ici : c'est une URL publique du site, et le
+     * site est en cours d'indexation. On essaie les variantes pour recuperer
+     * la demo maintenant, et la question du slug se tranche a part.
+     */
+    const variantes = [
+      ...(jeu.demoUrl && /www\.playngo\.com\/games\//.test(jeu.demoUrl) ? [jeu.demoUrl] : []),
+      `https://www.playngo.com/games/${jeu.slug}/`,
+      ...(jeu.slug.includes('apos')
+        ? [
+            `https://www.playngo.com/games/${jeu.slug.replace(/-apos-s-/g, 's-').replace(/-apos-/g, '-')}/`,
+            `https://www.playngo.com/games/${jeu.slug.replace(/-apos-s-/g, '-').replace(/-apos-/g, '')}/`,
+          ]
+        : []),
+    ];
+    const page = variantes[0];
 
     const t: Trouvaille = { slug: jeu.slug, nom: jeu.nom, avant: jeu.demoUrl ?? '(aucune)', page, trouve: null };
     const p = await ctx.newPage();
-    try {
-      const rep = await p.goto(page, { waitUntil: 'domcontentloaded', timeout: 45_000 });
-      if (rep && rep.status() !== 200) t.note = `page produit en statut ${rep.status()}`;
-      else {
+    for (const essai of [...new Set(variantes)]) {
+      try {
+        const rep = await p.goto(essai, { waitUntil: 'domcontentloaded', timeout: 45_000 });
+        if (rep && rep.status() !== 200) { t.note = `page produit en statut ${rep.status()}`; continue; }
         await p.waitForTimeout(3_000);
         t.trouve = choisir((await p.evaluate(CHERCHER)) as string[]);
-        if (!t.trouve) t.note = 'aucun lanceur dans la page';
+        if (t.trouve) { t.page = essai; t.note = undefined; break; }
+        t.note = 'aucun lanceur dans la page';
+      } catch (e) {
+        t.note = String(e).slice(0, 90);
       }
-    } catch (e) {
-      t.note = String(e).slice(0, 90);
     }
     await p.close();
 

@@ -2,6 +2,46 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-21 (3) — Play'n GO : 350 demos retrouvees, et l'adaptateur marchait
+
+Suite de l'entree (2). La passe a lu les 434 pages produit du studio.
+
+**351 lanceurs retrouves.** Etat REEL relu en base apres ecriture, jamais dans
+le fichier de sortie :
+
+     323  asccw.playngonetwork.com        lanceur vivant
+      27  released.playngonetwork.com     lanceur vivant
+      63  (aucune demo)                   page produit en 404
+      17  www.playngo.com                 page chargee, aucun lanceur dedans
+       3  demo.playngo.com                hote mort, variante non trouvee
+       1  qapromo01-cw.playngonetwork.com PREPRODUCTION — voir plus bas
+
+**L'adaptateur n'avait jamais ete en cause.** Capture d'essai sur 5 jeux avec
+les URL reparees : **4 sur 5 rendent des captures** (2 a 9 chacune), la ou 20
+sur 20 echouaient avant. Le panneau de regles sort propre — lignes de paiement,
+regles du wild, table des gains lisibles.
+
+Reste un defaut, plus etroit : **le RTP n'est pas lu** (« Image too small to
+scale » — l'OCR se trompe de recadrage sur ce moteur). Les captures se
+publient independamment du RTP, donc le chantier avance quand meme.
+
+### Deux choses a ne pas oublier
+
+**`scourge-of-rome` pointe un hote de PREPRODUCTION** (`qapromo01-cw`, et
+`pid=4` au lieu de `pid=2`). C'est ce que la page produit publiait. Le jeu se
+charge, mais un build QA peut differer de la production : toute donnee
+capturee dessus est a traiter avec suspicion, pas a verser telle quelle.
+
+**27 slugs portent « apos »** — `mermaid-apos-s-diamond` pour « Mermaid's
+Diamond », `casino-hold-apos-em` pour « Casino Hold'em ». L'apostrophe est
+arrivee echappee en `&apos;` puis a ete slugifiee telle quelle. Tous chez
+Play'n GO.
+
+Le moissonneur essaie desormais les variantes de slug pour retrouver la page
+produit, **sans toucher au slug en base** : c'est une URL publique du site, et
+le site est en cours d'indexation depuis le 12/09. Changer 27 URL demande des
+redirections et se decide — ca ne se glisse pas dans un correctif de demos.
+
 ## 2026-09-21 (2) — Play'n GO : 180 « demos » dont aucune n'etait jouable
 
 La campagne de captures Play'n GO a echoue **20 fois sur 20**. Le journal
