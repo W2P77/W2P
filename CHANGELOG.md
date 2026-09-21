@@ -2,6 +2,57 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-21 (4) — 48 % du catalogue sans RTP : ou peut-on encore aller le chercher
+
+**5 588 jeux sur 11 658 n'ont pas de RTP**, et **aucun** ne porte de
+`rtpSource`. `moissonner-specs-studio.ts`, qui relit une adresse deja visitee,
+ne peut donc rien pour eux : il n'y a pas d'adresse. La question prealable
+n'etait pas « comment lire » mais **« y a-t-il quelque chose a lire »**.
+
+`scripts/_tmp-sonder-sources-rtp.ts` repond, studio par studio : il prend
+l'inventaire decrit par `ouSourcer`, tire une fiche produit, et dit si un taux
+y figure. Il n'ecrit rien.
+
+### Le gisement, sur les 25 studios a ≥100 jeux manquants
+
+    PUBLIE, verifie              645   microgaming 214, gamomat 203,
+                                       dragon 128, eyecon 100
+    taux present, a confirmer    619   octoplay, nucleus, airdice,
+                                       felix, reevo
+    ne publie pas              1 255   tada, synot, mascot, amigogaming,
+                                       urgentgames, merkur, tomhorn
+    inventaire non descendu      460   swintt, platipus, amatic
+    injoignable (500)            231   spinoro
+    pas d'inventaire connu     1 147   yggdrasil 525, playn-go 254,
+                                       quickspin, elk, thunderkick
+
+**645 jeux sont atteignables des maintenant**, et vraisemblablement plus de
+1 200 une fois les « a confirmer » tranches. Les « ne publie pas » reposent sur
+**une seule page** chacun : c'est une presomption, pas un verdict.
+
+### Trois pannes de l'outil, et ce qui les a revelees
+
+Le premier tableau donnait **« ne publie pas » pour 18 studios**. Il etait
+entierement faux. Trois defauts successifs, tous du meme genre — l'outil
+rendait un resultat plausible en ayant regarde autre chose :
+
+1. **Les URL etaient lues dans le texte brut du XML**, pas dans les `<loc>`.
+   Les premieres URL d'un sitemap sont les espaces de noms : la sonde a teste
+   `http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd` pour 18 studios.
+2. **Le motif exigeait qu'aucun `%` ne separe le mot de la valeur**
+   (`[^%]{0,120}`). Or Microgaming ecrit son libelle « **RTP %** » : le `%` du
+   libelle arretait la recherche au caractere suivant.
+3. **Un sitemap d'index n'etait pas descendu.** Onze studios rendaient
+   « inventaire lu, aucune fiche produit » — un verdict sur notre outil
+   presente comme un verdict sur le studio. Apres correction, trois d'entre
+   eux publient.
+
+**Ce qui a sauve la mesure : un temoin connu-positif.** `96,05 %` avait ete lu
+a la main sur une fiche Microgaming ; quand la sonde l'a declaree muette, le
+desaccord a revele la panne. La sonde teste desormais ce temoin **avant** le
+tableau et s'arrete s'il echoue — un tableau entierement faux ressemble
+exactement a un tableau entierement vrai.
+
 ## 2026-09-21 (3) — Play'n GO : 350 demos retrouvees, et l'adaptateur marchait
 
 Suite de l'entree (2). La passe a lu les 434 pages produit du studio.
