@@ -245,15 +245,37 @@ async function moteur(page: Page): Promise<Moteur> {
     // Le 302 du lanceur a mené à un `AccessDenied` S3 : la démo est retirée.
     if (/AccessDenied/.test(document.documentElement.textContent ?? '')) return { inconnu: 'RETIRE' };
     if (document.querySelector('#rules_popup') && 'lgpCallbacks' in window) return 'reelplay';
-    const nom = document.querySelector('#f40CheatPanel')
-      ? 'F40'
-      : document.querySelector('.canvasContainer')
-        ? 'Bulletproof'
-        : document.querySelector('#app')
-          ? 'Vue'
-          : (document.querySelector('script[src]') as HTMLScriptElement | null)?.getAttribute('src')?.slice(0, 30) ??
-            'sans script';
-    return { inconnu: nom };
+    if (document.querySelector('#f40CheatPanel')) return { inconnu: 'F40' };
+    if (document.querySelector('.canvasContainer')) return { inconnu: 'Bulletproof' };
+    if (document.querySelector('#app')) return { inconnu: 'Vue' };
+
+    /*
+     * Faute de marqueur, on nomme le moteur par son script — mais pas
+     * n'importe lequel, et pas tel quel.
+     *
+     * Premiere version : le PREMIER `script[src]` de la page. Sur 86 jeux,
+     * 18 se sont ainsi appeles « googletagmanager » ou
+     * « google-analytics » : le marqueur d'audience est charge avant le
+     * moteur, donc il gagnait. Et quatre jeux d'une meme famille sont sortis
+     * sous quatre noms differents — `./preloader.js?v=607.0.0`,
+     * `?v=489.0.0`, `?v=0.0.948` — parce que la version fait partie de l'URL.
+     *
+     * Un nom qui varie pour un meme moteur empeche de voir ce qui domine :
+     * c'est la mesure qu'on casse, pas seulement la lisibilite.
+     */
+    const TIERS = /google-analytics|googletagmanager|gtag|hotjar|sentry|newrelic|cloudflare|facebook\.net|doubleclick/i;
+    const scripts = [...document.querySelectorAll('script[src]')]
+      .map((s) => s.getAttribute('src') ?? '')
+      .filter((src) => src && !TIERS.test(src));
+
+    const brut = scripts[0];
+    if (!brut) return { inconnu: 'sans script' };
+
+    /* On garde le nom de fichier, sans hash de build ni version. */
+    const nom = (brut.split('?')[0].split('/').pop() || brut)
+      .replace(/[.-][0-9a-f]{8,}(?=\.)/i, '')
+      .slice(0, 30);
+    return { inconnu: nom || 'sans nom' };
   });
 }
 

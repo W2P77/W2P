@@ -2,6 +2,61 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-21 — le detecteur de moteur nommait l'analytics, et GATI livre son RTP
+
+### Un nom de moteur qui varie pour un meme moteur casse la mesure
+
+Faute de marqueur, `adaptateur-yggdrasil.ts` nommait le moteur inconnu par le
+PREMIER `script[src]` de la page. Sur 86 jeux, **18 se sont appeles
+« googletagmanager » ou « google-analytics »** : le marqueur d'audience est
+charge avant le moteur, donc il gagnait. Et quatre jeux d'une meme famille
+sont sortis sous quatre noms — `preloader.js?v=607.0.0`, `?v=489.0.0`,
+`?v=0.0.948` — parce que la version fait partie de l'URL.
+
+Ce n'est pas un defaut de lisibilite : c'est la mesure qu'on casse. On ne peut
+pas decider quel moteur prendre en charge ensuite si un moteur compte pour
+quatre. Corrige : les scripts tiers sont ecartes, et le nom est reduit au
+fichier sans hash de build ni version.
+
+### La campagne de nuit : 38 jeux publies, et pourquoi si peu
+
+Huit studios enchaines. `playn-go` et `bgaming` **n'ont jamais tourne** —
+`P1001`, Supabase injoignable pendant leur creneau, a relancer tels quels.
+`yggdrasil` a tourne 17 h pour traiter **86 jeux sur 432**, dont 83 % sautes :
+2 minutes de pause par jeu (precaution de debit) plus 20 s de detection avant
+d'abandonner. Campagne arretee — corriger d'abord, relancer ensuite.
+
+Ce que le journal disait vraiment, une fois les noms nettoyes : **F40 20 jeux,
+Bulletproof 14**, tous deux deja *identifies* par le detecteur et simplement
+pas *pris en charge*. La moitie des echecs.
+
+### GATI recent expose son RTP dans sa configuration
+
+Sonde sur `2-fast-2-fruity` (Bulletproof / GATI recent, `PlatformGati.js` —
+pas la variante `gcw` que l'adaptateur connait). Le moteur est du **canvas
+pur** : `longueurTexte: 0`, aucun texte dans le DOM, donc aucun reglement
+lisible en HTML. Mais la page expose `gameData`, et dedans :
+
+    gameData.slotConfig.rtp = "0.94"
+
+Verifie contre la source du studio : yggdrasilgaming.com publie **« 94.0% and
+more »**, options 94,0 % et 90,5 %. La demo tourne donc sur l'option **haute**,
+et la configuration dit **laquelle est active** — ce que la page studio, elle,
+ne dit pas. C'est une source plus precise que le studio, et sans OCR.
+
+`slotConfig` porte aussi `paylines`, `defaultNumLines`, `prizeTable` et
+`coinSizes` : de quoi remplir grille et lignes de paiement au passage.
+
+**Prudence conservee** : un RTP lu dans la configuration peut etre une
+variante reduite — c'est deja arrive chez Reel Play (`rtp_variant_active`).
+Ici la confrontation a la page studio a valide la valeur ; elle restera
+obligatoire, valeur par valeur.
+
+**Ne se generalise pas.** Sonde sur `10000-bc-2-doublemax` (F40) : aucune des
+globales attendues, `gameData` absent. Les 20 F40 demandent leur propre
+reconnaissance. La route « RTP par la configuration » vaut pour la famille
+GATI recent / Bulletproof, soit ~55 jeux.
+
 ## 2026-09-20 (2) — le studio publie la structure, et ça vaut mieux que de la lire à l'écran
 
 **Ce qu'on a compris cette nuit.** Compter les lampes de part et d'autre d'une
