@@ -2,6 +2,39 @@
 
 Ce qui a été fait, pourquoi, et les pièges rencontrés. Une entrée par commit.
 
+## 2026-09-24 — le catalogue casino avait pris du retard sur BetsRank
+
+Les deux sites partagent les **memes identifiants numeriques** : un casino
+ajoute d'un cote garde son id de l'autre. C'est ce qui permet de les
+rapprocher sans table de correspondance — mais rien ne les tient ensemble, et
+W2S avait derive sur deux points.
+
+**Trois marques masquees sur BetsRank y etaient encore actives** : Pandibet,
+GxBet et Instasino. Une marque masquee d'un cote et vivante de l'autre envoie
+du trafic vers un deal arrete. Desactivees.
+
+**Les cinq marques ajoutees les 23 et 24/09 y etaient absentes** : VegasNova,
+BoomsBet, CrownSlots, Evospin, WinHero. Creees avec leurs logos, leurs notes
+et leurs liens d'affiliation.
+
+### Les deux sites ne nomment pas les studios pareil
+
+Premiere execution : l'intersection des cles de studio ecartait **Play'n GO,
+Pragmatic et Nolimit City** — les plus presents du catalogue. BetsRank colle
+les mots (`playngo`, `pragmatic`, `nolimit`), W2S met des traits d'union
+(`playn-go`, `pragmatic-play`, `nolimit-city`).
+
+Sans table de correspondance, VegasNova serait sorti avec **21 studios sur
+41**, BoomsBet avec 2 sur 4. Les casinos ne seraient apparus que sur une
+fraction des fiches de jeu — aucune erreur, aucun test rouge, juste des
+recommandations qui ne s'affichent pas. Avec les alias : 28, 3, 7, 4 et 3.
+
+Les rejets restants sont des studios que W2S n'a reellement pas a son
+catalogue : les garder laisserait croire a une couverture qui n'existe pas.
+
+Sauvegarde des 47 lignes avant ecriture dans `sauvegardes-betsrank/`, et
+verification faite **en relisant la base**, pas le fichier d'entree.
+
 ## 2026-09-21 (4) — 48 % du catalogue sans RTP : ou peut-on encore aller le chercher
 
 **5 588 jeux sur 11 658 n'ont pas de RTP**, et **aucun** ne porte de
